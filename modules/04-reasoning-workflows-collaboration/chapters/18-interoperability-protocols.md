@@ -67,15 +67,15 @@ sequenceDiagram
     participant C as Client
     participant A as Adapter
     participant D as Domain
-    C->>A: initialize(version)
-    A-->>C: negotiated or version_mismatch
+    C->>A: start and offer a protocol version
+    A-->>C: version agreed or incompatible
     C->>A: discover
     A-->>C: capability descriptions
     C->>A: request(identity, scope, task)
     A->>A: authorize and validate
     A->>D: typed request
     D-->>A: progress or artifact
-    C->>A: cancel(task)
+    C->>A: ask to cancel the task
     A-->>C: cancelled or completed
 ```
 

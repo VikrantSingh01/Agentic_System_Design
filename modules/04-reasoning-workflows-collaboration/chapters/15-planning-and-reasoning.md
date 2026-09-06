@@ -46,9 +46,9 @@ before any step runs.
 
 ```mermaid
 flowchart LR
-    A[T1: gather sources<br/>budget 2, low uncertainty] --> B[T2: compare claims<br/>budget 1]
-    A --> C[T3: check citations<br/>budget 1]
-    B --> D[T4: draft report<br/>expected artifact]
+    A[Gather] --> B[Compare]
+    A --> C[Check]
+    B --> D[Draft]
     C --> D
 ```
 
@@ -56,8 +56,9 @@ flowchart LR
 artifacts are enough to operate a plan without storing hidden reasoning.
 
 **Equivalent text description:** gathering sources must finish before comparison and
-citation checking. Both must finish before drafting. Each task has an ID and budget;
-the final task names its expected artifact.
+citation checking. Both must finish before drafting. The plan record keeps each task's
+ID, budget, uncertainty marker, and expected artifact even though the beginner diagram
+shows only the action names.
 
 ### Validate, execute, or replan
 

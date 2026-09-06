@@ -39,6 +39,23 @@ the instruction "please do this only once."
 
 ## Picture the idea
 
+### A beginner path
+
+```mermaid
+flowchart LR
+    A[Accepted] --> R[Ready]
+    R --> W[Working]
+    W --> P[Waiting]
+    P --> F[Finished]
+```
+
+**Takeaway:** a durable run moves through named, saved states instead of relying on
+one worker's memory.
+
+**Equivalent text description:** a request is accepted, becomes ready, starts working,
+waits when it needs an outside event, and then finishes. The detailed model below adds
+the alternate paths needed in a real runtime.
+
 ### Durable run states
 
 ```mermaid
@@ -73,13 +90,13 @@ sequenceDiagram
     participant S as State store
     participant P as Publisher double
     participant W2 as Worker 2
-    Q->>W1: activity A, lease L1
-    W1->>S: commit intent and key K
-    W1->>P: publish with K
+    Q->>W1: activity A, lease identifier 1
+    W1->>S: commit intent and idempotency key
+    W1->>P: publish with idempotency key
     W1--xS: crash before outcome commit
     Q->>W2: redeliver activity A
-    W2->>S: load checkpoint and intent K
-    W2->>P: lookup K
+    W2->>S: load checkpoint and idempotency key
+    W2->>P: look up idempotency key
     P-->>W2: existing receipt
     W2->>S: commit reconciled outcome
 ```
