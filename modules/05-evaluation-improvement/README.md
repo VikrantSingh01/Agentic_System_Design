@@ -6,11 +6,11 @@ Define quality, construct representative evaluation sets, calibrate evaluators, 
 
 ## Chapters
 
-19. **What Does Good Mean?**
-20. **Building Evaluation Sets**
-21. **Evaluators**
-22. **Agent and Tool Evaluation**
-23. **Debugging and Optimization**
+19. [**What Does Good Mean?**](chapters/19-what-does-good-mean.md)
+20. [**Building Evaluation Sets**](chapters/20-building-evaluation-sets.md)
+21. [**Evaluators**](chapters/21-evaluators.md)
+22. [**Agent and Tool Evaluation**](chapters/22-agent-and-tool-evaluation.md)
+23. [**Debugging and Optimization**](chapters/23-debugging-and-optimization.md)
 
 ## Northstar milestone
 
