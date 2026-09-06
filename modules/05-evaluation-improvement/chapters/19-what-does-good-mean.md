@@ -409,7 +409,7 @@ Evaluate the evaluation contract itself:
 - [ ] Failed thresholds have release, review, and rollback actions.
 - [ ] Metric drift and proxy gaming have a review cadence.
 
-## Production implications
+### Production implications
 
 Metric contracts become release dependencies. Store them with code and dataset
 versions, restrict changes to named owners, and make comparison tools reject

@@ -510,6 +510,18 @@ Authentication identifies the worker but does not grant every user's authority. 
 must carry and revalidate delegated context. Broad application authority can turn the worker
 into a confused deputy and bypass tenant or source permissions.
 
+## Recap and next step
+
+- User delegation and workload identity answer different authorization questions.
+- Tenant and principal context must survive and be checked at every boundary.
+- Minimize before model input, logs, memory, evaluation copies, and approvals.
+- Deletion covers primary and derived copies while documenting backup expiry and exceptions.
+- Content safety and accessibility require measurable behavior, escalation, and correction.
+- Legal and regulatory conclusions belong to qualified review, not code assumptions.
+
+Chapter 27 turns these artifacts into named accountability, meaningful oversight, incident and
+stop authority, vendor and change review, evidence freshness, and release decisions.
+
 ## Design exercise
 
 Choose a cache design for a permission-aware source:
@@ -532,18 +544,6 @@ checklist described above. Delete all temporary data after the run.
 
 Deliver the principal trace, data inventory, isolation and lifecycle tests, content-safety
 matrix, accessibility review record, and unresolved qualified-review register.
-
-## Recap and next step
-
-- User delegation and workload identity answer different authorization questions.
-- Tenant and principal context must survive and be checked at every boundary.
-- Minimize before model input, logs, memory, evaluation copies, and approvals.
-- Deletion covers primary and derived copies while documenting backup expiry and exceptions.
-- Content safety and accessibility require measurable behavior, escalation, and correction.
-- Legal and regulatory conclusions belong to qualified review, not code assumptions.
-
-Chapter 27 turns these artifacts into named accountability, meaningful oversight, incident and
-stop authority, vendor and change review, evidence freshness, and release decisions.
 
 ## Sources
 

@@ -360,7 +360,7 @@ reproduce the failure independently of protected holdout answers.
 - [ ] Gate output contains case and metric reason codes.
 - [ ] Rollback and override conditions are explicit and tested.
 
-## Production implications
+### Production implications
 
 Store experiment records beside release evidence. Automate compatibility
 checks before comparison. Route failures to component owners using stable

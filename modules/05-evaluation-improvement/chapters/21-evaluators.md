@@ -351,7 +351,7 @@ failures even when overall agreement is high.
 - [ ] Drift checks and recalibration triggers are scheduled.
 - [ ] No private chain-of-thought is requested, stored, or scored.
 
-## Production implications
+### Production implications
 
 Run deterministic evaluators synchronously where possible and queue expensive
 rubric or human review. Protect calibration labels from the system under test.

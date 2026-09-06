@@ -499,6 +499,19 @@ evidence, handling incidents, reviewing changes, enabling oversight, and stoppin
 the system. A document can carry that work, but a label without operating evidence and decision
 rights does not perform it.
 
+## Recap and next step
+
+- Governance connects intended use and material risk to named decisions and current evidence.
+- Meaningful oversight requires accessible understanding, edit, rejection, stop, and recovery.
+- Incidents need prepared containment, kill, evidence, communication-input, and restart paths.
+- Vendor and system changes reopen evaluation and security questions.
+- Laws, standards, and principles inform qualified review but do not prove compliance.
+
+Module 7 receives the accepted threat boundaries, capabilities, identity and lifecycle
+requirements, evidence schemas, owners, incident routing, oversight measures, kill authority,
+and unresolved review conditions. Production architecture may distribute these responsibilities,
+but it may not weaken them.
+
 ## Design exercise
 
 An indirect-injection regression fails one release test, while ordinary report quality improves.
@@ -517,19 +530,6 @@ red-team register and vendor review, then conduct the tabletop release and incid
 Deliver the governance record, meaningful-oversight plan, incident and kill runbook, restart
 criteria, red-team register, vendor review, qualified-review register, and a cumulative Module 6
 evidence index mapping controls to threats, tests, results, owners, dates, and limitations.
-
-## Recap and next step
-
-- Governance connects intended use and material risk to named decisions and current evidence.
-- Meaningful oversight requires accessible understanding, edit, rejection, stop, and recovery.
-- Incidents need prepared containment, kill, evidence, communication-input, and restart paths.
-- Vendor and system changes reopen evaluation and security questions.
-- Laws, standards, and principles inform qualified review but do not prove compliance.
-
-Module 7 receives the accepted threat boundaries, capabilities, identity and lifecycle
-requirements, evidence schemas, owners, incident routing, oversight measures, kill authority,
-and unresolved review conditions. Production architecture may distribute these responsibilities,
-but it may not weaken them.
 
 ## Sources
 

@@ -69,7 +69,7 @@ flowchart LR
 **Takeaway:** a request does not reach a tool until a deterministic gate allows it; denial ends
 in a safe stop.
 
-**Equivalent text description:** the user sends a request through the application programming
+**Step by step:** the user sends a request through the application programming
 interface to the agent runtime. The runtime presents a typed action to a deterministic policy
 gate. An allowed action reaches the bounded tool; denial at the gate stops safely.
 
@@ -96,7 +96,7 @@ flowchart LR
 **Takeaway:** every crossing changes what can be trusted; model output and retrieved content
 remain proposals or data, never authority.
 
-**Equivalent text description:** the user crosses into the application programming interface
+**Step by step:** the user crosses into the application programming interface
 with identity and a question. The application programming interface passes an authenticated
 task to the runtime. The runtime separately calls the model, retrieval path, memory, approval
 service, and evidence store. Retrieval reauthorizes at the source and returns labeled untrusted
@@ -117,7 +117,7 @@ flowchart LR
 **Takeaway:** authorized retrieval does not make source content trusted, and a model response
 remains a proposal without authority.
 
-**Equivalent text description:** a synthetic source contains a hostile sentence. Retrieval is
+**Step by step:** a synthetic source contains a hostile sentence. Retrieval is
 allowed because the user may read that source, but the returned text is labeled untrusted. A
 deterministic model double may follow it and propose publication, but that output remains a typed
 proposal.
@@ -126,15 +126,15 @@ proposal.
 
 ```mermaid
 flowchart TD
-    P[Typed proposal] --> V{Closed-schema validation}
+    TP[Typed proposal] --> V{Closed-schema validation}
     V -->|invalid| Z[Denied]
     V -->|valid| A{Delegated authority?}
     A -->|no| Z
     A -->|yes| G{Destination allowlisted?}
     G -->|no| Z
-    G -->|yes| P{Exact approval valid?}
-    P -->|no| Z
-    P -->|yes| T[Bounded tool call]
+    G -->|yes| AP{Exact approval valid?}
+    AP -->|no| Z
+    AP -->|yes| T[Bounded tool call]
     Z --> E[Redacted evidence]
     T --> E
 ```
@@ -142,7 +142,7 @@ flowchart TD
 **Takeaway:** the model may follow hostile text, but deterministic checks outside the model
 break the path before data leaves the system.
 
-**Equivalent text description:** closed-schema validation can reject malformed arguments.
+**Step by step:** closed-schema validation can reject malformed arguments.
 Delegated authorization rejects excess authority. The egress allowlist rejects an unknown
 destination. Exact approval rejects an unapproved payload. Only a proposal that passes every
 check reaches the bounded tool. Either result emits redacted evidence without source text.
@@ -165,7 +165,7 @@ flowchart LR
 **Takeaway:** controls reduce risk but do not erase it; a named owner must decide what happens
 to the residual risk using current evidence.
 
-**Equivalent text description:** identify assets and abuse paths, prioritize them by credible
+**Step by step:** identify assets and abuse paths, prioritize them by credible
 consequence and likelihood assumptions, then choose prevention, detection, containment, and
 recovery controls. Test those controls and reassess the system. Changes restart the loop. The
 remaining risk receives an explicit decision to accept, remediate, transfer, or avoid it.
@@ -325,6 +325,11 @@ class Decision:
 ALLOWED_TOOLS = {"search_sources", "store_draft"}
 ALLOWED_DESTINATIONS = {"tenant-a/drafts"}
 PROTECTED_MARKER = "DEMO-PROTECTED-2401"
+AUTHORITY_FLOW_NODE_IDS = ("TP", "V", "Z", "A", "G", "AP", "T", "E")
+
+# Regression: proposal and approval are distinct stages and every diagram ID is unique.
+assert len(AUTHORITY_FLOW_NODE_IDS) == len(set(AUTHORITY_FLOW_NODE_IDS))
+assert AUTHORITY_FLOW_NODE_IDS[0] != AUTHORITY_FLOW_NODE_IDS[5]
 
 
 def decide(
@@ -531,6 +536,18 @@ network egress, tenant authorization, tool scope, approval binding, secret isola
 rollback. Prompt instructions are one layer, but deterministic controls outside the model must
 contain a bad proposal.
 
+## Recap and next step
+
+- Threat modeling begins with the real system, assets, actors, boundaries, and intended use.
+- Retrieved content and model output never grant authority.
+- Controls must prevent, detect, contain, and support recovery from named abuse paths.
+- Tests should exercise unsafe proposals, not depend on perfect hostile-text detection.
+- Residual risk remains an owned decision backed by current evidence.
+
+Chapter 25 uses these threats and fixtures to replace broad tool access with narrow
+capabilities, secret isolation, egress control, approval binding, revocation, and explicit
+sandbox requirements.
+
 ## Design exercise
 
 Design a threat model for adding an internal `share_report` tool. Compare two options:
@@ -557,18 +574,6 @@ The complete lab should produce:
 - a deterministic adversarial fixture;
 - a minimized expected policy trace;
 - passing ordinary and hostile regression cases.
-
-## Recap and next step
-
-- Threat modeling begins with the real system, assets, actors, boundaries, and intended use.
-- Retrieved content and model output never grant authority.
-- Controls must prevent, detect, contain, and support recovery from named abuse paths.
-- Tests should exercise unsafe proposals, not depend on perfect hostile-text detection.
-- Residual risk remains an owned decision backed by current evidence.
-
-Chapter 25 uses these threats and fixtures to replace broad tool access with narrow
-capabilities, secret isolation, egress control, approval binding, revocation, and explicit
-sandbox requirements.
 
 ## Sources
 

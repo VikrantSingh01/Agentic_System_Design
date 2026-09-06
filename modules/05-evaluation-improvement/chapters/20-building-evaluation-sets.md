@@ -373,7 +373,7 @@ Accept a dataset version only when:
 - [ ] Dataset changes create a new version and comparability decision.
 - [ ] Retired or disputed labels remain traceable.
 
-## Production implications
+### Production implications
 
 Treat evaluation data as governed data, not a loose test folder. Separate
 metadata from answer-bearing holdout records, use least-privilege access,

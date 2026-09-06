@@ -355,7 +355,7 @@ component is nondeterministic.
 - [ ] Traces have tenant isolation, access control, retention, and deletion.
 - [ ] No private chain-of-thought is collected or expected.
 
-## Production implications
+### Production implications
 
 Capture stable internal events before mapping them to a telemetry vendor.
 Sample ordinary traces only after preserving all required safety and failure

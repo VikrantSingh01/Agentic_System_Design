@@ -61,7 +61,7 @@ flowchart LR
 **Takeaway:** constraints enter a deterministic gate, which either allows a bounded action or
 stops safely.
 
-**Equivalent text description:** applicable constraints enter a deterministic gate. If every
+**Step by step:** applicable constraints enter a deterministic gate. If every
 required check passes, the gate allows one bounded action. A denial, mismatch, or unknown result
 stops or pauses the request safely.
 
@@ -84,7 +84,7 @@ flowchart TD
 **Takeaway:** the most restrictive applicable constraint wins; no model output, retrieval,
 protocol message, or retry can add authority.
 
-**Equivalent text description:** task, tenant, delegated user, workload, tool, destination,
+**Step by step:** task, tenant, delegated user, workload, tool, destination,
 approval, and budget constraints enter one decision. The gateway issues a bounded capability
 only when every required constraint permits the same operation. A denial, expiry, mismatch, or
 unknown result causes denial or a safe pause.
@@ -114,7 +114,7 @@ sequenceDiagram
 **Takeaway:** generated text proposes a typed action, while the gateway obtains and uses a
 short-lived credential only after policy allows the request.
 
-**Equivalent text description:** the model sends a credential-free proposal to the runtime.
+**Step by step:** the model sends a credential-free proposal to the runtime.
 The runtime validates it and asks policy using authenticated context. After an allow decision,
 the gateway obtains a short-lived credential and calls the tool. The runtime receives a bounded,
 redacted result and receipt. Credentials may exist in the credential service and gateway memory,
@@ -132,9 +132,12 @@ stateDiagram-v2
     AwaitingApproval --> Approved: exact digest and principal match
     Approved --> Denied: payload, destination, policy, or identity changed
     Approved --> Revoked: revocation wins before execution
-    Approved --> Executing: capability consumed once
-    Executing --> Reconciled: authoritative outcome recorded
-    Executing --> Reconciled: duplicate checks existing outcome
+    Approved --> IntentDurable: commit immutable intent and consume capability
+    IntentDurable --> Executing: destination has no matching effect
+    Executing --> OutcomeUnknown: response or local outcome commit is lost
+    IntentDurable --> Reconciled: destination lookup finds matching effect
+    OutcomeUnknown --> Reconciled: authoritative lookup by key and digest
+    Executing --> Reconciled: commit confirmed outcome
     Reconciled --> [*]
     Denied --> [*]
     Expired --> [*]
@@ -144,10 +147,12 @@ stateDiagram-v2
 **Takeaway:** approval is a versioned state transition, and replay or cancellation cannot be
 resolved by a chat phrase.
 
-**Equivalent text description:** a request is denied or waits for approval. Waiting approval
+**Step by step:** a request is denied or waits for approval. Waiting approval
 can expire or be revoked. Exact approval permits one transition, but any changed payload,
 destination, policy, or identity returns to denial. Revocation before execution wins. Execution
-records an authoritative result, and duplicate delivery reconciles to that same result.
+starts only after durable intent. A lost response or local outcome commit leaves an unknown state;
+destination lookup by idempotency key and intent digest reconciles it to the authoritative result.
+Duplicate delivery returns that same durable result rather than blindly repeating the effect.
 
 ## Vocabulary
 
@@ -236,9 +241,14 @@ required, or policy-version-mismatched record is denied.
 
 ### Resolve retries using state, not hope
 
-Before a consequential call, store intent under an idempotency key. After the call, store the
-outcome. If a timeout leaves the outcome unknown, query the authoritative destination or
-reconcile by the same key. Do not publish again merely because no response arrived.
+Before a consequential call, commit intent under an idempotency key to durable storage. The
+destination must accept that key idempotently or expose an authoritative lookup by it. After the
+call, commit the outcome. A crash can therefore leave a durable intent with no local outcome even
+though the destination completed the effect. On recovery, query the destination by the same key,
+verify the immutable intent digest, and durably record the observed outcome. Only when the
+destination confirms that no effect exists may the reconciler submit the intent. This is not a
+distributed atomic transaction: its safety depends on destination-side key uniqueness and
+authoritative reconciliation.
 
 ### Treat results as untrusted
 
@@ -256,6 +266,7 @@ enters evidence.
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
+import sqlite3
 from tempfile import TemporaryDirectory
 
 
@@ -311,14 +322,58 @@ def authorize(request: Request, approval: Approval | None, *, now: int) -> tuple
     return True, "allowed"
 
 
-def publish_once(request: Request, root: Path, outcomes: dict[str, str]) -> str:
-    if request.idempotency_key in outcomes:
-        return outcomes[request.idempotency_key]
-    short_lived_fake_credential = "GATEWAY-ONLY-FAKE"
-    assert short_lived_fake_credential not in request.payload
-    receipt = f"published:{sha256(request.payload.encode()).hexdigest()}"
-    (root / "publication.txt").write_text(request.payload, encoding="utf-8")
-    outcomes[request.idempotency_key] = receipt
+def publish_reconciled(
+    request: Request,
+    approval: Approval | None,
+    state: sqlite3.Connection,
+    destination: sqlite3.Connection,
+    *,
+    now: int,
+    crash_after_effect: bool = False,
+) -> str:
+    payload_hash = sha256(request.payload.encode()).hexdigest()
+    state.execute(
+        "INSERT OR IGNORE INTO intents VALUES (?, ?, ?, NULL)",
+        (request.idempotency_key, request.destination, payload_hash),
+    )
+    state.commit()  # Intent is durable before the effect.
+    intent = state.execute(
+        "SELECT destination, payload_hash, outcome FROM intents WHERE key = ?",
+        (request.idempotency_key,),
+    ).fetchone()
+    assert intent is not None
+    if intent[:2] != (request.destination, payload_hash):
+        raise ValueError("idempotency_key_reused_for_different_intent")
+    if intent[2] is not None:
+        return intent[2]
+
+    observed = destination.execute(
+        "SELECT destination, payload_hash, receipt FROM effects WHERE key = ?",
+        (request.idempotency_key,),
+    ).fetchone()
+    if observed is None:
+        allowed, reason = authorize(request, approval, now=now)
+        if not allowed:
+            raise PermissionError(reason)
+        short_lived_fake_credential = "GATEWAY-ONLY-FAKE"
+        assert short_lived_fake_credential not in request.payload
+        # The destination's unique key makes a repeated submission idempotent.
+        receipt = f"published:{payload_hash}"
+        destination.execute(
+            "INSERT INTO effects VALUES (?, ?, ?, ?)",
+            (request.idempotency_key, request.destination, payload_hash, receipt),
+        )
+        destination.commit()
+        if crash_after_effect:
+            raise RuntimeError("synthetic_crash_after_effect")
+        observed = (request.destination, payload_hash, receipt)
+
+    if observed[:2] != (request.destination, payload_hash):
+        raise ValueError("destination_intent_mismatch")
+    receipt = observed[2]
+    state.execute("UPDATE intents SET outcome = ? WHERE key = ?",
+                  (receipt, request.idempotency_key))
+    state.commit()
     return receipt
 
 
@@ -329,11 +384,40 @@ allowed, reason = authorize(request, approval, now=10)
 assert allowed, reason
 
 with TemporaryDirectory() as directory:
-    outcomes: dict[str, str] = {}
-    first = publish_once(request, Path(directory), outcomes)
-    second = publish_once(request, Path(directory), outcomes)
+    root = Path(directory)
+    state = sqlite3.connect(root / "state.db")
+    destination = sqlite3.connect(root / "destination.db")
+    state.execute(
+        "CREATE TABLE intents "
+        "(key TEXT PRIMARY KEY, destination TEXT, payload_hash TEXT, outcome TEXT)"
+    )
+    destination.execute(
+        "CREATE TABLE effects "
+        "(key TEXT PRIMARY KEY, destination TEXT, payload_hash TEXT, receipt TEXT)"
+    )
+    try:
+        publish_reconciled(
+            request, approval, state, destination, now=10, crash_after_effect=True
+        )
+        raise AssertionError("synthetic crash was not reproduced")
+    except RuntimeError as error:
+        assert str(error) == "synthetic_crash_after_effect"
+    # Regression: the original in-memory design lost this outcome after the effect.
+    assert state.execute("SELECT outcome FROM intents").fetchone() == (None,)
+    assert destination.execute("SELECT count(*) FROM effects").fetchone() == (1,)
+    state.close()
+    destination.close()
+
+    # Simulate restart: reconciliation observes the effect and records its durable outcome.
+    state = sqlite3.connect(root / "state.db")
+    destination = sqlite3.connect(root / "destination.db")
+    first = publish_reconciled(request, approval, state, destination, now=10)
+    second = publish_reconciled(request, approval, state, destination, now=10)
     assert first == second
-    assert len(outcomes) == 1
+    assert destination.execute("SELECT count(*) FROM effects").fetchone() == (1,)
+    assert state.execute("SELECT outcome FROM intents").fetchone() == (first,)
+    state.close()
+    destination.close()
 
 changed = Request(**{**request.__dict__, "destination": "outside.example"})
 assert authorize(changed, approval, now=10) == (False, "egress_denied")
@@ -348,13 +432,13 @@ assert authorize(cross_scope, None, now=10) == (False, "delegation_mismatch")
 
 evidence = {"tool": request.tool, "decision": reason, "digest": approval.digest}
 assert "GATEWAY-ONLY-FAKE" not in repr(evidence)
-print("PASS: scoped publication, replay safety, revocation, and secret isolation verified")
+print("PASS: durable reconciliation, replay safety, revocation, and secret isolation verified")
 ```
 
 Expected output:
 
 ```text
-PASS: scoped publication, replay safety, revocation, and secret isolation verified
+PASS: durable reconciliation, replay safety, revocation, and secret isolation verified
 ```
 
 ## Microsoft implementation
@@ -389,7 +473,8 @@ Replace it with the typed gateway. The correction passes when:
 - the valid report still publishes once inside a temporary directory;
 - no fake credential enters the request, result, or evidence;
 - revocation is checked immediately before execution;
-- repeated delivery returns one authoritative outcome;
+- a crash after the effect leaves durable intent, and restart reconciliation records one
+  authoritative outcome without repeating the destination effect;
 - false denials are counted rather than hidden.
 
 ## Security and safety testing
@@ -404,7 +489,7 @@ Add these cases to the cumulative security suite:
 | Unapproved destination | Deny at egress policy |
 | Stale or revoked approval | Deny before credential acquisition |
 | Payload or destination substitution | Approval digest mismatch |
-| Duplicate publication | One outcome for one idempotency key |
+| Crash after publication but before local outcome | Reconcile one destination effect into one durable outcome |
 | Protocol version or lifecycle mismatch | Reject locally; peer cannot override |
 | Policy unavailable | Fail closed and preserve recoverable state |
 | Simulated sandbox escape request | No host, network, credential, or execution capability exists |
@@ -420,7 +505,7 @@ sandbox.
 | Authority | 100% of issued capabilities equal the permitted intersection. |
 | Misuse containment | 100% of the fixed excess-scope, egress, stale, replay, and mismatch cases are denied. |
 | Secret isolation | Zero credential markers in model-visible inputs, outputs, traces, and evidence. |
-| Consequential effects | Zero effects without exact fresh approval; one outcome per idempotency key. |
+| Consequential effects | Zero effects without exact fresh approval; one destination effect and one durable outcome per idempotency key. |
 | Revocation | Revoked capability cannot begin execution. |
 | Availability | Policy uncertainty fails closed with an explicit recoverable status. |
 | Utility | Allowed search, draft, and approved publication fixtures still complete. |
@@ -477,6 +562,17 @@ whether the user may read a document, publish a report, or send data to a destin
 authority, authorization, egress policy, exact approval, and evidence remain necessary outside
 the sandbox.
 
+## Recap and next step
+
+- Effective authority is the intersection of task, identity, tool, destination, approval, and budget constraints.
+- Models and protocol peers propose operations but cannot mint authority.
+- Credentials stay inside a short-lived gateway path.
+- Exact approval, revocation, idempotency, and reconciliation control consequential effects.
+- Sandboxes contain risky execution but do not replace authorization or egress policy.
+
+Chapter 26 carries this capability context through delegated identity, tenant isolation, data
+lifecycle, content-safety decisions, and accessible human interactions.
+
 ## Design exercise
 
 Northstar needs to summarize a new file format. Compare:
@@ -498,17 +594,6 @@ Delete the directory after the test.
 
 The lab deliverables are the capability matrix, policy fixtures, secret-flow diagram, exact
 approval format, minimized evidence record, and passing negative and legitimate-use tests.
-
-## Recap and next step
-
-- Effective authority is the intersection of task, identity, tool, destination, approval, and budget constraints.
-- Models and protocol peers propose operations but cannot mint authority.
-- Credentials stay inside a short-lived gateway path.
-- Exact approval, revocation, idempotency, and reconciliation control consequential effects.
-- Sandboxes contain risky execution but do not replace authorization or egress policy.
-
-Chapter 26 carries this capability context through delegated identity, tenant isolation, data
-lifecycle, content-safety decisions, and accessible human interactions.
 
 ## Sources
 
