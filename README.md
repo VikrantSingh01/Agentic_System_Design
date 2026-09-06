@@ -57,15 +57,28 @@ The material is organized as 36 chapters across nine modules:
 
 ## Repository map
 
+Reader and source content:
+
 - `modules/`: chapter content, module exercises, and local asset manifests
 - `case-study/northstar/`: architecture and requirements contract for the Northstar case study
 - `visuals/agent-system-journey/`: offline interactive journey through an agent system
-- `research/dossiers/`: independently owned research-agent outputs
+- `research/dossiers/`: authoritative research-agent evidence outputs
 - `research/source-ledger.csv`: approved claims and source freshness
+
+Project coordination and quality records:
+
 - `coordination/contracts/`: frozen authoring and architecture contracts
+- `coordination/agents/research-briefs/`: short R1-R9 research assignments
 - `coordination/dependency-graph.yml`: multi-agent stages and join gates
 - `reviews/`: editorial and publication-quality review records
-- `scripts/`: repository validation tools
+
+Tooling and generated publications:
+
+- `scripts/`: validation and book-build tools
+- `tests/`: repository contract tests
+- `book/`: generated PDF edition; do not edit directly
+- `docs/`: generated GitHub Pages edition; do not edit directly
+- `build/`: ignored intermediate build files
 
 ## Current status
 

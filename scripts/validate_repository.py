@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULES = ROOT / "modules"
-RESEARCH_BRIEFS = ROOT / "coordination" / "agents" / "research"
+RESEARCH_BRIEFS = ROOT / "coordination" / "agents" / "research-briefs"
 EXPECTED_CHAPTERS = set(range(1, 37))
 EXPECTED_RESEARCH_NODES = {f"R{number}" for number in range(1, 10)}
 MODULE_PATTERN = re.compile(r"^(\d{2})-")

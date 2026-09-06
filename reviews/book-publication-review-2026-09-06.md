@@ -41,7 +41,7 @@ and canonical-source policy.
   `volatile` (53); all rows show `accessed_date` of 2026-09-05 or 2026-09-06; all rows
   `status = approved`.
 - `research/dossiers/R1..R9` contain full evidence dossiers, while
-  `coordination/agents/research/R1..R9` contain shorter mission and coordination briefs.
+  `coordination/agents/research-briefs/R1..R9` contain shorter mission and coordination briefs.
   They are different artifact classes and must not be deleted as presumed duplicates.
 - `.github/workflows/validate.yml` runs the repository validator, unit tests, and the
   dependency-free offline animation validator.
@@ -139,13 +139,13 @@ surgical fix, and current status.
 
 ### 7. The relationship between research briefs and dossiers is undocumented
 - **Location:** `research/dossiers/R1-foundations-academia.md` … `R9-*.md` and
-  `coordination/agents/research/R1-*.md` … `R9-*.md`.
+  `coordination/agents/research-briefs/R1-*.md` … `R9-*.md`.
 - **Evidence:** the coordination files are short mission or assignment briefs, while the
   research files are substantially longer evidence dossiers. Supplemental dossiers also
   exist only under `research/dossiers/`. The validator checks the coordination briefs.
 - **Impact:** similar names can lead maintainers to mistake separate inputs and outputs for
   duplicates, delete evidence, or assume an undocumented synchronization rule.
-- **Fix:** document that `coordination/agents/research/` defines assignments and
+- **Fix:** document that `coordination/agents/research-briefs/` defines assignments and
   `research/dossiers/` preserves research outputs. If a canonical-source policy is later
   adopted, preserve both artifact roles or migrate them explicitly rather than deleting
   files based on names alone.

@@ -1,11 +1,10 @@
 # Research Dossiers
 
-Stage 1 research agents write their completed dossiers in `coordination/agents/research/`.
-The matching R1-R9 files here are publication snapshots retained with the approved source
-material. Update the coordination copy first, then synchronize its snapshot here before
-validation. Supplemental dossiers live only in this directory. A dossier is evidence input,
-not publishable chapter prose. The Source Editor reconciles all nine dossiers at J1 before
-any source becomes approved.
+Stage 1 research agents receive mission briefs from `coordination/agents/research-briefs/`
+and write their completed evidence dossiers here. The briefs define the assignment; these
+dossiers are the authoritative research outputs. Supplemental dossiers also live in this
+directory. A dossier is evidence input, not publishable chapter prose. The Source Editor
+reconciles all nine dossiers at J1 before any source becomes approved.
 
 Expected outputs:
 

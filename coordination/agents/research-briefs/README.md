@@ -1,6 +1,8 @@
-# Stage 1 Research Agents
+# Stage 1 Research Briefs
 
-Run R1-R9 in parallel after Stage 0 passes. Each agent owns one dossier under `research/dossiers/` and must not edit the shared source ledger, chapters, module indexes, contracts, or another dossier.
+This directory contains the short mission and coordination brief for each Stage 1 research agent. Run R1-R9 in parallel after Stage 0 passes. Each agent writes one completed evidence dossier under `research/dossiers/` and must not edit the shared source ledger, chapters, module indexes, contracts, or another dossier.
+
+The briefs define assignments; they are not copies of the completed dossiers. If a mission changes, update its brief before revising the corresponding dossier.
 
 ## Required report
 
