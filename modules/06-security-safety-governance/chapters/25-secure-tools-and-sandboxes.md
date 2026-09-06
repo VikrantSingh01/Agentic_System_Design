@@ -49,6 +49,22 @@ revocation, idempotency, evidence, and sometimes a sandbox working together.
 
 ## Picture the idea
 
+### Beginner view: constraints decide action
+
+```mermaid
+flowchart LR
+    C[Constraints] --> G{Gate}
+    G -->|all required checks pass| A[Allow bounded action]
+    G -->|deny, mismatch, or unknown| S[Stop or pause safely]
+```
+
+**Takeaway:** constraints enter a deterministic gate, which either allows a bounded action or
+stops safely.
+
+**Equivalent text description:** applicable constraints enter a deterministic gate. If every
+required check passes, the gate allows one bounded action. A denial, mismatch, or unknown result
+stops or pauses the request safely.
+
 ### Authority is an intersection
 
 ```mermaid
@@ -73,7 +89,7 @@ approval, and budget constraints enter one decision. The gateway issues a bounde
 only when every required constraint permits the same operation. A denial, expiry, mismatch, or
 unknown result causes denial or a safe pause.
 
-### A secretless tool call
+### Engineering deep dive D2: a secretless tool call
 
 ```mermaid
 sequenceDiagram
@@ -104,7 +120,7 @@ the gateway obtains a short-lived credential and calls the tool. The runtime rec
 redacted result and receipt. Credentials may exist in the credential service and gateway memory,
 but never in prompts, proposal arguments, model output, traces, or evidence.
 
-### Consequential action states
+### Engineering deep dive D3: consequential action states
 
 ```mermaid
 stateDiagram-v2

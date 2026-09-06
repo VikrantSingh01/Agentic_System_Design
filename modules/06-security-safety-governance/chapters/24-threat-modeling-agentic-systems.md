@@ -56,11 +56,28 @@ lock or one person's judgment.
 
 ## Picture the idea
 
-### One request, many trust boundaries
+### Beginner view: one request path
 
 ```mermaid
 flowchart LR
-    U[User] -->|identity + question| A[API]
+    U[User] --> A[Application programming interface]
+    A --> R[Agent runtime]
+    R --> G{Policy gate}
+    G --> O[Allow bounded tool or stop safely]
+```
+
+**Takeaway:** a request does not reach a tool until a deterministic gate allows it; denial ends
+in a safe stop.
+
+**Equivalent text description:** the user sends a request through the application programming
+interface to the agent runtime. The runtime presents a typed action to a deterministic policy
+gate. An allowed action reaches the bounded tool; denial at the gate stops safely.
+
+### Engineering map: one request, many trust boundaries
+
+```mermaid
+flowchart LR
+    U[User] -->|identity + question| A[Application programming interface]
     A -->|task + principal| R[Runtime]
     R -->|bounded prompt| M[Model]
     R -->|authorized query| Q[Retrieval]
@@ -79,21 +96,37 @@ flowchart LR
 **Takeaway:** every crossing changes what can be trusted; model output and retrieved content
 remain proposals or data, never authority.
 
-**Equivalent text description:** the user crosses into the API with identity and a question.
-The API passes an authenticated task to the runtime. The runtime separately calls the model,
-retrieval path, memory, approval service, and evidence store. Retrieval reauthorizes at the
-source and returns labeled untrusted extracts. A model proposal crosses a policy gate before a
-tool gateway can reach an allowlisted destination. A denial stops safely. Each crossing carries
-tenant, principal, purpose, policy version, and bounded data appropriate to that boundary.
+**Equivalent text description:** the user crosses into the application programming interface
+with identity and a question. The application programming interface passes an authenticated
+task to the runtime. The runtime separately calls the model, retrieval path, memory, approval
+service, and evidence store. Retrieval reauthorizes at the source and returns labeled untrusted
+extracts. A model proposal crosses a policy gate before a tool gateway can reach an allowlisted
+destination. A denial stops safely. Each crossing carries tenant, principal, purpose, policy
+version, and bounded data appropriate to that boundary.
 
-### The indirect-injection path
+### Untrusted-input flow
 
 ```mermaid
-flowchart TD
+flowchart LR
     S[Malicious sentence in synthetic source] --> R[Authorized retrieval]
     R --> L[Label as untrusted data]
     L --> M[Model double proposes publish_report]
-    M --> V{Closed-schema validation}
+    M --> P[Typed proposal only]
+```
+
+**Takeaway:** authorized retrieval does not make source content trusted, and a model response
+remains a proposal without authority.
+
+**Equivalent text description:** a synthetic source contains a hostile sentence. Retrieval is
+allowed because the user may read that source, but the returned text is labeled untrusted. A
+deterministic model double may follow it and propose publication, but that output remains a typed
+proposal.
+
+### Authority and approval flow
+
+```mermaid
+flowchart TD
+    P[Typed proposal] --> V{Closed-schema validation}
     V -->|invalid| Z[Denied]
     V -->|valid| A{Delegated authority?}
     A -->|no| Z
@@ -109,12 +142,10 @@ flowchart TD
 **Takeaway:** the model may follow hostile text, but deterministic checks outside the model
 break the path before data leaves the system.
 
-**Equivalent text description:** a synthetic source contains a hostile sentence. Retrieval is
-allowed because the user may read that source, but the returned text is labeled untrusted. A
-deterministic model double proposes publication. Closed-schema validation can reject malformed
-arguments. Delegated authorization rejects excess authority. The egress allowlist rejects an
-unknown destination. Exact approval rejects an unapproved payload. Only a proposal that passes
-every check reaches the bounded tool. Either result emits redacted evidence without source text.
+**Equivalent text description:** closed-schema validation can reject malformed arguments.
+Delegated authorization rejects excess authority. The egress allowlist rejects an unknown
+destination. Exact approval rejects an unapproved payload. Only a proposal that passes every
+check reaches the bounded tool. Either result emits redacted evidence without source text.
 
 ### Risk treatment is a loop
 
@@ -128,7 +159,7 @@ flowchart LR
     R --> T[Test]
     T --> A[Reassess]
     A -->|changed system or evidence| I
-    A --> X[Accept, remediate, transfer, or avoid residual risk]
+    A --> X[Residual-risk decision]
 ```
 
 **Takeaway:** controls reduce risk but do not erase it; a named owner must decide what happens

@@ -57,7 +57,7 @@ controls, measured classifiers, and human review.
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant A as API
+    participant A as Application programming interface
     participant R as Runtime
     participant W as Worker identity
     participant S as Source
@@ -70,43 +70,57 @@ sequenceDiagram
     W->>S: Reauthorize user scope and tenant
     S-->>W: Authorized synthetic extract
     W->>P: Reauthorize tool, destination, and purpose
-    P-->>W: Allow or deny with decision ID
+    P-->>W: Allow or deny with policy decision identifier
     W->>E: Redacted event with both identity references
 ```
 
 **Takeaway:** every boundary carries both identities, and the source and destination make fresh
 authorization decisions for the delegated user.
 
-**Equivalent text description:** the user authenticates at the API. The API admits a task with
-tenant, subject, scopes, purpose, and expiry. The runtime sends that context to a worker while
-retaining the worker's separate workload identity. The source reauthorizes the delegated user.
-Tool policy reauthorizes the operation and destination. Evidence stores redacted references to
-both identities and the decision, not credentials or unnecessary content.
+**Equivalent text description:** the user authenticates at the application programming
+interface. The application programming interface admits a task with tenant, subject, scopes,
+purpose, and expiry. The runtime sends that context to a worker while retaining the worker's
+separate workload identity. The source reauthorizes the delegated user. Tool policy reauthorizes
+the operation and destination and returns a policy decision identifier. Evidence stores redacted
+references to both identities and that decision, not credentials or unnecessary content.
 
-### Data has a lifecycle, not one delete button
+### Collection and bounded use
 
 ```mermaid
 flowchart LR
     C[Collect for declared purpose] --> K[Classify]
     K --> M[Minimize]
     M --> U[Use in bounded request]
-    U --> S[Store primary artifact]
-    U --> D[Derive index, cache, or evaluation copy]
-    S --> X[Authorized export]
-    S --> Q[Delete primary copy]
-    D --> Q
-    Q --> B[Backup expires on documented schedule]
     K -->|not accepted or excess| R[Reject or redact]
+```
+
+**Takeaway:** collect for a declared purpose, classify, and minimize before bounded use; reject
+or redact data that is unaccepted or excessive.
+
+**Equivalent text description:** collect only for a declared purpose, classify the data, and
+minimize it before bounded use. Excess or unaccepted data is rejected or redacted before model
+exposure.
+
+### Derived copies and deletion
+
+```mermaid
+flowchart LR
+    U[Bounded use] --> P[Primary artifact]
+    U --> D[Derived copies]
+    P --> X[Authorized export]
+    P --> Q[Deletion manifest]
+    D --> Q
+    Q --> R[Receipts for governed copies]
+    Q --> B[Documented backup expiry]
 ```
 
 **Takeaway:** deletion must find primary and derived copies, while backup removal follows a
 documented expiry rather than an unsupported promise of immediate erasure.
 
-**Equivalent text description:** collect only for a declared purpose, classify the data, and
-minimize it before use. The request may create primary artifacts and separately governed
-indexes, caches, memory, or evaluation copies. Authorized export has its own check. Deletion
-covers each primary and derived copy. Backup media follows a documented expiry and exception
-process. Excess or unaccepted data is rejected or redacted before model exposure.
+**Equivalent text description:** bounded use may create a primary artifact and separately
+governed indexes, caches, memory, or evaluation copies. Authorized export has its own check. A
+deletion manifest covers primary and derived copies and records receipts. Backup media follows a
+documented expiry and exception process.
 
 ### Accessible content-safety decisions
 
@@ -165,10 +179,10 @@ tenant_id, subject_id, delegated_scopes, workload_id,
 authentication_context, purpose, policy_version, issued_at, expiry
 ```
 
-The API validates it at admission. Retrieval checks it against the source. Cache keys include
-tenant and authorization-relevant versioning. Queue messages carry a protected reference or a
-short-lived context, and workers revalidate expiry. Tools check it at the destination. State,
-evidence, and administration remain tenant scoped.
+The application programming interface validates it at admission. Retrieval checks it against
+the source. Cache keys include tenant and authorization-relevant versioning. Queue messages
+carry a protected reference or a short-lived context, and workers revalidate expiry. Tools check
+it at the destination. State, evidence, and administration remain tenant scoped.
 
 Never infer authorization from a model claim, prompt field, display name, email-like string,
 document content, or protocol peer assertion alone.
@@ -375,7 +389,8 @@ workload adapter. The `PrincipalContext` still carries the separately authentica
 user and is reauthorized by each source and destination. A workload credential must never be
 treated as proof of user authorization.
 
-Credential behavior, supported environments, defaults, and APIs are volatile. Reverify
+Credential behavior, supported environments, defaults, and application programming interfaces
+are volatile. Reverify
 SRC-044 before release, configure an explicit production credential path, and test expiry,
 audience, scope, tenant mismatch, and denial. This chapter's approved sources do not support a
 Microsoft-specific content-safety product claim, so the classifier interface remains
@@ -481,10 +496,10 @@ telemetry. Regional expansion or new data classes require renewed qualified revi
 ## Try it safely
 
 Use two colors of paper for tenant A and tenant B. Give each user badge one read permission and
-give a differently shaped card to the service. Pass a request through cards labeled API, queue,
-cache, source, tool, and evidence. At each card, verify both tenant color and user scope. Remove
-the user's read permission halfway through; the source card must deny the request even though
-the service card remains valid.
+give a differently shaped card to the service. Pass a request through cards labeled application
+programming interface, queue, cache, source, tool, and evidence. At each card, verify both tenant
+color and user scope. Remove the user's read permission halfway through; the source card must
+deny the request even though the service card remains valid.
 
 ## Common misunderstanding
 

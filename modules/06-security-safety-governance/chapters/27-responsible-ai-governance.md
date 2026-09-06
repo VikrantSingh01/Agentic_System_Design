@@ -50,7 +50,24 @@ qualified review, measurable evidence, change control, appeal, and retirement cr
 
 ## Picture the idea
 
-### Accountability connects decisions to people
+### Beginner view: accountable action
+
+```mermaid
+flowchart LR
+    O[Owner] --> E[Evidence]
+    E --> D{Decision}
+    D -->|approved within conditions| A[Act]
+    D -->|missing, failed, stale, or denied| S[Stop]
+```
+
+**Takeaway:** a named owner uses current evidence to decide whether the system may act or must
+stop.
+
+**Equivalent text description:** a named owner reviews current evidence and records a decision.
+Approval within stated conditions permits action. Missing, failed, stale, or denied evidence
+leads to a stop.
+
+### Engineering deep dive: accountability roles
 
 ```mermaid
 flowchart TD
@@ -74,7 +91,7 @@ incident owner coordinates containment, and the kill authority can pause or stop
 Qualified reviewers advise and decide within their legal, privacy, accessibility, or domain
 mandates. Committee membership alone does not supply decision rights.
 
-### Evidence becomes a decision, then expires
+### Engineering deep dive: evidence and decision loop
 
 ```mermaid
 flowchart LR
@@ -103,7 +120,7 @@ narrows or avoids the use, accepts with conditions, or transfers part of the ris
 Missing, failed, or stale evidence blocks release. Decisions expire and are reassessed when the
 system or context changes.
 
-### Meaningful oversight is a loop
+### Engineering deep dive: meaningful oversight loop
 
 ```mermaid
 flowchart TD
