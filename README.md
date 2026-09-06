@@ -4,6 +4,33 @@ A beginner-to-production guide for designing, building, evaluating, securing, de
 
 The project teaches durable, vendor-neutral engineering principles first. Runnable examples use Python. Microsoft technologies are introduced through supported Python SDKs and architecture mappings where they add practical value.
 
+## Choose your path
+
+You do not need to read every chapter before building something useful.
+
+| Your goal | Start here | Then read |
+|---|---|---|
+| Learn from the beginning | [Module 1](modules/01-from-zero-to-agents/README.md) | Continue through the modules in order. |
+| Build a small controlled agent | [Module 1](modules/01-from-zero-to-agents/README.md) | [Module 2](modules/02-smallest-useful-agent/README.md), then [Module 5](modules/05-evaluation-improvement/README.md) and [Module 6](modules/06-security-safety-governance/README.md). |
+| Add retrieval or memory | [Module 3](modules/03-context-knowledge-memory/README.md) | Return to Modules 1 and 2 for any unfamiliar foundations. |
+| Prepare a system for production | [Module 7](modules/07-production-architecture-operations/README.md) | [Module 8](modules/08-scale-economics-lifecycle/README.md). Read Modules 5 and 6 before launch. |
+| Map the design to Microsoft services | [Module 9](modules/09-microsoft-synthesis-capstone/README.md) | Use the earlier vendor-neutral chapters to understand each design choice. |
+
+## What to expect in a chapter
+
+Each chapter follows the same learning rhythm:
+
+1. Start with a concrete problem and a plain-language explanation.
+2. Use diagrams and vocabulary to build a shared mental model.
+3. Study the mechanism, tradeoffs, and a Python example.
+4. Test a failure or misuse case with synthetic offline data.
+5. Apply evaluation, security, and production checks.
+6. Finish with review questions, a design exercise, and a hands-on lab.
+
+If a chapter feels too advanced, read its **First pass**, **Picture the idea**, and
+**Vocabulary** sections first. Return to the engineering sections when you need implementation
+detail.
+
 ## Learning path
 
 The material is organized as 36 chapters across nine modules:
@@ -36,7 +63,9 @@ The material is organized as 36 chapters across nine modules:
 
 ## Current status
 
-Stage 0 is in progress. The editorial contract, chapter structure, module ownership boundaries, and orchestration graph are being established before research and chapter agents fan out.
+All 36 chapters are present. The repository validator checks the module structure, required
+teaching sections, diagrams, and research briefs. Editorial review, companion assets, and
+source-freshness work continue in small, independently reviewed changes.
 
 ## Validate locally
 
