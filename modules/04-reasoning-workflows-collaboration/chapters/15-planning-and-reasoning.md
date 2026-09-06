@@ -11,8 +11,9 @@ advance. A single prompt may omit work. An unrestricted planner may create endle
 tasks, circular dependencies, or steps with more authority than the original run.
 
 Planning is useful only when the plan becomes a checked software artifact. We need
-stable task IDs, dependencies, completion tests, uncertainty, authority, and budgets,
-not a hidden story about what a model thought.
+to name each task, show which tasks must finish first, define how to check completion,
+and limit what each task may do. We do not need a hidden story about what a model
+thought.
 
 ## Learning objectives
 
@@ -55,7 +56,7 @@ flowchart LR
 **Takeaway:** inspectable tasks, dependencies, budgets, uncertainty, and expected
 artifacts are enough to operate a plan without storing hidden reasoning.
 
-**Equivalent text description:** gathering sources must finish before comparison and
+**Step by step:** gathering sources must finish before comparison and
 citation checking. Both must finish before drafting. The plan record keeps each task's
 ID, budget, uncertainty marker, and expected artifact even though the beginner diagram
 shows only the action names.
@@ -76,7 +77,7 @@ stateDiagram-v2
 
 **Takeaway:** replanning is one validated transition, not permission to think forever.
 
-**Equivalent text description:** a proposed plan is rejected or admitted by
+**Step by step:** a proposed plan is rejected or admitted by
 deterministic checks. Execution may complete, stop, or enter replanning after a named
 trigger. A validated revision resumes work; exhausted revisions stop.
 
@@ -97,7 +98,7 @@ flowchart TD
 **Takeaway:** planning is an evaluated option for uncertain decomposition, not a
 default wrapper around every request.
 
-**Equivalent text description:** use a direct request for one clear step, a fixed
+**Step by step:** use a direct request for one clear step, a fixed
 workflow for known decomposition, and dynamic planning only when decomposition is
 uncertain. Measure all candidates and return to the simpler one without a gain.
 

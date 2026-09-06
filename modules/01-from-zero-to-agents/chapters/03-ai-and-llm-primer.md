@@ -34,6 +34,16 @@ An LLM does something loosely similar with numbers. Given earlier pieces of text
 
 **Where the analogy stops:** a person has experiences, goals, senses, and an understanding of lunch. A language model has learned numerical patterns from training data and receives a bounded input. It does not experience peanut butter or know what tastes good.
 
+Before looking at each part, follow one model call from start to finish:
+
+1. **Split the text:** a tokenizer turns text into tokens.
+2. **Represent the tokens:** embeddings turn token identifiers into number lists.
+3. **Relate the input:** transformer layers combine information from the available context.
+4. **Score the next token:** the model assigns numerical scores to possible continuations.
+5. **Choose and repeat:** a decoding rule selects one token, then the cycle continues.
+
+The next sections explain each step and the limits that dependable software must handle.
+
 ### Tokens: text pieces
 
 A **token (a unit of text processed by a model)** may be a whole word, part of a word, punctuation, whitespace, or another symbol. A **tokenizer (a fixed procedure that converts text to token identifiers and back)** might split:

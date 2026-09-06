@@ -34,6 +34,17 @@ By the end of this chapter, the reader can:
 
 ## First pass
 
+Model selection is a five-gate decision:
+
+1. **Task:** What exact result must the model produce?
+2. **Quality and safety:** Which requirements must every result meet?
+3. **Context:** How much input and evidence must fit in one request?
+4. **Latency and cost:** How slow or expensive may one result be?
+5. **Fallback:** What should happen when no model passes every requirement?
+
+Keep these gates fixed while comparing candidates. Otherwise, a model can appear better only
+because it received an easier test.
+
 Imagine hiring someone to sort library notes.
 
 - One helper is fast and inexpensive but sometimes misses a required label.
