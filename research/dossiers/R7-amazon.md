@@ -96,7 +96,7 @@ Operational excellence, security, reliability, performance efficiency, cost opti
 - Chapters 12 and 16: memory policy, sessions, checkpoints, and durable workflows
 - Chapters 24-26: IAM, delegated authority, isolation, and data protection
 - Chapters 28-33: managed architecture, reliability, observability, deployment, quotas, and economics
-- Chapter 36: cross-cloud architectural comparison, not Microsoft implementation guidance
+- Chapter 42: cross-cloud architectural comparison, not Microsoft implementation guidance
 
 ## Discrepancies and unresolved questions
 

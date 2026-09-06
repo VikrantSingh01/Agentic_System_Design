@@ -10,4 +10,5 @@
 | [06. Security, Safety, and Governance](06-security-safety-governance/README.md) | 24-27 | Bound agent authority and govern production risk |
 | [07. Production Architecture and Operations](07-production-architecture-operations/README.md) | 28-32 | Deploy an observable and recoverable system |
 | [08. Scale, Economics, and Lifecycle](08-scale-economics-lifecycle/README.md) | 33-35 | Operate economically across tenants and regions |
-| [09. Microsoft Synthesis and Capstone](09-microsoft-synthesis-capstone/README.md) | 36 | Assemble and review the complete Northstar system |
+| [09. Hybrid AI Systems Engineering](09-hybrid-ai-systems-engineering/README.md) | 36-41 | Engineer hybrid AI across models, devices, tools, security, testing, and product experience |
+| [10. Microsoft Synthesis and Capstone](10-microsoft-synthesis-capstone/README.md) | 42 | Assemble and review the complete Northstar system |

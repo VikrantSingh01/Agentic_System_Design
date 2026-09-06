@@ -452,7 +452,7 @@ remain unasserted until that verification.
 | Managed container hosting and event-driven scaling candidate | Azure Container Apps | VOLATILE PRODUCT CLAIM, SRC-048 |
 | Durable command queue and topic candidate | Azure Service Bus | VOLATILE PRODUCT CLAIM, SRC-049 |
 
-Chapter 36 names additional Microsoft targets, including Azure OpenAI, Cosmos DB, Microsoft
+Chapter 42 names additional Microsoft targets, including Azure OpenAI, Cosmos DB, Microsoft
 Entra ID, Key Vault, content safety and governance products, API Management, delivery systems,
 and infrastructure-as-code tooling. The approved ledger does not yet contain claim-level
 entries for those specific mappings. They are unresolved and must not be presented as selected
@@ -501,7 +501,13 @@ or decision that its chapter must add; it is not a chapter draft.
 | 33 | Add workload model, per-accepted-report economics, caching policy, batching or routing only when measured, quotas, and capacity plan. | Load test reports quality, p50/p95/p99 latency, saturation, unit cost, and hard-budget compliance (SRC-046, SRC-052). |
 | 34 | Add tenant stamps, isolation tiers, home-region routing, residency constraints, regional recovery, and failover consistency rules. | Cross-tenant negative tests and regional game day meet declared RPO and RTO assumptions (SRC-045). |
 | 35 | Add versioned model, prompt, policy, evaluator, connector, index, and schema migrations with shadowing, canary, rollback, and retirement. | Change record proves compatibility, regression gates, rollback, and post-release monitoring (SRC-012, SRC-028, SRC-064, SRC-070). |
-| 36 | Map the accepted architecture to verified Microsoft targets and conduct a production-readiness review without weakening vendor-neutral contracts. | Every product claim is marked volatile, cites an approved ledger ID, and is reverified within 30 days; unresolved mappings remain explicit (SRC-040 through SRC-049). |
+| 36 | Add policy-controlled routing across deterministic, device, edge, and cloud paths without weakening quality, privacy, authority, or compatibility gates. | Replayable routing tests explain every selected and rejected path and preserve an accepted deterministic fallback. |
+| 37 | Add end-to-end latency, energy, thermal, network, and sustained-operation budgets for supported device and cloud classes. | Benchmarks report accepted outcomes under warm, cold, throttled, disconnected, and constrained-power conditions. |
+| 38 | Add layered component, contract, system, fault-injection, and recovery tests for the hybrid architecture. | Fault evidence shows useful work survives expected failures while duplicate, dangerous, or uncertain work remains bounded. |
+| 39 | Add a governed tool portfolio with lifecycle metadata and an authorization-filtered, task-relevant tool frontier. | Tests prove unavailable, incompatible, excessive, and unauthorized tools never enter the model-visible set. |
+| 40 | Add preventive, detective, containment, recovery, test, evidence, and ownership controls for hybrid AI threats. | Continuous assurance links each prioritized threat to controls, telemetry, exercises, evidence, and an accountable owner. |
+| 41 | Add a tested user contract that makes system capability, authority, state, evidence, uncertainty, controls, and limits legible. | Usability and accessibility evidence shows users can predict behavior, inspect evidence, intervene, recover, and report harm. |
+| 42 | Map the accepted architecture to verified Microsoft targets and conduct a production-readiness review without weakening vendor-neutral contracts. | Every product claim is marked volatile, cites an approved ledger ID, and is reverified within 30 days; unresolved mappings remain explicit (SRC-040 through SRC-049). |
 
 ## Unresolved decisions
 
@@ -524,7 +530,7 @@ deadline, and consequence.
 | U-12 | Protocol adapters and pinned versions, if any | Demonstrated partner need and contract, identity, and threat tests |
 | U-13 | Multimodal formats and any future computer-use boundary | Accessibility, security, safety, and task-value evidence; default denied |
 | U-14 | Operator access, evidence integrity mechanism, and incident disclosure workflow | Security, SRE, privacy, governance, and legal review |
-| U-15 | Microsoft mappings named by Chapter 36 but absent from the approved ledger | Source Editor adds claim-level evidence before product selection or prose |
+| U-15 | Microsoft mappings named by Chapter 42 but absent from the approved ledger | Source Editor adds claim-level evidence before product selection or prose |
 | U-16 | Current names, availability, regions, SDKs, quotas, prices, data handling, and service boundaries for every Microsoft target | Release Editor rechecks primary sources within 30 days of release |
 
 ## J2 acceptance checklist

@@ -525,7 +525,7 @@ check that the final answer contains no roster data or unauthorized action.
 
 ## Microsoft implementation
 
-The packing algorithm remains ordinary provider-neutral Python. Chapter 36 maps
+The packing algorithm remains ordinary provider-neutral Python. Chapter 42 maps
 the accepted context contract to freshly verified Microsoft services and Python
 SDKs. This chapter deliberately selects no product, package, credential type, or
 model limit because those details are volatile and do not change the required

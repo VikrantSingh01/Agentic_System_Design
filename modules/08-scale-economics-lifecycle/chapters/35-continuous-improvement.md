@@ -443,7 +443,7 @@ PASS: drift, hard gates, explicit decisions, rollback, and retirement verified
 
 This chapter does not select a Microsoft product. Its frozen sources contain no
 approved claim-level Microsoft product mapping for lifecycle orchestration,
-registries, or migration SDKs. Chapter 36 owns final Microsoft synthesis.
+registries, or migration SDKs. Chapter 42 owns final Microsoft synthesis.
 Product names, APIs, regional support, quotas, and data handling must not be
 asserted without an approved ledger entry and current verification. The domain
 registry and migration state machine remain replaceable and vendor-neutral.
@@ -572,7 +572,7 @@ and test a candidate behind privacy, compatibility, outcome, and rollback gates.
 - Migration and retirement require measurable gates and complete cleanup proof.
 
 Module 08 now supplies workload economics, tenant and region boundaries, and a
-controlled component lifecycle. Chapter 36 can map those requirements to
+controlled component lifecycle. Chapter 42 can map those requirements to
 Microsoft targets without changing the vendor-neutral contracts.
 
 ## Design exercise
@@ -618,4 +618,4 @@ Only this frozen chapter set is cited:
    <https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems>.
    Durable evidence about hidden dependencies and surrounding system controls.
 
-**Navigation:** [Previous: Chapter 34: Multi-Tenant and Multi-Region Design](34-multi-tenant-multi-region-design.md) | [Module 08 overview](../README.md) | [Next: Chapter 36: Northstar on the Microsoft Stack](../../09-microsoft-synthesis-capstone/chapters/36-northstar-on-microsoft-stack.md)
+**Navigation:** [Previous: Chapter 34: Multi-Tenant and Multi-Region Design](34-multi-tenant-multi-region-design.md) | [Module 08 overview](../README.md) | [Next: Chapter 36: Hybrid AI and Model Orchestration](../../09-hybrid-ai-systems-engineering/chapters/36-hybrid-ai-model-orchestration.md)

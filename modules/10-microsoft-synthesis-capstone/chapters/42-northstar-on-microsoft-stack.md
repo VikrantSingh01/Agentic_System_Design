@@ -1,4 +1,4 @@
-# Chapter 36: Northstar on the Microsoft Stack
+# Chapter 42: Northstar on the Microsoft Stack
 
 > Status: reviewing
 > Owner: Agentic System Design maintainers
@@ -27,10 +27,12 @@
 
 ## The problem
 
-Northstar already has an accepted design. It must produce useful research reports with
-source-level citations, preserve delegated authority and source permissions, stop within hard
-budgets, resume without repeating effects, and remain observable, recoverable, and replaceable.
-Those requirements were accepted before a cloud product was chosen.
+Northstar already has an accepted design and accepted Module 09 evidence for hybrid routing,
+device constraints, fault tolerance, tool-portfolio controls, secure-by-design assurance, and
+product UX. It must produce useful research reports with source-level citations, preserve
+delegated authority and source permissions, stop within hard budgets, resume without repeating
+effects, and remain observable, recoverable, and replaceable. Those requirements were accepted
+before a cloud product was chosen.
 
 The final architecture review now asks a narrower question:
 
@@ -1094,9 +1096,9 @@ More than one answer is defensible. Lower projected effort alone is not.
 ## Hands-on lab
 
 Create a temporary practice directory outside the repository and place the Python program from
-"Build it in Python" in `chapter36_validation.py`. Use only the included synthetic records.
+"Build it in Python" in `chapter42_validation.py`. Use only the included synthetic records.
 
-1. Run `python chapter36_validation.py` with Python 3.11 or later.
+1. Run `python chapter42_validation.py` with Python 3.11 or later.
 2. Confirm the fresh record passes and the 31-day record fails.
 3. Change the fresh record to an unapproved source ID and confirm rejection.
 4. Remove `unresolved_owner` and confirm the unresolved record fails.
@@ -1202,4 +1204,4 @@ supports review; it does not prove that a candidate satisfies Northstar's requir
 
 ---
 
-**Navigation:** [Previous: Chapter 35: Continuous Improvement](../../08-scale-economics-lifecycle/chapters/35-continuous-improvement.md) | [Module 09 overview](../README.md)
+**Navigation:** [Previous: Chapter 41: Product and UX Design for Agentic Systems](../../09-hybrid-ai-systems-engineering/chapters/41-product-ux-design-agentic-systems.md) | [Module 10 overview](../README.md)

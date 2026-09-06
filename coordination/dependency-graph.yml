@@ -42,13 +42,13 @@ stages:
   - id: S3
     name: module-blueprints
     predecessors: [J2]
-    parallel_nodes: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    parallel_nodes: [M1, M2, M3, M4, M5, M6, M7, M8, M9, M10]
     join: J3
 
   - id: J3
     name: chapter-contract-freeze
     owner: curriculum-architect
-    predecessors: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    predecessors: [M1, M2, M3, M4, M5, M6, M7, M8, M9, M10]
 
   - id: S4
     name: chapter-authoring
@@ -85,13 +85,13 @@ stages:
   - id: S7
     name: synthesis
     predecessors: [J5]
-    parallel_nodes: [CH36, CAPSTONE, CROSSREF, GLOSSARY, ACCESSIBILITY, CITATIONS]
+    parallel_nodes: [CH42, CAPSTONE, CROSSREF, GLOSSARY, ACCESSIBILITY, CITATIONS]
     join: J6
 
   - id: J6
     name: github-release-candidate
     owner: editor-in-chief
-    predecessors: [CH36, CAPSTONE, CROSSREF, GLOSSARY, ACCESSIBILITY, CITATIONS]
+    predecessors: [CH42, CAPSTONE, CROSSREF, GLOSSARY, ACCESSIBILITY, CITATIONS]
 
   - id: S8
     name: freshness-and-release

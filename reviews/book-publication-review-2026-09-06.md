@@ -16,11 +16,14 @@ This review records **observations at the time of the audit**. Several items bel
 have remediation underway; each finding carries a `Status` field so later passes can update
 it in place instead of re-litigating settled points.
 
+The Northstar capstone references below use its current Module 10, Chapter 42 identity. Corpus
+counts and measurements remain the original 9-module, 36-chapter audit snapshot.
+
 ## Post-audit remediation
 
 The final publication pass closed findings 1, 2, 3, 4, 6, 8, 9, and 10. The repository map
 now describes shipped artifacts accurately, the offline visual validator runs locally and in
-CI, all chapters use consistent review status and ownership metadata, Chapter 36 has an
+CI, all chapters use consistent review status and ownership metadata, Chapter 42 has an
 in-page outline, and every chapter has previous, module, and next navigation where applicable.
 A repository `CODEOWNERS` file assigns the maintained surface explicitly. Findings 5 and 7
 remain documented maintenance work: review disciplines should gain dedicated artifacts, and
@@ -31,7 +34,7 @@ and canonical-source policy.
 
 - 36 chapter files across 9 modules; 86 Markdown files repository-wide.
 - Chapter word counts: total 126,883 words, mean 3,525 words/chapter, max 9,217
-  (Chapter 36), min 1,362.
+  (Chapter 42), min 1,362.
 - Relative Markdown links checked repository-wide: 82; genuinely broken: 0.
 - Chapters containing at least one Markdown link to another `.md` file: 2 of 36, and both
   of those link only to the same external visuals transcript, not to another chapter.
@@ -123,9 +126,9 @@ surgical fix, and current status.
 - **Status:** fix in progress. This publication review is itself part of closing the gap;
   a dedicated technical-review and production-review artifact are still outstanding.
 
-### 6. Chapter 36 is an overlong page with no in-page navigation
+### 6. Chapter 42 is an overlong page with no in-page navigation
 - **Location:**
-  `modules/09-microsoft-synthesis-capstone/chapters/36-northstar-on-microsoft-stack.md`.
+  `modules/10-microsoft-synthesis-capstone/chapters/42-northstar-on-microsoft-stack.md`.
 - **Evidence:** 9,217 words / 1,170 lines / 43 H2+H3 headings, 2.6x the current
   36-chapter mean (3,525 words) and 6.8x the shortest chapter (1,362 words). No table of
   contents or anchor-link index precedes its 43 headings.

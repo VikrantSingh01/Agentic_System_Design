@@ -40,7 +40,7 @@ Northstar capstone. These are reading lanes through one book, not separate simpl
 ### Editorial development
 
 - Commission a developmental editor to test prerequisite order, chapter length, and repeated
-  explanations across all 36 chapters.
+  explanations across all 42 chapters.
 - Run a classroom pilot with advanced high-school and first-year college readers. Measure where
   they stop, which terms they look up, and whether they can complete the offline labs.
 - Add a professional technical review by independent specialists in evaluation, security,

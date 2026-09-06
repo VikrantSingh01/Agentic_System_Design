@@ -19,4 +19,4 @@ recovery, deployment, and data-state contracts.
 
 Load-test Northstar, enforce per-tenant budgets, plan regional recovery, and migrate models, prompts, and indexes with shadow traffic and rollback controls.
 
-**Continue:** [Previous module: Production Architecture and Operations](../07-production-architecture-operations/README.md) | [Book overview](../../README.md) | [Next module: Microsoft Synthesis and Capstone](../09-microsoft-synthesis-capstone/README.md)
+**Continue:** [Previous module: Production Architecture and Operations](../07-production-architecture-operations/README.md) | [Book overview](../../README.md) | [Next module: Hybrid AI Systems Engineering](../09-hybrid-ai-systems-engineering/README.md)

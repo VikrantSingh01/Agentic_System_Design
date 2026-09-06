@@ -161,13 +161,24 @@ flowchart LR
 
     def _write_module_tree(self, root: Path) -> None:
         modules = root / "modules"
-        for module in range(1, 10):
+        module_chapters = (
+            range(1, 5),
+            range(5, 9),
+            range(9, 14),
+            range(14, 19),
+            range(19, 24),
+            range(24, 28),
+            range(28, 33),
+            range(33, 36),
+            range(36, 42),
+            range(42, 43),
+        )
+        for module, chapter_numbers in enumerate(module_chapters, start=1):
             module_dir = modules / f"{module:02d}-module"
             chapters_dir = module_dir / "chapters"
             chapters_dir.mkdir(parents=True)
-            start = (module - 1) * 4 + 1
             lines = ["# Module", "", "## Chapters", ""]
-            for number in range(start, start + 4):
+            for number in chapter_numbers:
                 filename = f"{number:02d}-chapter.md"
                 (chapters_dir / filename).write_text(
                     valid_chapter(number), encoding="utf-8"

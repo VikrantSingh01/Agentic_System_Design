@@ -81,7 +81,8 @@ Northstar that:
   inputs, decisions, state transitions, tool events, policy results, and outcomes.
 - Every chapter contains at least two small Mermaid visuals in the eventual chapter. Each
   visual needs a one-sentence takeaway and an equivalent numbered text description.
-- Product mappings are replaceable examples. Chapter 36 owns final Microsoft service mapping.
+- Product mappings are replaceable examples. Module 09 consumes vendor-neutral engineering
+  evidence first; Module 10 Chapter 42 owns final Microsoft service mapping.
 
 ## Shared vocabulary
 
@@ -373,8 +374,9 @@ chapter. Record assumptions and require qualified legal and privacy review befor
 Pass the tenant boundary matrix, isolation-tier decision, home-region and residency policy,
 RPO and RTO measurements, failover state machine, and recovery evidence to Chapter 35. Every
 Chapter 35 shadow, migration, rollback, and retirement operation must retain these tenant and
-region constraints. Pass unresolved topology and product choices to Chapter 36 as
-requirements, not implied selections.
+region constraints. Pass unresolved topology and product choices to Module 09 as
+requirements, not implied selections. Module 10 Chapter 42 receives them only after Module 09
+has accepted the engineering constraints and evidence.
 
 ## Chapter 35: Continuous Improvement
 
@@ -504,10 +506,12 @@ requires an approved source plus release-time verification before publication.
 ### Handoff
 
 Pass the accepted workload and cost baseline, tenant-region requirements, component registry,
-migration and retirement controls, drift evidence, and unresolved decisions to Chapter 36.
-Chapter 36 may map these requirements to Microsoft services but may not replace them with
-product defaults or weaken vendor-neutral interfaces. Carry qualified privacy, legal,
-security, accessibility, procurement, and governance reviews as explicit gates.
+migration and retirement controls, drift evidence, and unresolved decisions first to Module
+09. Chapters 36-41 use them to constrain routes, hardware, faults, tools, assurance, and user
+experience without redefining Module 08 evidence. Module 10 Chapter 42 may map the accepted
+requirements to Microsoft services but may not replace them with product defaults or weaken
+vendor-neutral interfaces. Carry qualified privacy, legal, security, accessibility,
+procurement, and governance reviews as explicit gates.
 
 ## Cross-module handoff contract
 
@@ -526,9 +530,12 @@ production readiness.
 
 ### Outputs supplied
 
-- To Chapter 36: vendor-neutral workload classes, economics, quota and capacity policies,
-  isolation tiers, tenant-region rules, measured RPO and RTO, lifecycle registry, migration
-  state machine, retirement evidence, and unresolved product facts requiring fresh sources.
+- To Module 09 engineering synthesis: vendor-neutral workload classes, economics, quota and
+  capacity policies, isolation tiers, tenant-region rules, measured RPO and RTO, lifecycle
+  registry, migration state machine, retirement evidence, and unresolved product facts.
+- To Module 10 Chapter 42 after Module 09 acceptance: the same versioned evidence plus the
+  accepted route, hardware, fault, tool, assurance, and experience constraints, with product
+  facts still requiring fresh sources.
 - To Northstar J5 readiness: load and failure evidence, accepted-result unit cost, hard-budget
   compliance, negative tenant-isolation tests, regional game-day results, drift detection,
   rollback proof, and kill-switch and retirement exercises.
@@ -567,8 +574,8 @@ production readiness.
   conclusions are labeled assumptions with an owner and evidence gate.
 - [ ] Only SRC-046 and SRC-052 support Chapter 33; SRC-045 and SRC-072 support Chapter 34;
   SRC-012, SRC-028, SRC-064, and SRC-070 support Chapter 35.
-- [ ] Product and provider claims are marked volatile, dated, and deferred to Chapter 36 when
-  no approved claim-level source exists.
+- [ ] Product and provider claims are marked volatile, dated, and deferred to Module 10
+  Chapter 42 when no approved claim-level source exists.
 - [ ] Private chain-of-thought is absent from labs, traces, feedback, approvals, and evaluation.
 - [ ] The final `ScaleLifecyclePlan` is versioned, machine-readable, reviewable by a beginner,
   and linked to deterministic tests and evidence.
@@ -585,6 +592,7 @@ For each chapter brief derived from this contract, the author must identify:
 6. The seeded failures and the metrics that distinguish their causes.
 7. The Northstar files or decisions incremented without selecting a provider.
 8. The approved source IDs, claim boundaries, and freshness labels.
-9. The artifacts handed to the next chapter and Chapter 36.
+9. The artifacts handed to the next chapter, Module 09 engineering synthesis, and then
+  Module 10 Chapter 42.
 10. The acceptance evidence showing that no earlier quality, safety, privacy, reliability,
     recovery, or governance threshold was weakened.

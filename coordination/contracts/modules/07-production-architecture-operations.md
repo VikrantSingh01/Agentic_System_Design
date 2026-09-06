@@ -746,13 +746,18 @@ reliability, and recovery controls. Chapter 34 may add tenants and regions only 
 isolation and recovery. Chapter 35 may use production feedback only through the privacy-safe
 telemetry and governed release paths established here.
 
-### Output to Module 09
+### Outputs to Modules 09 and 10
 
-Chapter 36 receives stable vendor-neutral interfaces and requirements, not preselected cloud
-products. Microsoft mappings in Chapters 28-32 are dated examples only. Chapter 36 must
-reverify every volatile product, SDK, availability, region, quota, identity, data-handling,
-and service-boundary claim within 30 days of release and preserve build, buy, and hybrid
-alternatives.
+Module 09 receives stable vendor-neutral interfaces, component and failure boundaries,
+telemetry, delivery, state, and recovery evidence, not preselected cloud products. Chapters
+36-41 may extend that evidence for hybrid routes, hardware, cross-layer faults, tool
+portfolios, assurance, and user experience but may not redefine the production mechanisms.
+
+Module 10 Chapter 42 receives the accepted Module 09 engineering packet plus the retained
+Module 07 evidence. Microsoft mappings in Chapters 28-32 are dated examples only. Chapter 42
+must reverify every volatile product, SDK, availability, region, quota, identity,
+data-handling, and service-boundary claim within 30 days of release and preserve build, buy,
+and hybrid alternatives.
 
 ## Module acceptance checklist
 

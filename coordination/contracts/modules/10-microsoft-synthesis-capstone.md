@@ -1,13 +1,13 @@
-# Module 09 Contract: Microsoft Synthesis and Capstone
+# Module 10 Contract: Microsoft Synthesis and Capstone
 
 > Status: planned
-> Owner: J2 Module 09 contract author
+> Owner: J2 Module 10 contract author
 > Last verified: 2026-09-06
-> Scope: Chapter 36 only
+> Scope: Chapter 42 only
 
 ## Module purpose
 
-Module 09 completes the Northstar Research Assistant by testing whether its accepted,
+Module 10 completes the Northstar Research Assistant by testing whether its accepted,
 vendor-neutral production design can be implemented with current Microsoft services without
 weakening its interfaces, invariants, evaluation gates, or replacement paths. The chapter is
 a synthesis and production-readiness gate, not a first introduction to architecture and not a
@@ -18,7 +18,7 @@ requirement, threat model, evaluation result, workload measurement, or build, bu
 decision. Every product statement is volatile and must be verified against an approved primary
 source no more than 30 days before release.
 
-## Chapter 36: Northstar on the Microsoft Stack
+## Chapter 42: Northstar on the Microsoft Stack
 
 ### Reader question
 
@@ -27,11 +27,12 @@ requirements or interfaces?
 
 ### Prerequisites
 
-Direct prerequisites are Chapters 27, 28, 29, 30, 31, 32, 33, 34, and 35. Their prerequisite
-closure supplies the bounded runtime, permission-aware retrieval, evaluation harness,
-security controls, durable execution, observability, delivery, state design, economics,
-tenant and regional controls, and lifecycle evidence used here. Chapter 36 must not reteach
-or silently revise those contracts.
+Direct prerequisites are Chapters 36, 37, 38, 39, 40, and 41. Their prerequisite closure
+includes Chapters 27-35 and supplies the bounded runtime, permission-aware retrieval,
+evaluation harness, security controls, durable execution, observability, delivery, state
+design, economics, tenant and regional controls, lifecycle evidence, hybrid route policy,
+hardware profiles, fault campaign, governed tool portfolio, assurance case, and experience
+contract used here. Chapter 42 must not reteach or silently revise those contracts.
 
 ### Reader entry
 
@@ -43,6 +44,8 @@ The reader enters with:
 - representative evaluation and workload evidence, including the deterministic baseline;
 - a threat model, data classification, identity model, authority model, and governance record;
 - tested infrastructure, release, rollback, backup, restore, regional, and retirement plans;
+- an accepted Module 09 `HybridSystemsPacket` with route, hardware, fault, tool, assurance,
+  and user-experience evidence linked to Modules 05-08;
 - no requirement for prior Microsoft cloud product knowledge.
 
 ### Reader exit
@@ -55,6 +58,8 @@ The reader leaves able to:
 - identify product facts that need claim-level evidence and a 30-day freshness check;
 - review Python adapters, infrastructure as code, delivery controls, and operating evidence as
   one deployable system;
+- prove that service mappings preserve Module 09 route eligibility, hardware constraints,
+  fault containment, tool governance, assurance, user control, and accessibility contracts;
 - conduct a production-readiness review that can accept, conditionally accept, or reject the
   capstone without making a compliance claim.
 
@@ -85,23 +90,25 @@ and either passes its mapped acceptance test or remains an explicitly owned unre
 
 1. A frozen-requirements register with stable requirement IDs, owners, thresholds, and prior
    acceptance evidence.
-2. A vendor-neutral reference architecture and deployment-context decision record inherited
-   from Chapter 28.
-3. A build, buy, or hybrid decision matrix for every vendor-neutral component, including the
+2. The accepted Module 09 `HybridSystemsPacket`, including route, hardware, fault, tool,
+  assurance, and experience contracts and their traceability to Modules 05-08.
+3. A vendor-neutral reference architecture and deployment-context decision record inherited
+  from Chapter 28.
+4. A build, buy, or hybrid decision matrix for every vendor-neutral component, including the
    deterministic baseline and a no-change option.
-4. A service-mapping matrix that records requirement IDs, adapter boundaries, product claim
+5. A service-mapping matrix that records requirement IDs, adapter boundaries, product claim
    text, approved source IDs, verification dates, release dates, regions, limitations,
    acceptance tests, and exit paths.
-5. Python 3.11 adapter contracts and offline deterministic tests. All runnable examples are
+6. Python 3.11 adapter contracts and offline deterministic tests. All runnable examples are
    Python. No runnable example may require another programming language.
-6. Infrastructure-as-code plans and modules for each environment, with reviewable plans,
+7. Infrastructure-as-code plans and modules for each environment, with reviewable plans,
    policy checks, secret references, identity assignments, network boundaries, regional
    parameters, tags, budgets, and rollback or destroy procedures.
-7. A traceability matrix from frozen requirements through service mappings, infrastructure,
+8. A traceability matrix from frozen requirements through service mappings, infrastructure,
    tests, telemetry, runbooks, and named owners.
-8. A product-verification record showing that every released product statement passed the
+9. A product-verification record showing that every released product statement passed the
    30-day freshness rule.
-9. A production-readiness review packet, decision, conditions, residual risks, and follow-up
+10. A production-readiness review packet, decision, conditions, residual risks, and follow-up
    owners.
 
 ### Concepts to teach
@@ -132,7 +139,9 @@ Map the accepted vendor-neutral Northstar interfaces to current Microsoft servic
 supported Python SDKs, infrastructure as code, and delivery controls, then complete a
 production-readiness review. Preserve every earlier invariant, especially deny-by-default
 tools, permission-filtered retrieval, exact-payload approval, idempotency, tenant propagation,
-bounded execution, redacted telemetry, recovery, and replaceable provider boundaries.
+bounded execution, redacted telemetry, recovery, replaceable provider boundaries, hybrid
+route eligibility, measured hardware limits, fault containment, tool-portfolio policy,
+assurance traceability, informed user control, and accessibility.
 
 The increment is accepted only if mappings are derived from frozen requirements. Product-led
 redesign requires a new architecture decision and reruns all affected evaluation, security,
@@ -272,6 +281,8 @@ The failure lab injects at least these cases:
 - a regional dependency absent from the declared recovery region;
 - telemetry that captures protected source content;
 - a lower-cost mapping that misses a frozen quality or recovery threshold;
+- a service adapter that bypasses an accepted Module 09 route or tool eligibility gate;
+- a user experience mapping that hides cancellation or makes an approval inaccessible;
 - an infrastructure change that cannot be rolled back or reconstructed.
 
 The reader diagnoses each failure from the traceability and evidence records, applies a
@@ -287,6 +298,9 @@ Evaluation reports:
 - security, privacy, safety, accessibility, and redaction results;
 - p50, p95, and p99 latency, throughput, saturation, availability, recovery, RPO, and RTO;
 - cost per accepted report and comparison with the deterministic baseline;
+- route eligibility, device memory, energy, thermal, fault-containment, and fallback evidence;
+- tool-portfolio selection, protocol lifecycle, authorization, cancellation, and replacement;
+- user comprehension, appropriate reliance, interruption, recovery, and accessibility results;
 - operator workload, alert quality, runbook success, deployment rollback, and restore results;
 - portability evidence from at least one critical adapter substitution or exit exercise;
 - product-claim freshness coverage, which must equal 100 percent for release.
@@ -298,10 +312,11 @@ data, cost, accessibility, governance, source, and release owners. Qualified leg
 required for legal conclusions; passing this review is not a compliance certification.
 
 The panel reviews the declared deployment context, accepted requirements, architecture and
-trust boundaries, build/buy/hybrid rationale, source freshness, Python and infrastructure
-evidence, evaluation results, threat treatments, identity and data flows, operational
-dashboards, alerts, runbooks, incident path, recovery drills, release and rollback evidence,
-cost envelope, unresolved decisions, and retirement plan.
+trust boundaries, Module 09 `HybridSystemsPacket`, build/buy/hybrid rationale, source
+freshness, Python and infrastructure evidence, evaluation results, threat treatments,
+identity and data flows, operational dashboards, alerts, runbooks, incident path, recovery
+drills, release and rollback evidence, cost envelope, user-experience evidence, unresolved
+decisions, and retirement plan.
 
 The decision is one of:
 
@@ -326,7 +341,7 @@ The decision is one of:
 
 ### Approved sources
 
-Only these Chapter 36 ledger entries are approved for claims in this contract:
+Only these Chapter 42 ledger entries are approved for claims in this contract:
 
 | Source ID | Permitted use | Freshness treatment |
 |---|---|---|
@@ -342,10 +357,12 @@ entries.
 
 ### Capstone acceptance
 
-Chapter 36 and the Northstar capstone are accepted only when all conditions below pass:
+Chapter 42 and the Northstar capstone are accepted only when all conditions below pass:
 
 - [ ] The submission traces every Microsoft mapping to a frozen vendor-neutral responsibility
       and requirement ID.
+- [ ] Every mapping preserves the accepted Chapters 36-41 route, hardware, fault, tool,
+  assurance, experience, user-control, and accessibility contracts.
 - [ ] Build, buy, hybrid, and no-change options are compared, and the selected option is
       defended with measured workload and evaluation evidence.
 - [ ] The deterministic baseline remains available wherever an agentic or managed addition

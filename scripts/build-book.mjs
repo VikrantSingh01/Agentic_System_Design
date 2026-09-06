@@ -13,6 +13,7 @@ import puppeteer from "puppeteer";
 
 const root = path.resolve(import.meta.dirname, "..");
 const modulesRoot = path.join(root, "modules");
+const readerGuidePath = path.join(root, "front-matter", "reader-guide.md");
 const buildRoot = path.join(root, "build", "book");
 const outputRoot = path.join(root, "book");
 const docsRoot = path.join(root, "docs");
@@ -66,7 +67,7 @@ async function collectBook() {
     .map((entry) => entry.name)
     .sort();
 
-  if (moduleDirs.length !== 9) throw new Error(`Expected 9 modules, found ${moduleDirs.length}`);
+  if (moduleDirs.length !== 10) throw new Error(`Expected 10 modules, found ${moduleDirs.length}`);
 
   const modules = [];
   const chapters = [];
@@ -107,9 +108,9 @@ async function collectBook() {
     modules.push(moduleRecord);
   }
 
-  if (chapters.length !== 36) throw new Error(`Expected 36 chapters, found ${chapters.length}`);
+  if (chapters.length !== 42) throw new Error(`Expected 42 chapters, found ${chapters.length}`);
   if (chapters.some((chapter, index) => chapter.number !== index + 1)) {
-    throw new Error("Chapter sequence must be exactly 1 through 36");
+    throw new Error("Chapter sequence must be exactly 1 through 42");
   }
   return { modules, chapters };
 }
@@ -179,7 +180,8 @@ img, svg { max-width:100%; height:auto; }
 .cover-meta { margin-top:auto; }
 .cover .author { margin:0 0 2mm; color:white; font:600 13pt/1.3 "Segoe UI",sans-serif; }
 .cover .edition { margin:0; color:#bcd4d8; font:9.5pt/1.3 "Segoe UI",sans-serif; }
-.contents { break-after:page; }
+.reader-guide, .contents { break-after:page; }
+.reader-guide { padding-top:8mm; }
 .contents > ol { columns:2; column-gap:12mm; padding-left:1.3rem; }
 .contents li { margin:.18rem 0; break-inside:avoid; font-family:"Segoe UI",Calibri,sans-serif; font-size:9pt; }
 .contents > ol > li { margin:0 0 .7rem; color:var(--blue); font-weight:700; }
@@ -204,8 +206,8 @@ img, svg { max-width:100%; height:auto; }
   .web-header a { color:white; }
   .cover { min-height:calc(100vh - 44px); height:auto; padding:clamp(2rem,8vw,5rem) max(1.5rem,calc((100% - 920px)/2)); }
   .cover-content { min-height:calc(100vh - 10rem); }
-  .contents, main { width:min(100%,920px); margin:0 auto; padding:2rem clamp(1rem,4vw,3.5rem); background:white; }
-  .contents { min-height:100vh; }
+  .reader-guide, .contents, main { width:min(100%,920px); margin:0 auto; padding:2rem clamp(1rem,4vw,3.5rem); background:white; }
+  .reader-guide, .contents { min-height:100vh; }
   .module-opener, .chapter { min-height:0; padding-top:4rem; scroll-margin-top:3rem; }
   .back-to-contents { float:right; margin:.5rem 0 1rem 1rem; color:var(--teal); font:600 9pt/1.3 "Segoe UI",sans-serif; }
 }
@@ -225,6 +227,18 @@ img, svg { max-width:100%; height:auto; }
   :not(pre) > code { white-space:normal; overflow-wrap:anywhere; }
   .katex-display { max-width:100%; overflow-x:auto; overflow-y:hidden; }
   .diagram, .diagram svg { max-width:100%; overflow:hidden; }
+  .reader-guide table:nth-of-type(2),
+  .reader-guide table:nth-of-type(2) tbody,
+  .reader-guide table:nth-of-type(2) tr,
+  .reader-guide table:nth-of-type(2) td { display:block; width:100%; }
+  .reader-guide table:nth-of-type(2) thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  .reader-guide table:nth-of-type(2) tr { margin:0 0 .8rem; border:1px solid var(--line); }
+  .reader-guide table:nth-of-type(2) td { border:0; border-bottom:1px solid var(--line); }
+  .reader-guide table:nth-of-type(2) td:last-child { border-bottom:0; }
+  .reader-guide table:nth-of-type(2) td::before { display:block; color:var(--blue); font:700 8pt/1.3 "Segoe UI",sans-serif; }
+  .reader-guide table:nth-of-type(2) td:nth-child(1)::before { content:"Role"; }
+  .reader-guide table:nth-of-type(2) td:nth-child(2)::before { content:"Focused path"; }
+  .reader-guide table:nth-of-type(2) td:nth-child(3)::before { content:"Decision or output"; }
 }
 `;
 }
@@ -262,8 +276,9 @@ async function main() {
   await fs.cp(path.join(root, "node_modules", "katex", "dist", "fonts"), path.join(buildRoot, "fonts"), { recursive: true });
   await fs.cp(path.join(root, "node_modules", "katex", "dist", "fonts"), path.join(docsRoot, "fonts"), { recursive: true });
 
-  const [{ modules }, mermaidSource, katexCss] = await Promise.all([
+  const [{ modules }, readerGuideSource, mermaidSource, katexCss] = await Promise.all([
     collectBook(),
+    fs.readFile(readerGuidePath, "utf8"),
     fs.readFile(path.join(root, "node_modules", "mermaid", "dist", "mermaid.min.js"), "utf8"),
     fs.readFile(path.join(root, "node_modules", "katex", "dist", "katex.min.css"), "utf8"),
   ]);
@@ -287,6 +302,7 @@ async function main() {
       <div class="cover-meta"><p class="author">Vikrant Singh, Microsoft</p><p class="edition">First edition &nbsp;|&nbsp; September 2026</p></div>
     </div>
   </section>
+  <section class="reader-guide" id="reader-guide"><h1>How to Use This Book</h1>${markdown.render(withoutFirstHeading(readerGuideSource))}</section>
   <nav class="contents" id="contents"><h1>Contents</h1><ol>${tableOfContents(modules)}</ol></nav>
   <main>${bookSections(modules)}</main>
   <script>${mermaidSource}</script>
@@ -294,7 +310,7 @@ async function main() {
     mermaid.initialize({ startOnLoad:false, securityLevel:"strict", theme:"base", themeVariables:{ primaryColor:"#eef5f6", primaryTextColor:"#18222b", primaryBorderColor:"#0b5c7a", lineColor:"#53606a", secondaryColor:"#f2f8f7", tertiaryColor:"#fff7e6", fontFamily:"Segoe UI, sans-serif" }, flowchart:{ useMaxWidth:true, htmlLabels:true } });
     mermaid.run().then(() => { document.documentElement.dataset.mermaidReady = "true"; }).catch((error) => { document.documentElement.dataset.mermaidError = String(error); });
   </script>
-</body></html>`;
+</body></html>`.replace(/[\t ]+$/gm, "");
   await fs.writeFile(htmlPath, html, "utf8");
   await fs.writeFile(webPath, html, "utf8");
   await fs.writeFile(path.join(docsRoot, ".nojekyll"), "", "utf8");

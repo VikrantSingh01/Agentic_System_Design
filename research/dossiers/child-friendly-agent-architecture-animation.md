@@ -334,7 +334,7 @@ Pages use.
 - **Secondary:** Module 07, Chapter 28, using the twelve-scene full instance. Its frozen concept
   picture already uses this dossier's front-door/coordinator/specialists/records-area structure.
 - **Cross-links, not duplicates:** Chapter 8 for budgets and termination; Chapter 18 for
-  tool/subagent protocol boundaries; Chapters 24-26 for the security moments; Chapter 36 for a
+  tool/subagent protocol boundaries; Chapters 24-26 for the security moments; Chapter 42 for a
   capstone recap.
 
 ## Sources, freshness, and confidence

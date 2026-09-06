@@ -525,7 +525,7 @@ Keep `Observation`, `ActionProposal`, policy, confirmation, execution, and
 verification provider-neutral. The approved source ledger does not currently
 contain a Microsoft source specific enough to justify a Chapter 13 browser,
 vision, speech, or Microsoft 365 SDK recipe. Therefore this chapter makes no
-product-support claim. Chapter 36 must select freshly verified Microsoft
+product-support claim. Chapter 42 must select freshly verified Microsoft
 services and supported Python SDKs, record their versions and permissions, and
 map them behind these interfaces. The offline simulation requires none of them.
 

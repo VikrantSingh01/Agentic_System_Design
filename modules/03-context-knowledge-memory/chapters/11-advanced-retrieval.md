@@ -478,7 +478,7 @@ hybrid search, filters, and semantic ranking [SRC-043]. Product features, Python
 packages, authentication guidance, API versions, limits, and ranking behavior
 are **volatile** and must be rechecked before implementation. The application
 must preserve the vendor-neutral identity and permission boundary regardless of
-the current client or credential implementation selected in Chapter 36.
+the current client or credential implementation selected in Chapter 42.
 
 A production mapping is:
 

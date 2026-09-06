@@ -3,7 +3,7 @@
 Status: Proposed for J2  
 Freeze date: 2026-09-05  
 Owner: CURRICULUM  
-Scope: Chapters 1-36
+Scope: Chapters 1-42
 
 ## Purpose
 
@@ -86,11 +86,22 @@ The first-pass lane starts with familiar choices and feedback before introducing
 | 34 | How do we serve many tenants across regions without mixing data or losing recovery? | 26, 29, 31, 32, 33 | Demonstrate tenant isolation and noisy-neighbor controls, then execute a regional failover that meets stated recovery time and recovery point objectives. | Add per-tenant identity, data, quota, and cost boundaries plus residency, replication, failover, and disaster-recovery plans. | SRC-045, SRC-072 |
 | 35 | How can the system learn from production and change models, prompts, or indexes safely? | 23, 27, 30, 31, 33, 34 | Detect a seeded drift or regression and complete a privacy-safe shadow, migration, rollback, deprecation, and kill-switch exercise. | Add sampled feedback, drift monitors, experiment governance, shadow traffic, versioned migrations, rollback, and retirement controls. | SRC-012, SRC-028, SRC-064, SRC-070 |
 
-## Module 09: Microsoft Synthesis and Capstone
+## Module 09: Hybrid AI Systems Engineering
 
 | Ch | Reader question | Prerequisite chapters | Measurable outcome | Northstar increment | Approved source IDs |
 |---:|---|---|---|---|---|
-| 36 | How should we map the proven design to Microsoft services without surrendering our requirements or interfaces? | 27, 28, 29, 30, 31, 32, 33, 34, 35 | Produce and defend a build, buy, or hybrid architecture whose service mappings satisfy the frozen quality, security, reliability, operations, recovery, and cost requirements, with every volatile claim freshly verified. | Map the accepted vendor-neutral Northstar interfaces to current Microsoft services, SDKs, infrastructure as code, and delivery controls, then complete a production-readiness review. | SRC-040, SRC-042, SRC-044, SRC-045, SRC-046 |
+| 36 | When should work run on a deterministic subsystem, device model, edge model, or cloud model, and how can the system choose without weakening its contracts? | 6, 8, 19, 28, 29, 33, 35 | Implement an offline orchestrator that selects only eligible routes and passes restricted-data, connectivity, calibration, capability, quality, budget, fallback, cancellation, and fail-closed cases. | Add a provider-neutral route catalog and policy orchestrator before the model gateway while retaining the simplest eligible single-route baseline. | SRC-103, SRC-106, SRC-107, SRC-111 |
+| 37 | How do latency, throughput, memory, energy, and heat change which AI work a device can accept? | 30, 33, 34, 36 | Profile deterministic burst and sustained workloads, report latency, throughput, memory, energy per accepted task, thermal, queue, and rejection measures, and enforce admission limits. | Add versioned hardware profiles and route admission limits without changing accepted quality, capacity, latency, or cost thresholds. | SRC-104, SRC-105, SRC-108, SRC-111 |
+| 38 | How can we prove that faults across models, devices, tools, state, and networks stay bounded and lead to recovery or a safe stop? | 22, 23, 24, 29, 30, 35, 36, 37 | Run a deterministic cross-layer fault campaign that detects every seeded fault, prevents duplicate or unauthorized effects, and reaches the expected bounded terminal state. | Add a hybrid fault model and campaign to the existing regression suite while preserving task, security, telemetry, and recovery contracts. | SRC-024, SRC-025, SRC-057, SRC-058, SRC-060 |
+| 39 | Which tools should the system expose, how should MCP carry them, and when should a tool be combined, replaced, restricted, or retired? | 7, 18, 23, 25, 28, 30, 38 | Produce a governed tool portfolio and replaceable protocol adapter that pass discovery, schema, version, denial, lifecycle, cancellation, timeout, idempotency, audit, and substitution tests. | Add a minimized tool registry and MCP adapter while preserving the stable domain interface, deny-by-default authority, and offline direct-call replacement. | SRC-016, SRC-017, SRC-038, SRC-060, SRC-112 |
+| 40 | How do we make security a property of the hybrid architecture and its evidence rather than a review added after implementation? | 24, 25, 26, 27, 28, 31, 38, 39 | Produce an assurance case tracing every material hybrid threat to architecture, controls, executable tests, operating evidence, owners, recovery, residual risk, and a blocking release verdict. | Link accepted security controls to hybrid routes, hardware, faults, protocols, and tools through machine-checkable assurance evidence. | SRC-057, SRC-058, SRC-059, SRC-060 |
+| 41 | How should an agentic product communicate capability, progress, uncertainty, control, and recovery so people can use it effectively without misplaced trust? | 13, 19, 21, 23, 26, 27, 30, 35, 38, 40 | Build and test an offline interaction prototype for capability, evidence-based progress, uncertainty, approval, interruption, recovery, preference deletion, appropriate reliance, and accessibility. | Add a versioned experience contract and accessible interaction state machine with informed control, recoverable states, and minimized preferences. | SRC-057, SRC-066, SRC-113, SRC-114, SRC-115 |
+
+## Module 10: Microsoft Synthesis and Capstone
+
+| Ch | Reader question | Prerequisite chapters | Measurable outcome | Northstar increment | Approved source IDs |
+|---:|---|---|---|---|---|
+| 42 | How should we map the proven design to Microsoft services without surrendering our requirements or interfaces? | 36, 37, 38, 39, 40, 41 | Produce and defend a build, buy, or hybrid architecture whose service mappings preserve all frozen requirements and pass mapped tests, with every volatile claim freshly verified. | Map the accepted vendor-neutral Northstar and Module 09 engineering packet to current Microsoft services, SDKs, infrastructure as code, and delivery controls, then complete a production-readiness review. | SRC-040, SRC-042, SRC-044, SRC-045, SRC-046 |
 
 ## Misconception Progression
 
@@ -115,7 +126,13 @@ Module briefs must assign each misconception to the named chapter and must not a
 | 33 | The cheapest model creates the cheapest useful system. |
 | 34 | A shared application layer guarantees tenant isolation. |
 | 35 | Production feedback can be reused without privacy, bias, or rollback controls. |
-| 36 | A cloud product choice replaces system design. |
+| 36 | The fastest or smallest available model is automatically the right route for a task. |
+| 37 | One average benchmark predicts sustained performance, energy use, and thermal behavior. |
+| 38 | Passing component tests proves that cross-layer faults cannot cascade through the system. |
+| 39 | More tools always improve capability, and using a protocol makes those tools safe. |
+| 40 | Security can be added as a checklist after routes, protocols, tools, and deployment are designed. |
+| 41 | Human-like language, confident progress, and engagement prove that users understand and can control an agent. |
+| 42 | A cloud product choice replaces system design. |
 
 ## Cross-Module Prerequisite Rules
 
@@ -125,22 +142,26 @@ Module briefs must assign each misconception to the named chapter and must not a
 4. Context and data features in Module 03 depend on typed boundaries from Chapters 5-8. Permission-aware retrieval must precede identity and tenant-isolation claims in Chapter 26.
 5. Workflow, planning, and collaboration choices in Module 04 must retain a simpler baseline. Durable execution in Chapter 16 is required before protocol lifecycle and production reliability work.
 6. Chapter 19 freezes measurable success before later optimization, security acceptance, production readiness, or economics claims. Chapters 20-23 supply the regression gate required by all production changes.
-7. Security is cumulative, not deferred to Module 06. Earlier chapters must preserve least authority and safe fixtures; Chapters 24-27 formalize the threat, identity, privacy, safety, and governance evidence required by Modules 07-09.
+7. Security is cumulative, not deferred to Module 06. Earlier chapters must preserve least authority and safe fixtures; Chapters 24-27 formalize the threat, identity, privacy, safety, and governance evidence required by Modules 07-10.
 8. Module 07 may distribute only designs already evaluated in Module 05 and controlled in Module 06. Reliability precedes observability, delivery, and scaled state decisions where listed.
 9. Module 08 may optimize only against Chapter 19 thresholds and Module 07 telemetry. Cost reductions that violate quality, safety, privacy, reliability, or recovery thresholds fail acceptance.
-10. Chapter 36 is synthesis, not first exposure. It must map accepted vendor-neutral interfaces and requirements to Microsoft services, preserve build/buy/hybrid alternatives, and reverify volatile sources within 30 days of release.
-11. Cross-module additions or reordered prerequisites require an accepted coordination request. A breaking change invalidates affected downstream briefs and must be reconciled at the next join.
+10. Module 09 consumes accepted Modules 05-08 evidence and adds only hybrid route, hardware, cross-layer fault, tool-portfolio, assurance, and user-experience decisions. It must not redefine evaluation metrics, security invariants, production mechanisms, workload economics, tenant-region rules, or lifecycle controls.
+11. Chapter 42 is synthesis, not first exposure. It consumes the accepted Chapters 36-41 engineering packet, maps frozen vendor-neutral interfaces and requirements to Microsoft services, preserves build/buy/hybrid alternatives, and reverifies volatile sources within 30 days of release.
+12. Cross-module additions or reordered prerequisites require an accepted coordination request. A breaking change invalidates affected downstream briefs and must be reconciled at the next join.
 
 ## J2 Acceptance Checklist
 
-- [ ] Chapters 1-36 each appear exactly once and retain all six columns in the chapter matrix.
+- [ ] Chapters 1-42 each appear exactly once and retain all six columns in the chapter matrix.
 - [ ] Every chapter has one plain-language reader question, explicit prerequisites, one observable and assessable outcome, one cumulative Northstar increment, and 2-5 approved source IDs.
 - [ ] Every source ID exists in `research/source-ledger.csv` with status `approved`; no dossier-only candidate is cited.
 - [ ] Every prerequisite points to an earlier chapter, and the prerequisite graph is acyclic.
 - [ ] Chapters 1-4 are teachable without machine-learning or cloud background; jargon is defined only after intuition and only within prerequisite closure.
 - [ ] Each module outcome and Northstar milestone in the module README is covered by its chapter rows with no orphaned promise.
-- [ ] The Northstar increments form a cumulative path from a non-agent baseline through bounded runtime, cited retrieval, evaluated memory, durable work, evaluation, security, operations, scale, and Microsoft synthesis.
+- [ ] The Northstar increments form a cumulative path from a non-agent baseline through bounded runtime, cited retrieval, evaluated memory, durable work, evaluation, security, operations, scale, hybrid systems engineering, user control, and Microsoft synthesis.
 - [ ] Multi-agent, protocol, memory, cloud, and optimization choices include a simpler baseline or a measurable adoption criterion.
+- [ ] Chapters 36-41 consume named Modules 05-08 artifacts without duplicating or weakening their metric, threat, identity, reliability, telemetry, delivery, data, economics, tenant-region, migration, or retirement contracts.
+- [ ] Chapter 36 gates route eligibility before optimization; Chapter 37 measures sustained hardware behavior; Chapter 38 tests cross-layer fault containment; Chapter 39 minimizes and governs tools; Chapter 40 assembles executable assurance; Chapter 41 tests informed control and accessibility.
+- [ ] Chapter 42 consumes the accepted Module 09 packet and maps it through replaceable adapters without preselecting a product or relaxing a frozen requirement.
 - [ ] Consequential actions retain authorization, idempotency, audit, cancellation, and recovery requirements wherever applicable.
 - [ ] Private chain-of-thought is not required as an interface, trace, outcome, or evaluation artifact.
 - [ ] Accessibility, privacy, tenant isolation, source freshness, rollback, and qualified legal review appear before production-readiness acceptance.

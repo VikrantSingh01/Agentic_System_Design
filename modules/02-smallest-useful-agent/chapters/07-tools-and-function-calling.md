@@ -479,7 +479,7 @@ adding those fields to the model's arguments.
 ## Microsoft implementation
 
 The durable design above does not require a framework. Keep `ToolContract`,
-`ToolRequest`, and `ToolResult` as application-owned interfaces. Chapter 36 maps those
+`ToolRequest`, and `ToolResult` as application-owned interfaces. Chapter 42 maps those
 interfaces to freshly verified Microsoft services and Python SDKs after the tool
 authority, validation, approval, deadline, and idempotency requirements are accepted.
 This chapter deliberately selects no Microsoft package or credential type because those

@@ -30,6 +30,10 @@ Shared files have one owner per stage:
 - Python dependency lockfile: Runtime Maintainer
 - GitHub Actions workflows: Release Engineer
 
+## Curriculum structure
+
+The curriculum contains 42 chapters across ten numbered modules. Module 09, `modules/09-hybrid-ai-systems-engineering/`, owns Chapters 36-41. Module 10, `modules/10-microsoft-synthesis-capstone/`, owns Chapter 42. Keep chapter filenames, title numbers, module index links, and previous/next navigation aligned with those boundaries.
+
 ## Chapter pull requests
 
 A chapter pull request must include:

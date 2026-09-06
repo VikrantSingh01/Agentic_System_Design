@@ -463,7 +463,7 @@ PASS: version, fake card, scope, replay, authenticated cancellation, lifecycle, 
 ## Microsoft implementation
 
 For a cautious, separately maintained mapping from these vendor-neutral protocol
-boundaries to Microsoft products, see Chapter 36. Product availability, protocol
+boundaries to Microsoft products, see Chapter 42. Product availability, protocol
 conformance, preview/GA status, and authentication support must be verified there
 against current approved sources; this chapter makes no Microsoft product claim.
 

@@ -24,5 +24,7 @@ Supplemental focused dossiers:
   agent-to-agent architecture, identity, governance, security tests, and rollout plan
 - [`multi-agent-invocation-papers.md`](multi-agent-invocation-papers.md): academic and
   standards evidence for coordinator-to-specialist delegation, lifecycle, and security
+- [`hybrid-ai-systems-engineering.md`](hybrid-ai-systems-engineering.md): critical evidence
+  for cloud/device routing, on-device SLMs, system testing, MCP tools, security, and Product/UX
 - [`child-friendly-agent-architecture-animation.md`](child-friendly-agent-architecture-animation.md):
   accessible visual-story and offline animation specification

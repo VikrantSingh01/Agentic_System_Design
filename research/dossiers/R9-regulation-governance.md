@@ -109,7 +109,7 @@ Exact applicability and legal interpretation require qualified review. All effec
 - Chapters 24-27: risk, privacy, accessibility, oversight, governance, and incident obligations
 - Chapters 28-32: policy control plane, evidence stores, retention, residency, and audit
 - Chapters 34-35: regional deployment, lifecycle, migrations, and retirement
-- Chapter 36: Microsoft implementation mappings only after jurisdiction and role are established
+- Chapter 42: Microsoft implementation mappings only after jurisdiction and role are established
 
 ## Discrepancies and unresolved questions
 

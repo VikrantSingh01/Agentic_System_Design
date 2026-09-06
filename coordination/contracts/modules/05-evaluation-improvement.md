@@ -548,9 +548,13 @@ version. Historical results remain linked to the old version and must not be sil
 - Module 08 may optimize scale and unit economics only inside frozen quality, safety, privacy,
   reliability, and recovery thresholds. Production feedback follows Chapter 23 provenance and
   privacy controls.
-- Module 09 maps accepted vendor-neutral evaluator, telemetry, and release-gate interfaces to
-  current Microsoft services. A product selection cannot replace metric definitions,
-  calibration evidence, protected sets, or regression tests.
+- Module 09 consumes accepted evaluator, trajectory, telemetry, and release-gate evidence for
+  hybrid routing, cross-layer fault, tool-portfolio, assurance, and user-experience decisions.
+  It may add slices and fixtures but cannot replace metric definitions, calibration evidence,
+  protected sets, or regression tests.
+- Module 10 Chapter 42 maps accepted vendor-neutral evaluator, telemetry, and release-gate
+  interfaces to current Microsoft services. A product selection cannot replace their evidence
+  or weaken their thresholds.
 
 Any breaking change to a task contract, metric formula, dataset split, golden evidence,
 evaluator rubric, trajectory schema, threshold, or aggregation rule creates a new version and

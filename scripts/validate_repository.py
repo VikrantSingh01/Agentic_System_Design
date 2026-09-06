@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MODULES = ROOT / "modules"
 RESEARCH_BRIEFS = ROOT / "coordination" / "agents" / "research-briefs"
-EXPECTED_CHAPTERS = set(range(1, 37))
+EXPECTED_CHAPTERS = set(range(1, 43))
 EXPECTED_RESEARCH_NODES = {f"R{number}" for number in range(1, 10)}
 MODULE_PATTERN = re.compile(r"^(\d{2})-")
 CHAPTER_LINK_PATTERN = re.compile(
@@ -81,15 +81,15 @@ def validate_modules(
     errors: list[str] = []
     module_indexes = sorted(modules_root.glob("*/README.md"))
 
-    if len(module_indexes) != 9:
-        errors.append(f"Expected 9 module indexes, found {len(module_indexes)}")
+    if len(module_indexes) != 10:
+        errors.append(f"Expected 10 module indexes, found {len(module_indexes)}")
 
     chapter_files = sorted(modules_root.glob("*/chapters/*.md"))
     resolved_files = [path.resolve() for path in chapter_files]
-    if len(chapter_files) != 36:
-        errors.append(f"Expected exactly 36 chapter files, found {len(chapter_files)}")
+    if len(chapter_files) != 42:
+        errors.append(f"Expected exactly 42 chapter files, found {len(chapter_files)}")
     if len(set(resolved_files)) != len(resolved_files):
-        errors.append("Chapter files must resolve to 36 unique files")
+        errors.append("Chapter files must resolve to 42 unique files")
 
     chapter_owners: dict[int, Path] = {}
     linked_paths: dict[Path, Path] = {}
@@ -193,6 +193,7 @@ def validate_required_files(repository_root: Path | None = None) -> list[str]:
     required = [
         repository_root / "README.md",
         repository_root / "CONTRIBUTING.md",
+        repository_root / "front-matter/reader-guide.md",
         repository_root / "coordination/contracts/editorial-contract.md",
         repository_root / "coordination/contracts/chapter-template.md",
         repository_root / "coordination/dependency-graph.yml",
@@ -324,7 +325,7 @@ def main() -> int:
             print(f"ERROR: {error}")
         return 1
 
-    print("Repository contract valid: 9 modules, 36 chapters, and 9 research briefs.")
+    print("Repository contract valid: 10 modules, 42 chapters, and 9 research briefs.")
     return 0
 
 

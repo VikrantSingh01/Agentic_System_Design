@@ -497,8 +497,10 @@ compliance.
 Module 07 receives accepted threat boundaries, policy and identity requirements, evidence
 schemas, risk and control owners, incident routing, oversight requirements, kill authority,
 and unresolved review conditions. Module 08 must preserve these thresholds during scaling,
-cost optimization, regional expansion, and lifecycle changes. Module 09 may map them to
-Microsoft services only through replaceable adapters and freshly verified product evidence.
+cost optimization, regional expansion, and lifecycle changes. Module 09 extends them to
+hybrid route, device, protocol, tool-portfolio, assurance, and user-experience boundaries
+without weakening them. Module 10 Chapter 42 may map them to Microsoft services only through
+replaceable adapters and freshly verified product evidence.
 
 ## Cross-Module Handoff Contract
 
@@ -512,16 +514,19 @@ Microsoft services only through replaceable adapters and freshly verified produc
 - Consequential actions retain authorization, exact-payload approval, idempotency,
   cancellation, recovery, and durable evidence.
 
-### Outputs Required by Modules 07-09
+### Outputs Required by Modules 07-10
 
 - Module 07 must assign every accepted threat boundary, authority check, identity flow, data
   control, oversight action, evidence event, incident path, and kill switch to a production
   component and owner.
 - Module 08 may optimize or distribute only designs that continue to pass Module 06 isolation,
   authority, privacy, safety, accessibility, oversight, and evidence gates.
-- Module 09 must map stable requirements to Microsoft candidates without weakening them.
-  Product names, availability, SDK behavior, regions, data handling, and security features are
-  volatile claims that require current approved evidence.
+- Module 09 must carry stable requirements into hybrid route, hardware, fault, protocol, tool,
+  assurance, and experience decisions without weakening them.
+- Module 10 Chapter 42 must map stable requirements and the accepted Module 09 packet to
+  Microsoft candidates without weakening them. Product names, availability, SDK behavior,
+  regions, data handling, and security features are volatile claims that require current
+  approved evidence.
 - Any unresolved legal, regulatory, privacy, accessibility, records, transfer, sector, or
   incident-disclosure question remains visibly blocked or conditionally owned until qualified
   review. No downstream module may convert it into a compliance claim.

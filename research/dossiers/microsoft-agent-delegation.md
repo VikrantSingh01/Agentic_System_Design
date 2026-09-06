@@ -182,7 +182,7 @@ Do not silently convert these into facts:
 
 - **Chapter 17: Multi-Agent Systems:** Put task contracts, capability discovery, routing, retries, human approval, the generalized reference architectures, and the agent/tool boundary here.
 - **Chapter 18: Interoperability Protocols:** Put MCP, A2A, Linux Foundation governance, discovery/task/result mechanics, and "what A2A is not" here [SRC-080].
-- **Chapter 36: Northstar on the Microsoft Stack:** Treat the dated matrix and Microsoft mappings only as candidate research. Apply the chapter's approved-source scope and 30-day re-verification gate before using any claim.
+- **Chapter 42: Northstar on the Microsoft Stack:** Treat the dated matrix and Microsoft mappings only as candidate research. Apply the chapter's approved-source scope and 30-day re-verification gate before using any claim.
 - Cross-reference Section 4.3 from the security/governance module when drafted.
 
 ## 9. Candidate primary-source register
