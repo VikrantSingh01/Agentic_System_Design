@@ -19,7 +19,17 @@ By the end of this chapter, the reader can:
 
 ## First pass
 
-Explain the core idea for a reader with no machine-learning background.
+Explain the core idea so a curious child or nontechnical adult can follow it. Start with
+a familiar situation or analogy. State where the analogy stops matching the real system.
+Define necessary AI jargon immediately in parentheses.
+
+## Picture the idea
+
+Add a small Mermaid concept picture with plain-language labels. Follow it with a second
+process, data, or decision-flow diagram when the chapter explains how something works.
+Add another focused visual when a major mechanism would otherwise take several dense
+paragraphs. Give every visual a one-sentence takeaway and describe the same information
+step by step for readers who cannot see the diagram.
 
 ## Vocabulary
 
@@ -51,6 +61,13 @@ Synthesize attributable lessons from approved primary sources. Distinguish publi
 
 Make an important failure reproducible, diagnose it, and apply a measurable correction.
 
+## Security and safety testing
+
+Identify one realistic misuse or boundary failure for this chapter. Turn it into a safe,
+offline test with synthetic data. State the expected blocked or contained result and the
+evidence that proves the control worked. Never require real credentials, personal data,
+malware, or attacks against a live system.
+
 ## Evaluation
 
 Define outcome, trajectory, safety, latency, and cost checks as applicable.
@@ -66,6 +83,19 @@ Define outcome, trajectory, safety, latency, and cost checks as applicable.
 ## Review questions
 
 1. Question
+
+## Try it safely
+
+Give the reader a small hands-on activity, role-play, paper exercise, or thought experiment.
+Do not require an account, payment, personal data, or access to a live AI provider.
+
+## Common misunderstanding
+
+Correct one tempting but inaccurate interpretation in plain language.
+
+## Recap and next step
+
+Summarize the idea in three to five short points and connect it to the next chapter.
 
 ## Design exercise
 

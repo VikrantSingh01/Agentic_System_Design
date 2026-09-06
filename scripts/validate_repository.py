@@ -10,8 +10,17 @@ MODULES = ROOT / "modules"
 RESEARCH_BRIEFS = ROOT / "coordination" / "agents" / "research"
 EXPECTED_CHAPTERS = set(range(1, 37))
 EXPECTED_RESEARCH_NODES = {f"R{number}" for number in range(1, 10)}
-CHAPTER_PATTERN = re.compile(r"^\s*(\d+)\. \*\*", re.MULTILINE)
+CHAPTER_PATTERN = re.compile(r"^\s*(\d+)\. \[?\*\*", re.MULTILINE)
 RESEARCH_BRIEF_PATTERN = re.compile(r"^(R\d+)-.+\.md$")
+REQUIRED_TEACHING_SECTIONS = (
+    "## Picture the idea",
+    "## Vocabulary",
+    "## Try it safely",
+    "## Security and safety testing",
+    "## Common misunderstanding",
+    "## Recap and next step",
+)
+MINIMUM_CHAPTER_DIAGRAMS = 2
 
 
 def validate_modules() -> list[str]:
@@ -77,8 +86,35 @@ def validate_research_briefs() -> list[str]:
     return errors
 
 
+def validate_chapter_content(chapter_paths: list[Path] | None = None) -> list[str]:
+    errors: list[str] = []
+    paths = chapter_paths
+    if paths is None:
+        paths = sorted(MODULES.glob("*/chapters/*.md"))
+
+    for path in paths:
+        text = path.read_text(encoding="utf-8")
+        label = path.relative_to(ROOT) if path.is_relative_to(ROOT) else path
+        for section in REQUIRED_TEACHING_SECTIONS:
+            if section not in text:
+                errors.append(f"{label}: missing required section '{section}'")
+        diagram_count = text.count("```mermaid")
+        if diagram_count < MINIMUM_CHAPTER_DIAGRAMS:
+            errors.append(
+                f"{label}: expected at least {MINIMUM_CHAPTER_DIAGRAMS} Mermaid diagrams, "
+                f"found {diagram_count}"
+            )
+
+    return errors
+
+
 def main() -> int:
-    errors = validate_required_files() + validate_modules() + validate_research_briefs()
+    errors = (
+        validate_required_files()
+        + validate_modules()
+        + validate_research_briefs()
+        + validate_chapter_content()
+    )
     if errors:
         for error in errors:
             print(f"ERROR: {error}")

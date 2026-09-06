@@ -2,13 +2,21 @@
 
 ## Authoring principles
 
-1. Write for a high-school or early-college reader on the first pass.
-2. Put advanced algorithms and production tradeoffs in an engineering deep dive.
-3. Teach vendor-neutral concepts before framework or cloud implementations.
-4. Use Python for every runnable example.
-5. Support time-sensitive claims with approved primary sources.
-6. Never present preview status, pricing, model limits, product names, or regulations as timeless facts.
-7. Do not require or expose private chain-of-thought. Prefer observable plans, tool traces, outcomes, critiques, and structured rationale.
+1. Write the first pass so a curious child or nontechnical adult can follow it.
+2. Introduce an everyday analogy before an abstract mechanism, then explain where the analogy stops working.
+3. Define necessary AI jargon immediately in parentheses and include it in the vocabulary table.
+4. Use short sections, concrete nouns, and one idea per paragraph. Never trade technical accuracy for a cute explanation.
+5. Include at least two small visual explanations in every chapter: a concept picture and
+   a process, data, or decision flow. Add another visual when a major mechanism would
+   otherwise require several dense paragraphs.
+6. Give every diagram plain labels, a one-sentence takeaway, and an equivalent step-by-step
+   text description. Keep each beginner diagram focused on one teaching point.
+7. Put advanced algorithms and production tradeoffs in an engineering deep dive.
+8. Teach vendor-neutral concepts before framework or cloud implementations.
+9. Use Python for every runnable example.
+10. Support time-sensitive claims with approved primary sources.
+11. Never present preview status, pricing, model limits, product names, or regulations as timeless facts.
+12. Do not require or expose private chain-of-thought. Prefer observable plans, tool traces, outcomes, critiques, and structured rationale.
 
 ## Agent ownership
 
@@ -30,6 +38,7 @@ A chapter pull request must include:
 - approved sources used
 - volatile claims requiring freshness review
 - diagrams, exercises, and labs added
+- defensive security and safety tests added
 - validation commands run
 - unresolved cross-module requests
 - a completed chapter manifest

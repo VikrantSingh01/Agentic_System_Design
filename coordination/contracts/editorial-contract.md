@@ -5,21 +5,26 @@ Freeze date: 2026-09-05
 
 ## Reader contract
 
-The reader needs no machine-learning background. Basic familiarity with variables, functions, command-line tools, and HTTP is helpful but not required for the conceptual path.
+The reader needs no machine-learning background. The first-pass path must work for a curious child or nontechnical adult. Basic familiarity with variables, functions, command-line tools, and HTTP is helpful but not required.
 
 Every chapter must provide:
 
 1. An opening problem that motivates the topic.
 2. Measurable learning objectives.
-3. A first-pass explanation using concrete language and examples.
+3. A first-pass explanation that starts with a familiar situation or analogy, uses short concrete language, and states where the analogy stops matching the real system.
 4. An engineering deep dive covering mechanisms and tradeoffs.
-5. At least one architecture or sequence diagram when behavior spans components.
+5. At least two small visual explanations: a concept picture and a process, data, or
+   decision flow. Each needs a one-sentence takeaway and an equivalent text description.
 6. Vendor-neutral pseudocode or Python before framework-specific code.
 7. A Microsoft mapping using supported Python SDKs where applicable.
 8. A failure analysis explaining how the design breaks.
 9. Evaluation criteria and production considerations.
 10. Review questions, a design exercise, and a hands-on lab or simulation.
 11. Primary sources with volatile claims clearly identified.
+12. Necessary AI jargon defined immediately in parentheses and collected in the vocabulary table.
+13. A safe activity, a common misunderstanding, a recap, and a bridge to the next chapter.
+14. A defensive, offline security or safety test using synthetic data, with the expected
+    blocked or contained result.
 
 ## Technical contract
 
