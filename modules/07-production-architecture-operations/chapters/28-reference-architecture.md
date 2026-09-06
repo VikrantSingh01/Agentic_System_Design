@@ -30,7 +30,13 @@ box enforces none of those things.
 
 ## Picture the idea
 
-**Diagram D1 — Beginner path: follow one request through the system.**
+> **Optional interactive visual: the full 12-scene production journey.** In a local
+> copy of this repository, open [the offline animation](../../../visuals/agent-system-journey/index.html)
+> directly in a desktop browser, or read [its transcript](../../../visuals/agent-system-journey/transcript.md).
+> It starts paused and never autoplays, so playback is optional. The static Mermaid
+> diagrams and prose below remain a complete fallback.
+
+**Diagram D1: Beginner path: follow one request through the system.**
 
 ```mermaid
 flowchart LR
@@ -46,7 +52,7 @@ flowchart LR
 (3) the runtime coordinates work; (4) specialist gateways provide bounded capabilities; and
 (5) stores preserve authoritative state and artifacts.
 
-**Diagram D2 — Engineering deep dive: control plane and data plane boundaries.**
+**Diagram D2: Engineering deep dive: control plane and data plane boundaries.**
 
 ```mermaid
 flowchart TB
@@ -73,7 +79,7 @@ release; (3) the application programming interface (API) admits data-plane work;
 runtime calls model, retrieval, and tool gateways; (5) stores hold state; (6) redacted events
 go to observability; and (7) no model or retrieved document can change control-plane policy.
 
-**Diagram D3 — Engineering deep dive: typed request and evidence sequence.**
+**Diagram D3: Engineering deep dive: typed request and evidence sequence.**
 
 ```mermaid
 sequenceDiagram

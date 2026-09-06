@@ -7,7 +7,7 @@
 ## The problem
 
 A calculator should return `4` for `2 + 2` every time. A language model may return
-different wording—or a wrong answer—to the same request. Northstar, our bounded
+different wording or a wrong answer for the same request. Northstar, our bounded
 research helper, must use generated language without letting fluent text become
 unchecked evidence or an unauthorized action.
 
@@ -55,6 +55,12 @@ budget, and records the result. The model never chooses the user's identity or
 creates a new tool by naming one.
 
 ## Picture the idea
+
+> **Optional interactive visual: a beginner-friendly architecture journey.** In a local
+> copy of this repository, open [the offline animation](../../../visuals/agent-system-journey/index.html)
+> directly in a desktop browser, or read [its transcript](../../../visuals/agent-system-journey/transcript.md).
+> It starts paused and never autoplays, so playback is optional. The static Mermaid
+> diagrams and prose below remain a complete fallback.
 
 ```mermaid
 flowchart TB

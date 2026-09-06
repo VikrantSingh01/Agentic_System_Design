@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>A Question’s Safe Journey Through an Agent System</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="scenes.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#story">Skip to the story</a>
+  <header class="page-header">
+    <p class="eyebrow">Interactive architecture story</p>
+    <h1>A question’s safe journey through an agent system</h1>
+    <p class="lede">Follow one request from intake to answer or an explicit safe stop. The model proposes; ordinary software checks authority, policy, tools, approvals, and limits before anything can happen.</p>
+    <p class="story-map" aria-label="Journey summary">
+      <span>Ask</span><span aria-hidden="true">→</span>
+      <span>Check</span><span aria-hidden="true">→</span>
+      <span>Coordinate</span><span aria-hidden="true">→</span>
+      <span>Act safely</span><span aria-hidden="true">→</span>
+      <span>Answer or stop</span>
+    </p>
+  </header>
+
+  <main id="story">
+    <section class="control-panel" aria-labelledby="controls-title">
+      <h2 id="controls-title">Story controls</h2>
+      <div class="primary-controls">
+        <button id="previous" type="button" aria-label="Previous scene">← Previous</button>
+        <button id="play" type="button" aria-label="Play story" aria-pressed="false">▶ Play</button>
+        <button id="next" type="button" aria-label="Next scene">Next →</button>
+        <button id="replay" type="button" aria-label="Replay from scene one">↺ Replay</button>
+        <button id="stop" type="button" aria-label="Stop and return to scene one">■ Stop</button>
+      </div>
+      <div class="options">
+        <label for="scene-select">Scene</label>
+        <select id="scene-select" aria-label="Choose a scene"></select>
+        <label for="speed">Speed</label>
+        <select id="speed" aria-label="Playback speed">
+          <option value="2">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="0.6667">1.5×</option>
+        </select>
+        <label class="check"><input id="captions-toggle" type="checkbox" checked> Captions</label>
+        <label class="check"><input id="motion-toggle" type="checkbox"> Disable motion</label>
+        <label class="check"><input id="contrast-toggle" type="checkbox"> High contrast</label>
+      </div>
+      <p class="key-help"><strong>Keyboard:</strong> Space plays or pauses; ←/→ steps; Home/End jumps to the first/last scene; R replays; Escape stops; 1–9 jump to scenes 1–9; 0 jumps to scene 10.</p>
+      <p id="playback-status" class="sr-only" aria-live="polite"></p>
+    </section>
+
+    <section class="scene-card" aria-labelledby="scene-heading">
+      <div class="progress-row">
+        <label for="story-progress">Journey progress</label>
+        <progress id="story-progress" max="12" value="1">1 of 12</progress>
+      </div>
+      <div class="scene-heading-row">
+        <div>
+          <p id="scene-position" class="eyebrow">Scene 1 of 12</p>
+          <h2 id="scene-heading" tabindex="-1">The Front Door</h2>
+        </div>
+        <span class="status-chip"><span class="status-label">State:</span> <span id="terminal-status">received</span></span>
+      </div>
+
+      <div class="diagram-wrap">
+        <svg id="architecture" viewBox="0 0 1100 660" role="img" aria-labelledby="svg-title svg-desc">
+          <title id="svg-title">Help-center agent architecture</title>
+          <desc id="svg-desc">A request moves from a person through a front door, a distinct admission ticket boundary, an identity badge check, policy, a runtime coordinator, bounded services, records, and back as an answer or explicit safe stop.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z"></path>
+            </marker>
+          </defs>
+          <g class="edges" aria-hidden="true">
+            <path id="edge-user-front" d="M130 315 H170"></path>
+            <path id="edge-front-admission" d="M280 315 H315"></path>
+            <path id="edge-admission-badge" d="M405 315 H420"></path>
+            <path id="edge-badge-runtime" d="M540 315 H570"></path>
+            <path id="edge-runtime-retrieval" d="M665 255 C705 150 730 115 775 105"></path>
+            <path id="edge-retrieval-runtime" d="M775 135 C730 150 710 200 670 270"></path>
+            <path id="edge-runtime-model" d="M675 295 H775"></path>
+            <path id="edge-model-runtime" d="M775 325 H675"></path>
+            <path id="edge-runtime-rulebook" d="M665 355 C710 400 735 415 775 420"></path>
+            <path id="edge-rulebook-runtime" d="M775 450 C725 440 700 400 660 370"></path>
+            <path id="edge-runtime-toolbox" d="M610 390 V510"></path>
+            <path id="edge-toolbox-runtime" d="M640 510 V390"></path>
+            <path id="edge-runtime-specialist" d="M570 365 C470 430 405 475 325 505"></path>
+            <path id="edge-specialist-runtime" d="M330 535 C430 505 500 445 585 385"></path>
+            <path id="edge-toolbox-outside" d="M700 550 H815"></path>
+            <path id="edge-outside-toolbox" d="M815 580 H700"></path>
+            <path id="edge-runtime-approval" d="M575 270 C510 175 450 140 385 125"></path>
+            <path id="edge-approval-runtime" d="M385 155 C455 175 510 225 590 265"></path>
+            <path id="edge-runtime-records" d="M580 385 C520 575 365 605 255 585"></path>
+            <path id="edge-runtime-front" d="M570 335 H280"></path>
+            <path id="edge-front-user" d="M170 335 H130"></path>
+          </g>
+
+          <g id="node-user" class="node terminal" role="group" tabindex="0" aria-label="Child or user: asks a question and receives an answer or safe-stop explanation.">
+            <title>Child or User</title><desc>Asks a question and receives an accessible answer or safe-stop explanation.</desc>
+            <rect x="20" y="275" width="110" height="80" rx="40"></rect>
+            <text x="75" y="308">Person</text><text class="technical" x="75" y="333">Child / User</text>
+          </g>
+          <g id="node-front-door" class="node" role="group" tabindex="0" aria-label="Front Door, Experience adapter: accepts the request at the system boundary.">
+            <title>Front Door</title><desc>The Experience adapter accepts the request without granting it authority.</desc>
+            <rect x="170" y="265" width="110" height="100" rx="16"></rect>
+            <text x="225" y="302">Front Door</text><text class="technical" x="225" y="329">Experience adapter</text>
+          </g>
+          <g id="node-admission" class="node" role="group" tabindex="0" aria-label="Admission Ticket Boundary, API and admission control: creates a request ticket, assigns an ID, and rate-limits.">
+            <title>Admission Ticket Boundary</title><desc>API and admission control create a distinct request ticket, assign its identifier, and enforce admission limits.</desc>
+            <rect x="315" y="265" width="90" height="100" rx="12"></rect>
+            <text x="360" y="298">Ticket</text><text x="360" y="320">Boundary</text><text class="technical" x="360" y="343">Admission control</text>
+          </g>
+          <g id="node-badge-check" class="node decision" role="group" tabindex="0" aria-label="Identity Badge Check and Policy decision point: authenticates identity and checks delegated authority.">
+            <title>Identity Badge Check</title><desc>Authenticates who is asking, resolves tenant context, and intersects delegated authority with policy; deny by default.</desc>
+            <path d="M480 255 L540 315 L480 375 L420 315 Z"></path>
+            <text x="480" y="301">Identity</text><text x="480" y="321">Badge Check</text><text class="technical" x="480" y="344">Policy decision</text>
+          </g>
+          <g id="node-runtime" class="node runtime" role="group" tabindex="0" aria-label="Coordinator’s Desk, Runtime: manages the state machine, budgets, context, and termination.">
+            <title>Coordinator’s Desk</title><desc>The Runtime observes, decides, acts, records, and stops within explicit budgets.</desc>
+            <rect x="570" y="245" width="120" height="145" rx="18"></rect>
+            <text x="630" y="278">Coordinator</text><text x="630" y="299">Desk</text>
+            <text class="technical" x="630" y="325">Runtime</text>
+            <text class="symbol" x="630" y="358">⏱ budget · ⛔ stop</text>
+          </g>
+          <g id="node-retrieval" class="node store" role="group" tabindex="0" aria-label="Reference Shelf, Retrieval service: returns authorized, versioned, untrusted passages.">
+            <title>Reference Shelf</title><desc>The Retrieval service searches only authorized sources and labels returned content untrusted.</desc>
+            <path d="M775 85 C775 65 935 65 935 85 V145 C935 165 775 165 775 145 Z"></path>
+            <ellipse cx="855" cy="85" rx="80" ry="20"></ellipse>
+            <text x="855" y="112">Reference Shelf</text><text class="technical" x="855" y="134">Retrieval (untrusted)</text>
+          </g>
+          <g id="node-model" class="node" role="group" tabindex="0" aria-label="Next-Step Guesser, Model gateway: predicts one proposal and never executes it.">
+            <title>Next-Step Guesser</title><desc>The Model gateway predicts a typed proposal from bounded context. It does not know, decide policy, or execute.</desc>
+            <rect x="775" y="260" width="180" height="100" rx="16"></rect>
+            <text x="865" y="298">Next-Step Guesser</text><text class="technical" x="865" y="323">Model gateway</text><text class="tag" x="865" y="344">proposal only</text>
+          </g>
+          <g id="node-rulebook" class="node decision" role="group" tabindex="0" aria-label="Rulebook Checker, Policy decision point: approves or denies a proposal.">
+            <title>Rulebook Checker</title><desc>Deterministic checks approve or deny based on schema, authority, policy, state, and budget.</desc>
+            <path d="M865 380 L965 440 L865 500 L765 440 Z"></path>
+            <text x="865" y="431">Rulebook Checker</text><text class="technical" x="865" y="454">Policy decision point</text><text class="tag" x="865" y="475">allowed / denied</text>
+          </g>
+          <g id="node-toolbox" class="node" role="group" tabindex="0" aria-label="Toolbox, Connector and tool gateway: offers typed, allowlisted, least-privilege tools.">
+            <title>Toolbox</title><desc>The Connector and tool gateway validates typed requests and exposes only allowlisted tools.</desc>
+            <rect x="560" y="510" width="140" height="90" rx="14"></rect>
+            <text x="630" y="545">Locked Toolbox</text><text class="technical" x="630" y="569">Tool gateway</text><text class="tag" x="630" y="588">allowlisted</text>
+          </g>
+          <g id="node-specialist" class="node runtime" role="group" tabindex="0" aria-label="Specialist Runtime: receives a coordinator handoff and operates with its own bounded policy and allowlisted tools.">
+            <title>Specialist Runtime</title><desc>A separate bounded runtime receives a structured coordinator handoff, applies its own policy and tool allowlist, and cannot gain authority by delegation.</desc>
+            <rect x="195" y="475" width="155" height="110" rx="14"></rect>
+            <text x="272" y="507">Specialist Runtime</text><text class="technical" x="272" y="532">own bounded policy</text><text class="technical" x="272" y="551">+ allowlisted tools</text><text class="tag" x="272" y="572">coordinator handoff</text>
+          </g>
+          <g id="node-outside" class="node untrusted" role="group" tabindex="0" aria-label="Outside World, External systems: responses are untrusted until verified.">
+            <title>Outside World</title><desc>External systems return responses that remain untrusted until provenance and content are verified.</desc>
+            <rect x="815" y="525" width="170" height="90" rx="45"></rect>
+            <text x="900" y="558">Outside World</text><text class="technical" x="900" y="581">External systems</text><text class="tag" x="900" y="601">⚠ double-check this</text>
+          </g>
+          <g id="node-approval" class="node" role="group" tabindex="0" aria-label="Supervisor’s Stamp, Approval service: binds approval to an exact payload and expiry.">
+            <title>Supervisor’s Stamp</title><desc>The Approval service records an authorized decision for an exact payload, destination, policy version, and expiry.</desc>
+            <rect x="205" y="70" width="180" height="100" rx="16"></rect>
+            <text x="295" y="104">Supervisor’s Stamp</text><text class="technical" x="295" y="128">Approval service</text><text class="tag" x="295" y="150">approval required</text>
+          </g>
+          <g id="node-records" class="node store" role="group" tabindex="0" aria-label="Records Area, state and artifact stores plus Observability pipeline: records minimized, redacted evidence.">
+            <title>Records Area</title><desc>Versioned state and artifacts plus minimized, redacted observable evidence; never secrets or private chain-of-thought.</desc>
+            <path d="M40 515 C40 490 205 490 205 515 V600 C205 625 40 625 40 600 Z"></path>
+            <ellipse cx="122.5" cy="515" rx="82.5" ry="20"></ellipse>
+            <text x="122" y="552">Records Area</text><text class="technical" x="122" y="575">Stores + observability</text><text class="tag" x="122" y="598">redacted evidence</text>
+          </g>
+        </svg>
+      </div>
+      <div class="diagram-key" aria-label="Diagram key">
+        <span><i class="key-swatch key-current" aria-hidden="true"></i>Current step</span>
+        <span><i class="key-swatch key-context" aria-hidden="true"></i>System context</span>
+        <span><i class="key-line" aria-hidden="true"></i>Active data flow</span>
+      </div>
+
+      <div id="caption-region" class="caption" aria-live="polite" aria-atomic="true">
+        <p id="caption-text"></p>
+      </div>
+      <div class="explanation-grid">
+        <section aria-labelledby="what-title">
+          <h3 id="what-title">What is really happening?</h3>
+          <p id="scene-detail"></p>
+          <p><strong>Architecture label:</strong> <span id="contract-label"></span></p>
+        </section>
+        <section class="safety-note" aria-labelledby="safety-title">
+          <h3 id="safety-title">🛡 Safe-stop check</h3>
+          <p id="security-note"></p>
+        </section>
+      </div>
+    </section>
+
+    <nav class="scene-navigation" aria-label="All story scenes">
+      <h2>All 12 scenes</h2>
+      <ol id="scene-list"></ol>
+    </nav>
+
+    <aside class="analogy-limit" aria-labelledby="limit-title">
+      <h2 id="limit-title">Where the help-center picture stops matching</h2>
+      <ul>
+        <li>The model is not a person and does not understand or know. It predicts likely tokens and can be confidently wrong.</li>
+        <li>The Runtime reconstructs bounded context; it does not remember naturally. Cross-run memory is separate, evaluated, opt-in, and off by default.</li>
+        <li>Approval is narrower than a human signature: it is bound to an exact payload, destination, policy version, and expiry.</li>
+        <li>Software workers do not exercise independent judgment. They exchange structured requests and results within fixed authority.</li>
+        <li>The system cannot improvise past its rulebook. Authority never increases at runtime; anything not explicitly allowed is denied.</li>
+      </ul>
+    </aside>
+    <noscript><p class="noscript">JavaScript is off. Read <a href="transcript.md">the complete transcript</a>; it contains every scene caption and explanation.</p></noscript>
+  </main>
+  <footer>
+    <p>Offline companion visual. <a href="transcript.md">Read the transcript</a> · <a href="README.md">About this asset</a></p>
+  </footer>
+</body>
+</html>
