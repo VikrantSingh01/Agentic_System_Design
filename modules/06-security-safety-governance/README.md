@@ -14,3 +14,25 @@ Threat-model an agentic system, restrict tool authority, propagate identity safe
 ## Northstar milestone
 
 Defend against indirect prompt injection and data exfiltration, enforce delegated identity and tenant isolation, and preserve auditable approval evidence.
+
+## Dedicated security testing track
+
+Security is not one final check. Each chapter in this module adds tests to a growing,
+offline **agent security test suite** (repeatable checks that try unsafe or unexpected
+inputs without attacking a real system).
+
+- **Map what could go wrong:** draw trust boundaries and turn threats into test cases.
+- **Test tool boundaries:** verify invalid inputs, excessive permissions, repeated
+   actions, timeouts, and sandbox escapes are blocked or contained.
+- **Test identity and data boundaries:** verify one user or tenant cannot access
+   another's data, secrets are redacted, and delegated permissions are enforced.
+- **Test hostile content safely:** use harmless prompt-injection and data-exfiltration
+   simulations to confirm untrusted instructions cannot override policy.
+- **Test human control:** verify consequential actions pause for informed approval,
+   denials remain denied, and audit evidence records what happened.
+- **Retest after change:** keep failures as regression tests so a model, prompt, tool,
+   policy, or dependency update cannot silently reopen a known weakness.
+
+The track must include a child-friendly threat map and a request-to-decision security
+flow. Examples stay defensive, synthetic, local, and free of real credentials or
+personal data.
