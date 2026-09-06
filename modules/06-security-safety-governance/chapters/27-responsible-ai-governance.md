@@ -1,7 +1,7 @@
 # Chapter 27: Responsible AI and Governance
 
-> Status: drafting  
-> Owner: Chapter 27 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -541,3 +541,5 @@ evidence index mapping controls to threats, tests, results, owners, dates, and l
 
 These sources guide governance questions and evidence design. They do not establish legal
 applicability, certification, conformity, compliance, or the adequacy of Northstar's controls.
+
+**Navigation:** [Previous: Chapter 26: Identity, Privacy, and Content Safety](26-identity-privacy-content-safety.md) | [Module 06 overview](../README.md) | [Next: Chapter 28: Reference Architecture](../../07-production-architecture-operations/chapters/28-reference-architecture.md)

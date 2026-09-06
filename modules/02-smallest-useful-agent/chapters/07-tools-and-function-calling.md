@@ -1,7 +1,7 @@
 # Chapter 07: Tools and Function Calling
 
-> Status: drafting  
-> Owner: Module 02  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -689,6 +689,8 @@ Use the code in **Build it in Python** as the offline lab:
 The built-in catalog is the fixture. The printed result plus assertion outcomes are the
 expected trace. Cleanup is simply deleting your scratch copy; the lab creates no files,
 accounts, network traffic, or external changes.
+
+**Navigation:** [Previous: Chapter 6: Models and Inference](06-models-and-inference.md) | [Module 02 overview](../README.md) | [Next: Chapter 8: The Agent Runtime](08-agent-runtime.md)
 
 ## Sources
 

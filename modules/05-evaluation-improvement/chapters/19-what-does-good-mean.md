@@ -1,7 +1,7 @@
 # Chapter 19: What Does Good Mean?
 
-> Status: drafting
-> Owner: Module 05 author
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -491,3 +491,5 @@ takes 24 seconds and costs 1 unit. State exactly when each wins.
 
 All thresholds and run results in this chapter are synthetic teaching values,
 not external benchmarks or production commitments.
+
+**Navigation:** [Previous: Chapter 18: Interoperability Protocols](../../04-reasoning-workflows-collaboration/chapters/18-interoperability-protocols.md) | [Module 05 overview](../README.md) | [Next: Chapter 20: Building Evaluation Sets](20-building-evaluation-sets.md)

@@ -1,7 +1,7 @@
 # Chapter 34: Multi-Tenant and Multi-Region Design
 
-> Status: drafting  
-> Owner: Chapter 34 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -534,3 +534,5 @@ Only this frozen chapter set is cited:
 2. **SRC-072**: O'Reilly Media, Martin Kleppmann, *Designing Data-Intensive
    Applications*. <https://dataintensive.net/>. Durable distributed-data
    concepts; system-specific claims still require Northstar evidence.
+
+**Navigation:** [Previous: Chapter 33: Performance and Cost Engineering](33-performance-cost-engineering.md) | [Module 08 overview](../README.md) | [Next: Chapter 35: Continuous Improvement](35-continuous-improvement.md)

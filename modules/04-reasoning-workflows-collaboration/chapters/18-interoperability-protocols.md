@@ -1,7 +1,7 @@
 # Chapter 18: Interoperability Protocols
 
-> Status: drafting  
-> Owner: Chapter 18 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -550,3 +550,5 @@ state.
 
 All protocol names, roles, versions, fields, lifecycle claims, and compatibility
 claims require primary-source revalidation within 30 days of release.
+
+**Navigation:** [Previous: Chapter 17: Multi-Agent Systems](17-multi-agent-systems.md) | [Module 04 overview](../README.md) | [Next: Chapter 19: What Does Good Mean?](../../05-evaluation-improvement/chapters/19-what-does-good-mean.md)

@@ -1,7 +1,7 @@
 # Chapter 06: Models and Inference
 
-> Status: drafting  
-> Owner: Module 02 Chapter 06 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -909,6 +909,8 @@ The economy result reports one context failure. The citation-omission mutation l
 ### Cleanup
 
 Delete the locally created `model_selection_demo.py`, test file, and saved trace. The lab makes no network calls, creates no account, spends no money, and should contain no personal data.
+
+**Navigation:** [Previous: Chapter 5: Messages, Prompts, and Structured Output](05-messages-prompts-structured-output.md) | [Module 02 overview](../README.md) | [Next: Chapter 7: Tools and Function Calling](07-tools-and-function-calling.md)
 
 ## Sources
 

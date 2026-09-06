@@ -1,7 +1,7 @@
 # Chapter 22: Agent and Tool Evaluation
 
-> Status: drafting
-> Owner: Module 05 author
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -431,3 +431,5 @@ allowlisted-event design.
   Used for realistic interactive-agent evaluation. Freshness: evolving.
 
 All trace data, tools, reports, and results in this chapter are synthetic.
+
+**Navigation:** [Previous: Chapter 21: Evaluators](21-evaluators.md) | [Module 05 overview](../README.md) | [Next: Chapter 23: Debugging and Optimization](23-debugging-and-optimization.md)

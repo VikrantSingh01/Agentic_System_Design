@@ -35,7 +35,7 @@ h1 { font-size: clamp(2rem, 5vw, 4rem); max-width: 20ch; margin: .25rem 0; }
 .eyebrow { color: var(--accent); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin: 0; }
 .story-map { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; margin: 1.25rem 0 0; }
 .story-map span:nth-child(odd) { padding: .3rem .65rem; border: 2px solid var(--line); border-radius: 999px; background: var(--surface); font-weight: 750; }
-.control-panel, .scene-card, .analogy-limit, .scene-navigation, .noscript {
+.control-panel, .scene-card, .analogy-limit, .scene-navigation, .architecture-context, .noscript {
   background: var(--surface); border: 2px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); margin: 1rem 0; padding: 1rem;
 }
 .control-panel h2 { margin-top: 0; }
@@ -52,6 +52,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .key-help { color: var(--muted); margin-bottom: 0; }
 .progress-row { display: grid; grid-template-columns: auto minmax(10rem, 1fr); align-items: center; gap: .75rem; margin-bottom: .75rem; color: var(--muted); font-weight: 750; }
 progress { width: 100%; height: .8rem; accent-color: var(--accent); }
+.trace-note { margin: 0 0 1rem; padding: .7rem .9rem; border-left: 5px solid var(--warning); background: color-mix(in srgb, var(--warning) 9%, var(--surface)); }
 .scene-heading-row { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
 .scene-heading-row h2 { margin: .3rem 0 1rem; font-size: clamp(1.6rem, 4vw, 2.6rem); }
 .status-chip { border: 2px solid var(--safe); border-radius: 999px; padding: .35rem .7rem; color: var(--safe); font-weight: 800; max-width: 28ch; text-align: center; }
@@ -86,6 +87,18 @@ svg { display: block; width: 100%; height: auto; }
 #scene-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .5rem; padding-left: 1.5rem; }
 #scene-list button { width: 100%; text-align: left; font-weight: 650; }
 #scene-list button[aria-current="step"] { color: white; background: var(--accent); border-color: var(--accent); }
+.architecture-context > h2 { margin: .35rem 0; }
+.architecture-context > p { max-width: 80ch; }
+.plane-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+.plane { border: 2px solid var(--line); border-radius: 14px; padding: 1rem; }
+.plane h3 { margin-top: 0; }
+.control-plane { border-color: var(--warning); }
+.data-plane { border-color: var(--accent); }
+.component-flow { display: grid; gap: .75rem; margin: 0; padding-left: 1.5rem; }
+.component-flow li { padding-left: .25rem; }
+.component-flow span { display: block; color: var(--muted); margin-top: .15rem; }
+.plane-flows { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top: 1rem; }
+.plane-flows p { margin: 0; padding: .75rem; border-radius: 10px; background: var(--accent-soft); }
 .analogy-limit { border-color: var(--warning); }
 footer { padding: 1rem 0 2rem; }
 
@@ -99,10 +112,10 @@ body.high-contrast #play, body.high-contrast #scene-list button[aria-current="st
 body.no-motion *, body.no-motion *::before, body.no-motion *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 
 @media (max-width: 700px) {
-  .explanation-grid { grid-template-columns: 1fr; }
+  .explanation-grid, .plane-grid, .plane-flows { grid-template-columns: 1fr; }
   .scene-heading-row { display: block; }
   .status-chip { display: inline-block; margin-bottom: .75rem; }
-  .diagram-wrap svg { width: 900px; max-width: none; }
+  .diagram-wrap svg { width: 1050px; max-width: none; }
   .progress-row { grid-template-columns: 1fr; gap: .25rem; }
 }
 @media (prefers-color-scheme: dark) {
@@ -120,7 +133,7 @@ body.no-motion *, body.no-motion *::before, body.no-motion *::after { animation:
 }
 @media (prefers-contrast: more) {
   :root { --line: #000; --accent: #00467f; --muted: #27313a; --focus: #8b2500; --shadow: none; }
-  .control-panel, .scene-card, .analogy-limit, .scene-navigation { border-width: 3px; }
+  .control-panel, .scene-card, .analogy-limit, .scene-navigation, .architecture-context { border-width: 3px; }
 }
 @media (forced-colors: active) {
   * { forced-color-adjust: auto; }

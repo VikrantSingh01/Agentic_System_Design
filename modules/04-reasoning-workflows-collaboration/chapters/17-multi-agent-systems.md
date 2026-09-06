@@ -1,7 +1,7 @@
 # Chapter 17: Multi-Agent Systems
 
-> Status: drafting  
-> Owner: Chapter 17 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -476,3 +476,5 @@ retain, narrow, or reject. The lab is offline, deterministic, and has no cleanup
 - SRC-020, OpenAI, *A practical guide to building agents*, updated periodically.
 - SRC-042, Microsoft, *Microsoft Agent Framework repository*, updated continuously;
   volatile, revalidate within 30 days of release.
+
+**Navigation:** [Previous: Chapter 16: Durable Execution](16-durable-execution.md) | [Module 04 overview](../README.md) | [Next: Chapter 18: Interoperability Protocols](18-interoperability-protocols.md)

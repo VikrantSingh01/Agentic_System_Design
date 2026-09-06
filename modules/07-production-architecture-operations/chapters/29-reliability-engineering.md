@@ -1,7 +1,7 @@
 # Chapter 29: Reliability Engineering
 
-> Status: drafting  
-> Owner: Module 07 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -259,3 +259,5 @@ fallback. Cleanup requires only deleting local synthetic files.
 - SRC-045, Microsoft, *Azure Architecture Center*. Evolving; accessed 2026-09-05.
 - SRC-049, Microsoft, *Azure Service Bus messaging documentation*. Volatile; accessed 2026-09-05.
 - SRC-061, Temporal, *Temporal Platform documentation*. Volatile; accessed 2026-09-05.
+
+**Navigation:** [Previous: Chapter 28: Reference Architecture](28-reference-architecture.md) | [Module 07 overview](../README.md) | [Next: Chapter 30: Observability and site reliability engineering (SRE)](30-observability-and-sre.md)

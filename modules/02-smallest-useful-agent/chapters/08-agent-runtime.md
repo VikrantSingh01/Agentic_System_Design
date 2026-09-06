@@ -1,7 +1,7 @@
 # Chapter 08: The Agent Runtime
 
-> Status: drafting  
-> Owner: Chapter 08 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -836,6 +836,8 @@ Use the embedded [Build it in Python](#build-it-in-python) program.
 
 All fixtures are invented source IDs. The lab is deterministic, offline, and
 free of consequential side effects.
+
+**Navigation:** [Previous: Chapter 7: Tools and Function Calling](07-tools-and-function-calling.md) | [Module 02 overview](../README.md) | [Next: Chapter 9: Context Engineering](../../03-context-knowledge-memory/chapters/09-context-engineering.md)
 
 ## Sources
 

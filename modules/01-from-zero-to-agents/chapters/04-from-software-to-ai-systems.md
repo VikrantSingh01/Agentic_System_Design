@@ -1,7 +1,7 @@
 # Chapter 04: From Software to AI Systems
 
-> Status: drafting  
-> Owner: Module 01 Chapter 04 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -486,6 +486,8 @@ disposable learning folder and run it with Python 3.11 or later.
 
 The fixture is offline and read-only. It creates no account, network request,
 payment, or real-world side effect.
+
+**Navigation:** [Previous: Chapter 3: AI and LLM Primer](03-ai-and-llm-primer.md) | [Module 01 overview](../README.md) | [Next: Chapter 5: Messages, Prompts, and Structured Output](../../02-smallest-useful-agent/chapters/05-messages-prompts-structured-output.md)
 
 ## Sources
 

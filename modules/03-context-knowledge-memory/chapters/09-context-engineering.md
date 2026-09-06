@@ -1,7 +1,7 @@
 # Chapter 9: Context Engineering
 
-> Status: drafting  
-> Owner: Module 03  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -748,6 +748,8 @@ The expected trace is deterministic because sorting uses kind, relevance, and
 item ID. A production implementation should add mandatory-item reservations;
 the intentionally small lab exposes why greedy packing alone can fail under a
 very tight budget.
+
+**Navigation:** [Previous: Chapter 8: The Agent Runtime](../../02-smallest-useful-agent/chapters/08-agent-runtime.md) | [Module 03 overview](../README.md) | [Next: Chapter 10: RAG Foundations](10-rag-foundations.md)
 
 ## Sources
 

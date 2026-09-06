@@ -1,7 +1,7 @@
 # Chapter 31: Deployment and Delivery
 
-> Status: drafting  
-> Owner: Module 07 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -279,3 +279,5 @@ failure above and assert cleanup removes the temporary directory and leaves no p
 - SRC-036, Meta, *Llama models repository*. Volatile; accessed 2026-09-05.
 - SRC-045, Microsoft, *Azure Architecture Center*. Evolving; accessed 2026-09-05.
 - SRC-048, Microsoft, *Azure Container Apps documentation*. Volatile; accessed 2026-09-05.
+
+**Navigation:** [Previous: Chapter 30: Observability and site reliability engineering (SRE)](30-observability-and-sre.md) | [Module 07 overview](../README.md) | [Next: Chapter 32: Data and State at Scale](32-data-and-state-at-scale.md)

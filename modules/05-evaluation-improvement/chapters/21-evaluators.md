@@ -1,7 +1,7 @@
 # Chapter 21: Evaluators
 
-> Status: drafting
-> Owner: Module 05 author
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -423,3 +423,5 @@ a layered design. State which cases each cannot judge.
 
 The calibration cases, thresholds, and evaluator behavior are synthetic
 teaching examples, not external benchmark claims.
+
+**Navigation:** [Previous: Chapter 20: Building Evaluation Sets](20-building-evaluation-sets.md) | [Module 05 overview](../README.md) | [Next: Chapter 22: Agent and Tool Evaluation](22-agent-and-tool-evaluation.md)

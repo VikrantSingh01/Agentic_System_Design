@@ -17,30 +17,30 @@
       caption: "The front desk checks who is asking and what they are allowed to request.",
       focus: ["front-door", "admission", "badge-check"],
       edges: ["front-admission", "admission-badge"],
-      detail: "API and admission control create a request ticket, assign its request ID, and rate-limit at a distinct boundary. The identity badge check authenticates and resolves tenant context before the Policy decision point checks delegated authority. Being polite is not authorization.",
-      security: "Safe test: a valid-looking but unauthorized synthetic badge is forbidden; no tool is called.",
+      detail: "API and admission control create a request ticket, assign its request ID, and rate-limit at a distinct boundary. Admission authenticates the user, resolves tenant context, and checks delegated authority. The runtime will use a separate workload identity. Being polite is not authorization.",
+      security: "Safe test: a valid-looking but unauthorized synthetic user badge is forbidden; a service badge cannot substitute for user delegation, and no tool is called.",
       status: "policy_denied or admitted",
-      contract: "Admission ticket boundary → identity badge check → Policy decision point"
+      contract: "Admission boundary → delegated user identity → admission authorization"
     },
     {
       title: "The Coordinator’s Desk",
       caption: "A coordinator takes the question to a desk with a notepad and a kitchen timer.",
-      focus: ["badge-check", "runtime"],
-      edges: ["badge-runtime"],
-      detail: "The Runtime manages explicit state, budgets, deadlines, and the observe → decide → act loop. Its working context is bounded and reconstructed.",
-      security: "The timer is enforced: time, step, tool, and retry limits can safely stop the run.",
+      focus: ["badge-check", "runtime", "workload-id"],
+      edges: ["badge-runtime", "workload-runtime"],
+      detail: "The Runtime manages explicit state, budgets, deadlines, and the observe → decide → act loop. A separate durable workflow substrate supplies checkpoints, waits, retries, and cancellation. Delegated user identity and workload identity remain distinct at every boundary.",
+      security: "The timer is enforced: time, step, tool, and retry limits can safely stop the run. The workload identity cannot expand the user's delegated authority.",
       status: "running within budget",
-      contract: "Coordinator: run task / Runtime"
+      contract: "Runtime state machine on a durable workflow substrate"
     },
     {
       title: "The Reference Shelf",
       caption: "The coordinator opens only approved binders. A sticky note inside one is something to read, never a new instruction.",
-      focus: ["runtime", "retrieval"],
-      edges: ["runtime-retrieval", "retrieval-runtime"],
-      detail: "The Retrieval service performs permission-aware search and returns versioned passages with provenance. Retrieved content stays untrusted.",
-      security: "Safe test: a synthetic passage saying “ignore prior rules” remains quoted data and is never executed.",
+      focus: ["runtime", "retrieval", "outside"],
+      edges: ["runtime-retrieval", "retrieval-outside", "outside-retrieval", "retrieval-runtime"],
+      detail: "The Retrieval service performs permission-aware search, reauthorizes the delegated user when fetching from a source, and returns versioned passages with provenance. Retrieved content stays untrusted.",
+      security: "Safe test: a cross-tenant fetch is denied at the source. An authorized synthetic passage saying “ignore prior rules” remains quoted data and is never executed.",
       status: "authorized content returned (untrusted)",
-      contract: "Retrieval service / Authorized source query"
+      contract: "Permission-aware search → reauthorize-on-fetch → versioned passages"
     },
     {
       title: "The Next-Step Guesser",
@@ -57,7 +57,7 @@
       caption: "A checker compares the proposed step with the rules. A disallowed guess stops here.",
       focus: ["runtime", "rulebook"],
       edges: ["runtime-rulebook", "rulebook-runtime"],
-      detail: "The Policy decision point and deterministic runtime validate schema, authority, budget, and task state. Anything not explicitly allowed is denied.",
+      detail: "This per-action Policy decision point is distinct from admission authorization. The deterministic Runtime validates schema, delegated and workload authority, purpose, destination, budget, and task state. Anything not explicitly allowed is denied.",
       security: "A disallowed synthetic proposal becomes policy_denied. Model text cannot override the decision.",
       status: "allowed or policy_denied",
       contract: "Code checks → allowed / denied"
@@ -67,7 +67,7 @@
       caption: "The coordinator may use only tools approved for this job.",
       focus: ["runtime", "toolbox"],
       edges: ["runtime-toolbox", "toolbox-runtime"],
-      detail: "The Connector and tool gateway exposes typed, allowlisted, least-privilege tools. Effectful calls also require an idempotency key and durable outcome.",
+      detail: "The Connector and tool gateway exposes typed, allowlisted, least-privilege tools. Read-only calls may proceed after action authorization. Consequential effects remain blocked until exact approval is valid and also require an idempotency key plus a durable outcome.",
       security: "Safe test: an out-of-allowlist or malformed call returns invalid_request or forbidden.",
       status: "validated tool result",
       contract: "Bounded tool / Connector and tool gateway"
@@ -87,17 +87,17 @@
       caption: "Answers from outside are labeled ‘double-check this’ until verified.",
       focus: ["toolbox", "outside"],
       edges: ["toolbox-outside", "outside-toolbox"],
-      detail: "External systems return untrusted responses. Provenance, authorization metadata, and verification travel with usable evidence.",
-      security: "Safe test: missing or mismatched provenance keeps a result labeled untrusted and withholds it from citation.",
+      detail: "This scene shows a read-only external response. External systems return untrusted data, and the gateway enforces destination and egress policy. Provenance, authorization metadata, and verification travel with usable evidence.",
+      security: "Safe test: missing or mismatched provenance keeps a result labeled untrusted and withholds it from citation. A consequential write remains blocked pending exact approval.",
       status: "untrusted until verified",
       contract: "External systems / Versioned cited passages"
     },
     {
       title: "The Supervisor’s Stamp",
       caption: "A consequential action needs a supervisor to approve the exact page before it goes out.",
-      focus: ["runtime", "approval"],
-      edges: ["runtime-approval", "approval-runtime"],
-      detail: "The Approval service binds an authorized reviewer’s decision to the exact payload digest, destination, policy version, and expiry. Approval is a state transition, not a chat phrase.",
+      focus: ["runtime", "approval", "toolbox"],
+      edges: ["runtime-approval", "approval-runtime", "runtime-toolbox"],
+      detail: "Before an effectful tool runs, the Approval service binds an authorized reviewer’s decision to the exact payload digest, destination, policy version, and expiry. The reviewer identity is distinct from the runtime workload identity. Approval is a state transition, not a chat phrase.",
       security: "Safe test: changing the payload or using a stale approval is denied. Class D actions remain denied in the initial design.",
       status: "awaiting_approval or allowed",
       contract: "Approval service / exact-action review"
@@ -105,19 +105,19 @@
     {
       title: "The Records Area",
       caption: "Observable steps go into a logbook. Secrets and private scratch notes do not.",
-      focus: ["runtime", "records"],
-      edges: ["runtime-records"],
-      detail: "The Observability pipeline and state/artifact stores capture minimized, redacted events, durable state, and versioned artifacts, not private chain-of-thought.",
-      security: "Safe test: a synthetic secret in trace input is redacted before an append-only evidence record is emitted.",
+      focus: ["runtime", "state", "observability"],
+      edges: ["runtime-state", "state-runtime", "runtime-observability"],
+      detail: "Authoritative state and artifact stores preserve checkpoints and versioned outputs. Separately, the Observability pipeline receives minimized, redacted events for operations and later trajectory evaluation, not private chain-of-thought.",
+      security: "Safe test: a synthetic secret in trace input is redacted before evidence is emitted. Losing telemetry cannot silently rewrite authoritative run state.",
       status: "redacted evidence recorded",
-      contract: "Records: state and artifacts / Observability pipeline"
+      contract: "Authoritative state and artifacts ≠ redacted observability evidence"
     },
     {
       title: "Answer or Stop",
       caption: "The coordinator returns an answer or explains a safe stop when time runs out or the rules say no, instead of guessing forever.",
-      focus: ["runtime", "records", "front-door", "user"],
-      edges: ["runtime-records", "runtime-front", "front-user"],
-      detail: "The Runtime returns a versioned result or an explicit terminal status. Safe outcomes include completed, completed_with_warnings, needs_clarification, awaiting_approval, budget_exhausted, cancelled, policy_denied, failed_recoverable, and failed_terminal.",
+      focus: ["runtime", "state", "observability", "front-door", "user"],
+      edges: ["runtime-state", "runtime-observability", "runtime-front", "front-user"],
+      detail: "The Runtime validates output, citations, provenance, and redaction before returning a versioned result or explicit terminal status. Release evaluation remains a separate control-plane process. Safe outcomes include completed, completed_with_warnings, needs_clarification, awaiting_approval, budget_exhausted, cancelled, policy_denied, failed_recoverable, and failed_terminal.",
       security: "Safe test: forced exhaustion ends as budget_exhausted with no silent retry loop and no unapproved final report.",
       status: "completed or explicit safe stop",
       contract: "Recorded result → accessible report delivery"

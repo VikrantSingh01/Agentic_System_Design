@@ -56,6 +56,7 @@
         <label for="story-progress">Journey progress</label>
         <progress id="story-progress" max="12" value="1">1 of 12</progress>
       </div>
+      <p class="trace-note"><strong>This is a request trace, not a deployment diagram.</strong> It reveals one boundary at a time. Retrieval, tools, approval, and specialist delegation are conditional branches; a request does not necessarily use all of them.</p>
       <div class="scene-heading-row">
         <div>
           <p id="scene-position" class="eyebrow">Scene 1 of 12</p>
@@ -65,9 +66,9 @@
       </div>
 
       <div class="diagram-wrap">
-        <svg id="architecture" viewBox="0 0 1100 660" role="img" aria-labelledby="svg-title svg-desc">
+        <svg id="architecture" viewBox="0 0 1250 660" role="img" aria-labelledby="svg-title svg-desc">
           <title id="svg-title">Help-center agent architecture</title>
-          <desc id="svg-desc">A request moves from a person through a front door, a distinct admission ticket boundary, an identity badge check, policy, a runtime coordinator, bounded services, records, and back as an answer or explicit safe stop.</desc>
+          <desc id="svg-desc">A request moves from a person through admission authorization to a runtime coordinator operating on a durable workflow. Delegated user identity remains distinct from workload identity. The runtime uses bounded model, retrieval, policy, tool, approval, and specialist services, writes state and artifacts, emits redacted evidence, and returns an answer or explicit safe stop.</desc>
           <defs>
             <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
               <path d="M0,0 L8,4 L0,8 Z"></path>
@@ -78,8 +79,11 @@
             <path id="edge-front-admission" d="M280 315 H315"></path>
             <path id="edge-admission-badge" d="M405 315 H420"></path>
             <path id="edge-badge-runtime" d="M540 315 H570"></path>
+            <path id="edge-workload-runtime" d="M630 410 V390"></path>
             <path id="edge-runtime-retrieval" d="M665 255 C705 150 730 115 775 105"></path>
             <path id="edge-retrieval-runtime" d="M775 135 C730 150 710 200 670 270"></path>
+            <path id="edge-retrieval-outside" d="M935 120 C1015 185 1015 455 950 525"></path>
+            <path id="edge-outside-retrieval" d="M920 525 C980 445 980 210 920 150"></path>
             <path id="edge-runtime-model" d="M675 295 H775"></path>
             <path id="edge-model-runtime" d="M775 325 H675"></path>
             <path id="edge-runtime-rulebook" d="M665 355 C710 400 735 415 775 420"></path>
@@ -92,7 +96,9 @@
             <path id="edge-outside-toolbox" d="M815 580 H700"></path>
             <path id="edge-runtime-approval" d="M575 270 C510 175 450 140 385 125"></path>
             <path id="edge-approval-runtime" d="M385 155 C455 175 510 225 590 265"></path>
-            <path id="edge-runtime-records" d="M580 385 C520 575 365 605 255 585"></path>
+            <path id="edge-runtime-state" d="M580 385 C520 575 365 605 255 585"></path>
+            <path id="edge-state-runtime" d="M255 555 C375 570 500 500 595 390"></path>
+            <path id="edge-runtime-observability" d="M690 275 C805 185 930 135 1040 130"></path>
             <path id="edge-runtime-front" d="M570 335 H280"></path>
             <path id="edge-front-user" d="M170 335 H130"></path>
           </g>
@@ -112,17 +118,23 @@
             <rect x="315" y="265" width="90" height="100" rx="12"></rect>
             <text x="360" y="298">Ticket</text><text x="360" y="320">Boundary</text><text class="technical" x="360" y="343">Admission control</text>
           </g>
-          <g id="node-badge-check" class="node decision" role="group" tabindex="0" aria-label="Identity Badge Check and Policy decision point: authenticates identity and checks delegated authority.">
-            <title>Identity Badge Check</title><desc>Authenticates who is asking, resolves tenant context, and intersects delegated authority with policy; deny by default.</desc>
+          <g id="node-badge-check" class="node decision" role="group" tabindex="0" aria-label="User Badge Check and admission authorization: authenticates the user and checks delegated authority.">
+            <title>User Badge Check</title><desc>Authenticates who is asking, resolves tenant context, and checks delegated user authority for admission; deny by default.</desc>
             <path d="M480 255 L540 315 L480 375 L420 315 Z"></path>
-            <text x="480" y="301">Identity</text><text x="480" y="321">Badge Check</text><text class="technical" x="480" y="344">Policy decision</text>
+            <text x="480" y="301">User Badge</text><text x="480" y="321">Check</text><text class="technical" x="480" y="344">Admission policy</text>
           </g>
-          <g id="node-runtime" class="node runtime" role="group" tabindex="0" aria-label="Coordinator’s Desk, Runtime: manages the state machine, budgets, context, and termination.">
-            <title>Coordinator’s Desk</title><desc>The Runtime observes, decides, acts, records, and stops within explicit budgets.</desc>
+          <g id="node-runtime" class="node runtime" role="group" tabindex="0" aria-label="Coordinator’s Desk, Runtime on a durable workflow: manages the state machine, budgets, context, checkpoints, and termination.">
+            <title>Coordinator’s Desk</title><desc>The Runtime observes, decides, acts, records, and stops within explicit budgets. A separate durable workflow substrate supplies checkpoints, waits, retries, and cancellation.</desc>
             <rect x="570" y="245" width="120" height="145" rx="18"></rect>
             <text x="630" y="278">Coordinator</text><text x="630" y="299">Desk</text>
             <text class="technical" x="630" y="325">Runtime</text>
+            <text class="technical" x="630" y="344">durable workflow</text>
             <text class="symbol" x="630" y="358">⏱ budget · ⛔ stop</text>
+          </g>
+          <g id="node-workload-id" class="node" role="group" tabindex="0" aria-label="Workload Identity: identifies the running application separately from the delegated user.">
+            <title>Workload Identity</title><desc>The runtime's machine identity is checked separately from the user identity and cannot widen delegated authority.</desc>
+            <rect x="570" y="410" width="120" height="55" rx="14"></rect>
+            <text x="630" y="433">Service Badge</text><text class="technical" x="630" y="453">workload identity</text>
           </g>
           <g id="node-retrieval" class="node store" role="group" tabindex="0" aria-label="Reference Shelf, Retrieval service: returns authorized, versioned, untrusted passages.">
             <title>Reference Shelf</title><desc>The Retrieval service searches only authorized sources and labels returned content untrusted.</desc>
@@ -135,10 +147,10 @@
             <rect x="775" y="260" width="180" height="100" rx="16"></rect>
             <text x="865" y="298">Next-Step Guesser</text><text class="technical" x="865" y="323">Model gateway</text><text class="tag" x="865" y="344">proposal only</text>
           </g>
-          <g id="node-rulebook" class="node decision" role="group" tabindex="0" aria-label="Rulebook Checker, Policy decision point: approves or denies a proposal.">
+          <g id="node-rulebook" class="node decision" role="group" tabindex="0" aria-label="Action Rulebook Checker, Policy decision point: authorizes or denies each proposed action.">
             <title>Rulebook Checker</title><desc>Deterministic checks approve or deny based on schema, authority, policy, state, and budget.</desc>
             <path d="M865 380 L965 440 L865 500 L765 440 Z"></path>
-            <text x="865" y="431">Rulebook Checker</text><text class="technical" x="865" y="454">Policy decision point</text><text class="tag" x="865" y="475">allowed / denied</text>
+            <text x="865" y="431">Action Rulebook</text><text class="technical" x="865" y="454">Policy decision point</text><text class="tag" x="865" y="475">allowed / denied</text>
           </g>
           <g id="node-toolbox" class="node" role="group" tabindex="0" aria-label="Toolbox, Connector and tool gateway: offers typed, allowlisted, least-privilege tools.">
             <title>Toolbox</title><desc>The Connector and tool gateway validates typed requests and exposes only allowlisted tools.</desc>
@@ -160,11 +172,17 @@
             <rect x="205" y="70" width="180" height="100" rx="16"></rect>
             <text x="295" y="104">Supervisor’s Stamp</text><text class="technical" x="295" y="128">Approval service</text><text class="tag" x="295" y="150">approval required</text>
           </g>
-          <g id="node-records" class="node store" role="group" tabindex="0" aria-label="Records Area, state and artifact stores plus Observability pipeline: records minimized, redacted evidence.">
-            <title>Records Area</title><desc>Versioned state and artifacts plus minimized, redacted observable evidence; never secrets or private chain-of-thought.</desc>
+          <g id="node-state" class="node store" role="group" tabindex="0" aria-label="State and Artifact Stores: preserve authoritative run state, checkpoints, and versioned artifacts.">
+            <title>State and Artifact Stores</title><desc>Authoritative execution state, checkpoints, and versioned artifacts are durable and distinct from telemetry.</desc>
             <path d="M40 515 C40 490 205 490 205 515 V600 C205 625 40 625 40 600 Z"></path>
             <ellipse cx="122.5" cy="515" rx="82.5" ry="20"></ellipse>
-            <text x="122" y="552">Records Area</text><text class="technical" x="122" y="575">Stores + observability</text><text class="tag" x="122" y="598">redacted evidence</text>
+            <text x="122" y="552">State &amp; Artifacts</text><text class="technical" x="122" y="575">authoritative stores</text><text class="tag" x="122" y="598">versioned + durable</text>
+          </g>
+          <g id="node-observability" class="node store" role="group" tabindex="0" aria-label="Observability Pipeline: receives minimized, redacted evidence but is not an authoritative state store.">
+            <title>Observability Pipeline</title><desc>Minimized, redacted observable events support operations and trajectory evaluation; never secrets or private chain-of-thought.</desc>
+            <path d="M1040 90 C1040 70 1220 70 1220 90 V160 C1220 180 1040 180 1040 160 Z"></path>
+            <ellipse cx="1130" cy="90" rx="90" ry="20"></ellipse>
+            <text x="1130" y="120">Evidence Pipeline</text><text class="technical" x="1130" y="143">Observability</text><text class="tag" x="1130" y="162">minimized + redacted</text>
           </g>
         </svg>
       </div>
@@ -194,6 +212,35 @@
       <h2>All 12 scenes</h2>
       <ol id="scene-list"></ol>
     </nav>
+
+    <section class="architecture-context" aria-labelledby="production-title">
+      <p class="eyebrow">Production context</p>
+      <h2 id="production-title">Keep administrative authority outside the request path</h2>
+      <p>The request trace above is the data plane. Policy authors, evaluators, and deployment systems operate in a separate control plane. Untrusted request, model, retrieval, or tool content cannot cross upward and become configuration.</p>
+      <div class="plane-grid">
+        <article class="plane control-plane">
+          <h3>Control plane</h3>
+          <ol class="component-flow">
+            <li><strong>Governance and policy configuration</strong><span>Owners publish versioned policy, capability, model, and connector definitions.</span></li>
+            <li><strong>Evaluation and release gates</strong><span>Offline and continuous evidence qualifies a version; evaluation does not authorize each answer inline.</span></li>
+            <li><strong>Deployment platform</strong><span>Only approved, versioned releases reach the runtime.</span></li>
+          </ol>
+        </article>
+        <article class="plane data-plane">
+          <h3>Data plane</h3>
+          <ol class="component-flow">
+            <li><strong>Admission and task service</strong><span>Creates scoped work with tenant, principal, purpose, policy version, and budget.</span></li>
+            <li><strong>Runtime on durable workflow</strong><span>Coordinates typed calls, checkpoints, retries, waits, cancellation, and safe termination.</span></li>
+            <li><strong>Bounded services and stores</strong><span>Gateways reauthorize access; state, artifacts, and redacted evidence remain separate.</span></li>
+          </ol>
+        </article>
+      </div>
+      <div class="plane-flows" aria-label="Cross-plane flows">
+        <p><strong>Control → data:</strong> signed or otherwise integrity-protected versioned policy, configuration, and releases.</p>
+        <p><strong>Data → operations:</strong> minimized, redacted events for observability and later trajectory evaluation.</p>
+        <p><strong>Never data → control:</strong> prompts, model output, retrieved passages, and tool responses remain untrusted data.</p>
+      </div>
+    </section>
 
     <aside class="analogy-limit" aria-labelledby="limit-title">
       <h2 id="limit-title">Where the help-center picture stops matching</h2>

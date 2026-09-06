@@ -1,7 +1,7 @@
 # Chapter 11: Advanced Retrieval
 
-> Status: drafting  
-> Owner: Chapter 11 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -765,6 +765,8 @@ diagnostic for the permitted IDs if desired; never log sensitive passage text
 in a production trace. Cleanup: delete the two files and any `__pycache__`
 folder. The lab needs Python 3.11, no packages, credentials, account, network,
 or payment.
+
+**Navigation:** [Previous: Chapter 10: RAG Foundations](10-rag-foundations.md) | [Module 03 overview](../README.md) | [Next: Chapter 12: Memory Without Mythology](12-memory-without-mythology.md)
 
 ## Sources
 

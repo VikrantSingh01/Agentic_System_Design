@@ -1,7 +1,7 @@
 # Chapter 33: Performance and Cost Engineering
 
-> Status: drafting  
-> Owner: Chapter 33 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -570,3 +570,5 @@ Only this frozen chapter set is cited:
 2. **SRC-052**: AWS, *Generative AI Lens*.
    <https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/generative-ai-lens.html>.
    Evolving guidance; verify current content before use.
+
+**Navigation:** [Previous: Chapter 32: Data and State at Scale](../../07-production-architecture-operations/chapters/32-data-and-state-at-scale.md) | [Module 08 overview](../README.md) | [Next: Chapter 34: Multi-Tenant and Multi-Region Design](34-multi-tenant-multi-region-design.md)

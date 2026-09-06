@@ -1,7 +1,7 @@
 # Chapter 20: Building Evaluation Sets
 
-> Status: drafting
-> Owner: Module 05 author
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -450,3 +450,5 @@ State how reports remain comparable after a source update.
 
 All cases and outputs in this chapter are synthetic. The coverage matrix is a
 declared teaching design, not a claim that twelve cases reproduce production.
+
+**Navigation:** [Previous: Chapter 19: What Does Good Mean?](19-what-does-good-mean.md) | [Module 05 overview](../README.md) | [Next: Chapter 21: Evaluators](21-evaluators.md)

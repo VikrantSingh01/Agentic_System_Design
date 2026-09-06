@@ -1,7 +1,7 @@
 # Chapter 05: Messages, Prompts, and Structured Output
 
-> Status: drafting  
-> Owner: Module 02 Chapter 05 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -703,6 +703,8 @@ Use the Python listing in **Build it in Python** as the self-contained offline l
 8. Change both attempts to invalid output and confirm a `budget_error` ends the run.
 
 No network, provider account, secrets, payment, or personal data is required. Cleanup consists of deleting the personal practice file and any generated `__pycache__` directory. Do not add live-provider credentials to the exercise.
+
+**Navigation:** [Previous: Chapter 4: From Software to AI Systems](../../01-from-zero-to-agents/chapters/04-from-software-to-ai-systems.md) | [Module 02 overview](../README.md) | [Next: Chapter 6: Models and Inference](06-models-and-inference.md)
 
 ## Sources
 

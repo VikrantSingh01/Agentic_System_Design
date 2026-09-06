@@ -1,7 +1,7 @@
 # Chapter 25: Secure Tools and Sandboxes
 
-> Status: drafting  
-> Owner: Chapter 25 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -605,3 +605,5 @@ approval format, minimized evidence record, and passing negative and legitimate-
 
 These sources inform design and testing. They do not prove that a capability, sandbox, protocol,
 cloud service, or deployment is secure or compliant.
+
+**Navigation:** [Previous: Chapter 24: Threat Modeling Agentic Systems](24-threat-modeling-agentic-systems.md) | [Module 06 overview](../README.md) | [Next: Chapter 26: Identity, Privacy, and Content Safety](26-identity-privacy-content-safety.md)

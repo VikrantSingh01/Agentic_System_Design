@@ -1,7 +1,7 @@
 # Chapter 35: Continuous Improvement
 
-> Status: drafting  
-> Owner: Chapter 35 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -610,3 +610,5 @@ Only this frozen chapter set is cited:
 4. **SRC-070**: NeurIPS, *Hidden Technical Debt in Machine Learning Systems*.
    <https://papers.nips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems>.
    Durable evidence about hidden dependencies and surrounding system controls.
+
+**Navigation:** [Previous: Chapter 34: Multi-Tenant and Multi-Region Design](34-multi-tenant-multi-region-design.md) | [Module 08 overview](../README.md) | [Next: Chapter 36: Northstar on the Microsoft Stack](../../09-microsoft-synthesis-capstone/chapters/36-northstar-on-microsoft-stack.md)

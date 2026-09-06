@@ -1,7 +1,7 @@
 # Chapter 03: AI and LLM Primer
 
-> Status: drafting  
-> Owner: Module 01 Chapter 03 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -536,6 +536,8 @@ assert Random(7).choices(tokens, weights=probabilities, k=20) != (
 8. Delete `primer_simulation.py` when finished; the lab creates no other files.
 
 This simulation is safe and transparent because it is offline and has no model, account, billable API, or side effect.
+
+**Navigation:** [Previous: Chapter 2: The Observe-Decide-Act Loop](02-observe-decide-act-loop.md) | [Module 01 overview](../README.md) | [Next: Chapter 4: From Software to AI Systems](04-from-software-to-ai-systems.md)
 
 ## Sources
 

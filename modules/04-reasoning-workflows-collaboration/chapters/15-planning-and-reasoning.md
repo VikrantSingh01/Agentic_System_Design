@@ -1,7 +1,7 @@
 # Chapter 15: Planning and Reasoning
 
-> Status: drafting  
-> Owner: Chapter 15 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -330,3 +330,5 @@ offline, zero cost, and leaves no persistent files to clean up.
 - SRC-008, ICLR, *ReAct: Synergizing Reasoning and Acting in Language Models*, 2023.
 - SRC-027, DeepMind, *Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model*, 2020.
 - SRC-038, Meta AI, *Toolformer: Language Models Can Teach Themselves to Use Tools*, 2023.
+
+**Navigation:** [Previous: Chapter 14: Workflow Patterns](14-workflow-patterns.md) | [Module 04 overview](../README.md) | [Next: Chapter 16: Durable Execution](16-durable-execution.md)

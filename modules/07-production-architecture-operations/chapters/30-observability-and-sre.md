@@ -1,7 +1,7 @@
 # Chapter 30: Observability and site reliability engineering (SRE)
 
-> Status: drafting  
-> Owner: Module 07 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -236,3 +236,5 @@ runs after the script exits.
 - SRC-028, Google, *Site Reliability Engineering*. Durable.
 - SRC-047, Microsoft, *Azure Monitor OpenTelemetry*. Volatile; accessed 2026-09-05.
 - SRC-056, OpenTelemetry, *Semantic conventions for generative AI systems*. Volatile; accessed 2026-09-05.
+
+**Navigation:** [Previous: Chapter 29: Reliability Engineering](29-reliability-engineering.md) | [Module 07 overview](../README.md) | [Next: Chapter 31: Deployment and Delivery](31-deployment-and-delivery.md)

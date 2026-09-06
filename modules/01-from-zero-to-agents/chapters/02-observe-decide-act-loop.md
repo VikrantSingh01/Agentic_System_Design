@@ -1,7 +1,7 @@
 # Chapter 02: The Observe-Decide-Act Loop
 
-> Status: drafting  
-> Owner: Chapter 02 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -595,6 +595,8 @@ Use the embedded [Build it in Python](#build-it-in-python) program as the lab.
 
 The lab is intentionally a simulation. It exposes every decision and avoids
 accounts, payments, provider calls, and consequential side effects.
+
+**Navigation:** [Previous: Chapter 1: Why Agentic Systems](01-why-agentic-systems.md) | [Module 01 overview](../README.md) | [Next: Chapter 3: AI and LLM Primer](03-ai-and-llm-primer.md)
 
 ## Sources
 

@@ -1,7 +1,7 @@
 # Chapter 14: Workflow Patterns
 
-> Status: drafting  
-> Owner: Chapter 14 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -379,3 +379,5 @@ practice file; the program creates no persistent state.
 
 Framework and product claims from SRC-032 and SRC-051 must be revalidated against
 their primary sources within 30 days of release.
+
+**Navigation:** [Previous: Chapter 13: Multimodal and Computer-Using Agents](../../03-context-knowledge-memory/chapters/13-multimodal-computer-using-agents.md) | [Module 04 overview](../README.md) | [Next: Chapter 15: Planning and Reasoning](15-planning-and-reasoning.md)

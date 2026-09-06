@@ -1,7 +1,7 @@
 # Chapter 23: Debugging and Optimization
 
-> Status: drafting
-> Owner: Module 05 author
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -441,3 +441,5 @@ condition, and the exact machine-readable block reasons.
 
 All failures, traces, metrics, and optimization results in this chapter are
 synthetic teaching examples.
+
+**Navigation:** [Previous: Chapter 22: Agent and Tool Evaluation](22-agent-and-tool-evaluation.md) | [Module 05 overview](../README.md) | [Next: Chapter 24: Threat Modeling Agentic Systems](../../06-security-safety-governance/chapters/24-threat-modeling-agentic-systems.md)

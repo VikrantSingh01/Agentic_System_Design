@@ -1,7 +1,7 @@
 # Chapter 12: Memory Without Mythology
 
-> Status: drafting  
-> Owner: Chapter 12 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -863,6 +863,8 @@ mandatory tenant-isolation test.
 
 Never use real names, messages, secrets, medical facts, or provider credentials
 in this lab.
+
+**Navigation:** [Previous: Chapter 11: Advanced Retrieval](11-advanced-retrieval.md) | [Module 03 overview](../README.md) | [Next: Chapter 13: Multimodal and Computer-Using Agents](13-multimodal-computer-using-agents.md)
 
 ## Sources
 

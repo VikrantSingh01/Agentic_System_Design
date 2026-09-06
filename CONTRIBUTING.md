@@ -37,7 +37,7 @@ A chapter pull request must include:
 - learning objectives covered
 - approved sources used
 - volatile claims requiring freshness review
-- diagrams, exercises, and labs added
+- diagrams, exercises, and runnable examples added
 - defensive security and safety tests added
 - validation commands run
 - unresolved cross-module requests
@@ -47,7 +47,7 @@ Review findings belong in `reviews/<chapter>/<role>.md`. Reviewers report issues
 
 ## Validate changes
 
-Before submitting content or visual changes, run:
+Before submitting content or visual changes, run these checks. The animation validator is dependency-free.
 
 ```powershell
 python scripts/validate_repository.py

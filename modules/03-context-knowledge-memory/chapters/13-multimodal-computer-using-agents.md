@@ -1,7 +1,7 @@
 # Chapter 13: Multimodal and Computer-Using Agents
 
-> Status: drafting  
-> Owner: Chapter 13 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -776,6 +776,8 @@ After the offline simulation passes, change one thing at a time:
 For each extension, write the expected result before running it. Keep the
 simulation offline, deterministic, synthetic, and unable to reach real files,
 accounts, devices, or networks.
+
+**Navigation:** [Previous: Chapter 12: Memory Without Mythology](12-memory-without-mythology.md) | [Module 03 overview](../README.md) | [Next: Chapter 14: Workflow Patterns](../../04-reasoning-workflows-collaboration/chapters/14-workflow-patterns.md)
 
 ## Sources
 

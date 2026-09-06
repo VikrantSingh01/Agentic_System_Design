@@ -1,7 +1,7 @@
 # Chapter 28: Reference Architecture
 
-> Status: drafting  
-> Owner: Module 07 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -284,3 +284,5 @@ telemetry. Cleanup means deleting only the local synthetic practice file.
 - SRC-045, Microsoft, *Azure Architecture Center*. Evolving; accessed 2026-09-05.
 - SRC-050, AWS, *Amazon Bedrock AgentCore developer guide*. Volatile; accessed 2026-09-05.
 - SRC-070, NeurIPS, *Hidden Technical Debt in Machine Learning Systems*. Durable.
+
+**Navigation:** [Previous: Chapter 27: Responsible AI and Governance](../../06-security-safety-governance/chapters/27-responsible-ai-governance.md) | [Module 07 overview](../README.md) | [Next: Chapter 29: Reliability Engineering](29-reliability-engineering.md)

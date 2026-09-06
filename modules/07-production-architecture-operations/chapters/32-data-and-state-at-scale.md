@@ -1,7 +1,7 @@
 # Chapter 32: Data and State at Scale
 
-> Status: drafting  
-> Owner: Module 07 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -255,3 +255,5 @@ partition keys. Test cleanup of temporary files and scheduled backup expiry meta
 - SRC-049, Microsoft, *Azure Service Bus messaging documentation*. Volatile; accessed 2026-09-05.
 - SRC-063, European Union, *Regulation (EU) 2016/679*. Evolving; qualified-review input, not legal advice.
 - SRC-072, O'Reilly Media, *Designing Data-Intensive Applications*. Durable.
+
+**Navigation:** [Previous: Chapter 31: Deployment and Delivery](31-deployment-and-delivery.md) | [Module 07 overview](../README.md) | [Next: Chapter 33: Performance and Cost Engineering](../../08-scale-economics-lifecycle/chapters/33-performance-cost-engineering.md)

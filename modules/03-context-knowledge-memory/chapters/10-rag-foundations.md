@@ -1,7 +1,7 @@
 # Chapter 10: RAG Foundations
 
-> Status: drafting  
-> Owner: Module 03  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -771,6 +771,8 @@ Use the embedded [Build it in Python](#build-it-in-python) program.
 
 All content and identities are synthetic. The lab is deterministic, offline, account-free,
 and safe to delete.
+
+**Navigation:** [Previous: Chapter 9: Context Engineering](09-context-engineering.md) | [Module 03 overview](../README.md) | [Next: Chapter 11: Advanced Retrieval](11-advanced-retrieval.md)
 
 ## Sources
 

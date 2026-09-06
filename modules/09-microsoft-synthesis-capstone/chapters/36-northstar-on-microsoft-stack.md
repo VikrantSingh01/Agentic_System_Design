@@ -1,7 +1,7 @@
 # Chapter 36: Northstar on the Microsoft Stack
 
-> Status: reviewing  
-> Owner: Agentic System Design maintainers  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 **On this page**
@@ -1192,5 +1192,5 @@ supports review; it does not prove that a candidate satisfies Northstar's requir
 
 ---
 
-**Navigation:** [← Previous: Chapter 35 — Continuous Improvement](../../08-scale-economics-lifecycle/chapters/35-continuous-improvement.md)
+**Navigation:** [Previous: Chapter 35: Continuous Improvement](../../08-scale-economics-lifecycle/chapters/35-continuous-improvement.md) | [Module 09 overview](../README.md)
 · [Module 09 README](../README.md)

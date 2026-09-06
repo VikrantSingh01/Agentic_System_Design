@@ -1,7 +1,7 @@
 # Chapter 16: Durable Execution
 
-> Status: drafting  
-> Owner: Chapter 16 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -385,3 +385,5 @@ cleanup is in-memory object disposal.
 
 All product semantics and APIs require primary-source revalidation within 30 days of
 release.
+
+**Navigation:** [Previous: Chapter 15: Planning and Reasoning](15-planning-and-reasoning.md) | [Module 04 overview](../README.md) | [Next: Chapter 17: Multi-Agent Systems](17-multi-agent-systems.md)

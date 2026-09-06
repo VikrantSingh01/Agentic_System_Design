@@ -1,7 +1,7 @@
 # Chapter 01: Why Agentic Systems
 
-> Status: drafting  
-> Owner: Module 01 Chapter 01 author
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -414,6 +414,8 @@ Then perform the change in [Failure lab](#failure-lab), add an assertion for the
 four-entry capped trace, and restore the corrected double. No packages, account,
 network, or live provider are needed. Cleanup: delete the practice folder. Do not
 place the scratch file in this repository.
+
+**Navigation:** [Module 01 overview](../README.md) | [Next: Chapter 2: The Observe-Decide-Act Loop](02-observe-decide-act-loop.md)
 
 ## Sources
 

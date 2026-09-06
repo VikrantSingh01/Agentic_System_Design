@@ -1,7 +1,7 @@
 # Chapter 26: Identity, Privacy, and Content Safety
 
-> Status: drafting  
-> Owner: Chapter 26 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -555,3 +555,5 @@ matrix, accessibility review record, and unresolved qualified-review register.
 
 These sources inform engineering and qualified-review questions. They do not establish legal
 applicability, compliance, conformity, accessibility, privacy, or safety for Northstar.
+
+**Navigation:** [Previous: Chapter 25: Secure Tools and Sandboxes](25-secure-tools-and-sandboxes.md) | [Module 06 overview](../README.md) | [Next: Chapter 27: Responsible AI and Governance](27-responsible-ai-governance.md)

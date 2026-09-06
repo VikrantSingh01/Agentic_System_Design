@@ -1,7 +1,7 @@
 # Chapter 24: Threat Modeling Agentic Systems
 
-> Status: drafting  
-> Owner: Chapter 24 author  
+> Status: reviewing
+> Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
 ## The problem
@@ -585,3 +585,5 @@ The complete lab should produce:
 
 These sources guide threat discovery and treatment. They do not prove completeness,
 certification, conformity, legal compliance, or the safety of a particular deployment.
+
+**Navigation:** [Previous: Chapter 23: Debugging and Optimization](../../05-evaluation-improvement/chapters/23-debugging-and-optimization.md) | [Module 06 overview](../README.md) | [Next: Chapter 25: Secure Tools and Sandboxes](25-secure-tools-and-sandboxes.md)
