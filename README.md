@@ -4,6 +4,8 @@
 
 **Author:** Vikrant Singh, Microsoft
 
+<a href="book/building-agentic-systems.pdf"><img src="book/building-agentic-systems-cover.png" alt="Building Agentic Systems book cover" width="420"></a>
+
 A beginner-to-production guide for designing, building, evaluating, securing, deploying, and operating agentic systems.
 
 **Read the book:** [Web edition](https://vikrantsingh01.github.io/Agentic_System_Design/) | [PDF edition](book/building-agentic-systems.pdf)

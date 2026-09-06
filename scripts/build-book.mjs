@@ -20,6 +20,7 @@ const docsRoot = path.join(root, "docs");
 const htmlPath = path.join(buildRoot, "agentic-system-design.html");
 const webPath = path.join(docsRoot, "index.html");
 const pdfPath = path.join(outputRoot, "building-agentic-systems.pdf");
+const coverImagePath = path.join(outputRoot, "building-agentic-systems-cover.png");
 
 const escapeHtml = (value) => value
   .replaceAll("&", "&amp;")
@@ -166,20 +167,41 @@ img, svg { max-width:100%; height:auto; }
 .diagram { margin:1rem 0; padding:.45rem; text-align:center; border:1px solid var(--line); background:white; break-inside:avoid-page; }
 .diagram svg { max-width:100% !important; height:auto !important; max-height:220mm; }
 .katex-display { overflow:hidden; font-size:.92em; }
-.cover { position:relative; height:245mm; overflow:hidden; padding:24mm 20mm; color:white; background:#123d4a; break-after:page; }
-.cover::before { content:""; position:absolute; inset:0 auto 0 0; width:7mm; background:#d39a2c; }
-.cover::after { content:""; position:absolute; right:-38mm; bottom:-45mm; width:130mm; height:130mm; border:1.2mm solid rgba(121,213,197,.42); transform:rotate(18deg); }
-.cover-content { position:relative; z-index:2; display:flex; min-height:197mm; flex-direction:column; }
-.cover .kicker { margin:0 0 19mm; color:#79d5c5; font:700 10pt/1.2 "Segoe UI",sans-serif; letter-spacing:.12em; text-transform:uppercase; }
-.cover h1 { max-width:155mm; margin:0 0 5mm; color:white; font-size:43pt; letter-spacing:0; }
-.cover .subtitle { max-width:145mm; margin:0; font-size:15pt; line-height:1.38; color:#dbecee; }
-.cover-map { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; gap:4mm; width:142mm; margin:20mm 0 0; font-family:"Segoe UI",sans-serif; }
-.cover-node { padding:4mm 3mm; border:1px solid rgba(255,255,255,.72); color:white; text-align:center; font-size:10pt; font-weight:700; text-transform:uppercase; }
-.cover-arrow { color:#d39a2c; font-size:18pt; font-weight:700; }
-.cover-controls { width:142mm; margin:4mm 0 0; padding-top:3mm; border-top:1px solid rgba(121,213,197,.55); color:#bcd4d8; font:8.5pt/1.4 "Segoe UI",sans-serif; text-align:center; }
-.cover-meta { margin-top:auto; }
-.cover .author { margin:0 0 2mm; color:white; font:600 13pt/1.3 "Segoe UI",sans-serif; }
-.cover .edition { margin:0; color:#bcd4d8; font:9.5pt/1.3 "Segoe UI",sans-serif; }
+.cover { position:relative; height:245mm; overflow:hidden; padding:18mm 18mm 16mm; color:#f7f3e8; background:#101512; break-after:page; }
+.cover::before { content:""; position:absolute; inset:0 auto 0 0; width:5mm; background:#f0523d; }
+.cover::after { content:""; position:absolute; z-index:1; right:-26mm; top:22mm; width:82mm; height:82mm; border:1px solid rgba(132,226,204,.52); transform:rotate(45deg); }
+.cover-grid { position:absolute; z-index:1; inset:0; overflow:hidden; pointer-events:none; }
+.cover-grid span { position:absolute; display:block; background:rgba(247,243,232,.1); }
+.cover-grid span:nth-child(1) { top:29mm; right:0; width:53%; height:1px; }
+.cover-grid span:nth-child(2) { top:0; right:37mm; width:1px; height:100%; }
+.cover-grid span:nth-child(3) { left:5mm; bottom:47mm; width:100%; height:1px; }
+.cover-grid span:nth-child(4) { right:12mm; bottom:15mm; width:18mm; height:18mm; background:#d8e948; }
+.cover-content { position:relative; z-index:2; display:flex; min-height:211mm; flex-direction:column; }
+.cover-topline { display:flex; align-items:center; justify-content:space-between; margin:0 0 15mm; padding-bottom:3mm; border-bottom:1px solid rgba(247,243,232,.34); font:700 8pt/1.2 "Trebuchet MS",sans-serif; text-transform:uppercase; }
+.cover-topline .cover-series { color:#84e2cc; }
+.cover-topline .cover-edition { color:#f7f3e8; }
+.cover-title-block { position:relative; max-width:164mm; }
+.cover .kicker { margin:0 0 4mm; color:#f0523d; font:700 11pt/1.2 "Trebuchet MS",sans-serif; text-transform:uppercase; }
+.cover h1 { max-width:164mm; margin:0; color:#f7f3e8; font-family:"Arial Narrow","Trebuchet MS",sans-serif; font-size:49pt; font-weight:800; line-height:.93; letter-spacing:0; text-transform:uppercase; }
+.cover h1 .cover-building { display:block; margin-bottom:2mm; color:#84e2cc; font:italic 21pt/1.1 Georgia,"Times New Roman",serif; text-transform:none; }
+.cover .subtitle { max-width:130mm; margin:7mm 0 0; padding-left:4mm; border-left:1.5mm solid #d8e948; color:#d9ded8; font:12.5pt/1.45 Georgia,"Times New Roman",serif; }
+.cover-system { width:100%; margin:14mm 0 0; font-family:"Trebuchet MS",sans-serif; }
+.cover-loop { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:stretch; width:100%; border-top:1px solid rgba(247,243,232,.48); border-bottom:1px solid rgba(247,243,232,.48); }
+.cover-stage { display:grid; grid-template-columns:auto 1fr; gap:3mm; align-items:center; min-height:17mm; padding:3mm; }
+.cover-stage strong { color:#f0523d; font-size:8pt; }
+.cover-stage span { color:#f7f3e8; font-size:10pt; font-weight:700; text-transform:uppercase; }
+.cover-arrow { align-self:center; color:#d8e948; font-size:16pt; font-weight:700; }
+.cover-layers { display:grid; grid-template-columns:repeat(4,1fr); margin-top:4mm; border:1px solid rgba(132,226,204,.56); }
+.cover-layer { min-height:14mm; padding:3mm; border-right:1px solid rgba(132,226,204,.4); }
+.cover-layer:last-child { border-right:0; }
+.cover-layer b { display:block; margin-bottom:1mm; color:#84e2cc; font-size:7.5pt; text-transform:uppercase; }
+.cover-layer span { display:block; color:#bfc8c1; font-size:7.5pt; line-height:1.3; }
+.cover-positioning { margin:4mm 0 0; color:#d8e948; font:700 7.5pt/1.4 "Trebuchet MS",sans-serif; text-align:right; text-transform:uppercase; }
+.cover-meta { display:flex; align-items:flex-end; justify-content:space-between; gap:10mm; margin-top:auto; }
+.cover .author { margin:0; color:#f7f3e8; font:700 13pt/1.3 "Trebuchet MS",sans-serif; }
+.cover .author-role { display:block; margin-top:1mm; color:#84e2cc; font-size:8pt; font-weight:400; text-transform:uppercase; }
+.cover .cover-mark { display:flex; align-items:center; gap:2mm; color:#aab4ac; font:700 7.5pt/1 "Trebuchet MS",sans-serif; text-transform:uppercase; }
+.cover .cover-mark::before { content:""; display:block; width:8mm; height:8mm; border:1px solid #f0523d; background:#d8e948; }
 .reader-guide, .contents { break-after:page; }
 .reader-guide { padding-top:8mm; }
 .contents > ol { columns:2; column-gap:12mm; padding-left:1.3rem; }
@@ -196,7 +218,9 @@ img, svg { max-width:100%; height:auto; }
 @page { size:A4; margin:17mm 16mm 19mm; }
 @media print {
   a { color:inherit; }
-  .cover { margin:-17mm -16mm -19mm; padding:34mm 28mm; height:297mm; }
+  .cover { margin:-17mm -16mm -19mm; padding:23mm 23mm 19mm; height:297mm; }
+  .cover-content { min-height:255mm; }
+  .cover-grid span:nth-child(4) { display:none; }
 }
 @media screen {
   html { scroll-behavior:smooth; }
@@ -216,10 +240,22 @@ img, svg { max-width:100%; height:auto; }
   main { overflow-x:clip; }
   main a { overflow-wrap:anywhere; }
   .web-header span { display:none; }
-  .cover h1 { font-size:34pt; }
-  .cover-map, .cover-controls { width:100%; }
-  .cover-map { grid-template-columns:1fr; }
+  .cover-topline { margin-bottom:2rem; }
+  .cover h1 { font-size:37pt; }
+  .cover h1 .cover-building { font-size:18pt; }
+  .cover .subtitle { font-size:11.5pt; }
+  .cover-system { margin-top:2rem; }
+  .cover-loop { grid-template-columns:1fr; }
   .cover-arrow { transform:rotate(90deg); text-align:center; }
+  .cover-layers { grid-template-columns:1fr 1fr; }
+  .cover-layer:nth-child(2) { border-right:0; }
+  .cover-layer:nth-child(-n+2) { border-bottom:1px solid rgba(132,226,204,.4); }
+  .cover-positioning { max-width:100%; margin-bottom:.75rem; font-size:6.8pt; line-height:1.35; text-align:left; white-space:normal; }
+  .cover-meta { gap:.75rem; }
+  .cover .author { flex:1 1 auto; font-size:11pt; }
+  .cover .cover-mark { flex:0 1 9rem; font-size:6.2pt; line-height:1.25; }
+  .cover .cover-mark::before { flex:0 0 auto; width:1.6rem; height:1.6rem; }
+  .cover-grid span:nth-child(4) { display:none; }
   .contents > ol { columns:1; }
   table { display:block; max-width:100%; overflow-x:auto; font-size:8pt; }
   pre { max-width:100%; overflow-x:auto; white-space:pre; }
@@ -376,17 +412,29 @@ async function main() {
 <body>
   <header class="web-only web-header"><a href="#contents">Building Agentic Systems</a><span>Vikrant Singh, Microsoft</span></header>
   <section class="cover">
+    <div class="cover-grid" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="cover-content">
-      <p class="kicker">From first principles to production</p>
-      <h1>Building<br>Agentic Systems</h1>
-      <p class="subtitle">Build understandable, safe, reliable, and scalable agentic systems with evidence-driven engineering.</p>
-      <div class="cover-map" aria-label="Observe, decide, act">
-        <span class="cover-node">Observe</span><span class="cover-arrow">→</span>
-        <span class="cover-node">Decide</span><span class="cover-arrow">→</span>
-        <span class="cover-node">Act</span>
+      <div class="cover-topline"><span class="cover-series">A practical engineering handbook</span><span class="cover-edition">First edition / 2026</span></div>
+      <div class="cover-title-block">
+        <p class="kicker">From first principles to production</p>
+        <h1><span class="cover-building">Building</span>Agentic<br>Systems</h1>
+        <p class="subtitle">Design, evaluate, secure, and operate AI systems that can reason, use tools, recover, and scale.</p>
       </div>
-      <p class="cover-controls">EVIDENCE &nbsp;|&nbsp; AUTHORITY &nbsp;|&nbsp; RELIABILITY &nbsp;|&nbsp; SCALE</p>
-      <div class="cover-meta"><p class="author">Vikrant Singh, Microsoft</p><p class="edition">First edition &nbsp;|&nbsp; September 2026</p></div>
+      <div class="cover-system" aria-label="Agentic system from observation through production controls">
+        <div class="cover-loop">
+          <div class="cover-stage"><strong>01</strong><span>Observe</span></div><span class="cover-arrow">→</span>
+          <div class="cover-stage"><strong>02</strong><span>Decide</span></div><span class="cover-arrow">→</span>
+          <div class="cover-stage"><strong>03</strong><span>Act</span></div>
+        </div>
+        <div class="cover-layers">
+          <div class="cover-layer"><b>Intelligence</b><span>Models / Context / Memory</span></div>
+          <div class="cover-layer"><b>Capability</b><span>Tools / MCP / Workflows</span></div>
+          <div class="cover-layer"><b>Control</b><span>Policy / Evals / Security</span></div>
+          <div class="cover-layer"><b>Production</b><span>Reliability / Cost / Scale</span></div>
+        </div>
+        <p class="cover-positioning">For builders, reviewers, product teams, and leaders</p>
+      </div>
+      <div class="cover-meta"><p class="author">Vikrant Singh<span class="author-role">Microsoft</span></p><p class="cover-mark">Evidence before autonomy</p></div>
     </div>
   </section>
   <section class="reader-guide" id="reader-guide"><h1>How to Use This Book</h1>${markdown.render(withoutFirstHeading(readerGuideSource))}</section>
@@ -429,11 +477,29 @@ async function main() {
       margin: { top: "17mm", right: "16mm", bottom: "19mm", left: "16mm" },
       timeout: 120_000,
     });
+    await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });
+    await page.emulateMediaType("print");
+    await page.evaluate(() => {
+      const cover = document.querySelector(".cover");
+      document.body.replaceChildren(cover);
+      document.documentElement.style.cssText = "margin:0;width:794px;height:1123px;overflow:hidden;background:#101512";
+      document.body.style.cssText = "margin:0;width:794px;height:1123px;overflow:hidden;background:#101512";
+      cover.style.cssText += "margin:0;width:794px;height:1123px;min-height:1123px";
+    });
+    const cover = await page.$(".cover");
+    if (!cover) throw new Error("Cover image validation failed: cover element is missing");
+    await cover.screenshot({ path: coverImagePath });
   } finally {
     await browser.close();
   }
 
   const bytes = await fs.readFile(pdfPath);
+  const coverBytes = await fs.readFile(coverImagePath);
+  const coverWidth = coverBytes.readUInt32BE(16);
+  const coverHeight = coverBytes.readUInt32BE(20);
+  if (coverWidth !== 1588 || coverHeight !== 2246 || coverBytes.length < 100_000) {
+    throw new Error(`Cover image validation failed: ${coverWidth}x${coverHeight}, ${coverBytes.length} bytes`);
+  }
   const document = await PDFDocument.load(bytes);
   document.setTitle("Building Agentic Systems: From First Principles to Production");
   document.setAuthor("Vikrant Singh, Microsoft");
@@ -445,6 +511,7 @@ async function main() {
   const pages = document.getPageCount();
   if (pages < 100 || finalBytes.length < 500_000) throw new Error(`PDF validation failed: ${pages} pages, ${finalBytes.length} bytes`);
   console.log(`Built ${path.relative(root, pdfPath)}: ${pages} pages, ${(finalBytes.length / 1_048_576).toFixed(1)} MiB, ${sourceDiagramCount} Mermaid diagrams rendered, ${outlineEntries} PDF bookmarks.`);
+  console.log(`Built ${path.relative(root, coverImagePath)}: ${coverWidth}x${coverHeight}, ${(coverBytes.length / 1024).toFixed(0)} KiB.`);
   console.log(`Built ${path.relative(root, webPath)}: responsive GitHub Pages edition with local fonts and diagrams.`);
 }
 
