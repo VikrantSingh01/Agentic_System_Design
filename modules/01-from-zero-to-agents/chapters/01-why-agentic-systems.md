@@ -40,8 +40,8 @@ rule is stable. The analogy stops here: real automation can contain many rules,
 retries, and computer systems; it need not be a tiny timer.
 
 A recipe is like a **workflow** (a predetermined control flow that may contain model
-calls): first mix, then bake, then cool. A workflow may branch—“if the cake is still
-wet, bake five more minutes”—but its designer chose the branches in advance. The
+calls): first mix, then bake, then cool. A workflow may branch: “if the cake is still
+wet, bake five more minutes”, but its designer chose the branches in advance. The
 analogy stops here: software workflows can run steps in parallel, wait for days, and
 recover from machine failures.
 
@@ -145,6 +145,7 @@ maturity path: use the leftmost pattern that meets the need.
 | Autonomy | How much freedom software has to choose and carry out next actions. |
 | Guardrail | A control that blocks, limits, checks, or escalates risky behavior. |
 | Idempotency key | A unique request label used to prevent a retry from causing another effect. |
+| Token | A model-counted unit of text; it may be shorter or longer than a word. |
 | Trajectory | The observable sequence of tool requests and results in a run. |
 | Evaluation | A repeatable measurement of results, action paths, safety, speed, or cost. |
 | Production ready | Evaluated, secure, observable, recoverable, operable, and cost-bounded. |
@@ -184,7 +185,8 @@ The important control boundary surrounds the uncertain model:
 - schemas restrict action names and argument shapes;
 - allowlists restrict which tools exist for this identity and task;
 - authorization checks happen again inside every tool;
-- turn, time, token, and money budgets force termination;
+- turn, time, **token** (a model-counted unit of text that may be shorter or
+  longer than a word), and money budgets force termination;
 - approval gates protect consequential side effects;
 - durable state permits recovery without silently repeating an action; and
 - an observable **trajectory** (the sequence of tool requests and results) supports
@@ -333,7 +335,7 @@ against the agent and the simplest non-agent baseline.
 
 Thresholds are design examples, not universal standards. Set them from the real
 task's risk and baseline. Evaluate observable inputs, proposed actions, tool results,
-and outcomes—never require private chain-of-thought.
+and outcomes; never require private chain-of-thought.
 
 ## Production checklist
 

@@ -7,8 +7,10 @@
 ## The problem
 
 Northstar starts a report, waits overnight for approval, and loses its worker. A new
-worker must continue without forgetting the cancellation deadline or publishing the
-same report twice. Process memory and a chat transcript cannot provide that guarantee.
+worker must continue without forgetting the cancellation deadline or saving the same
+internal draft twice. Northstar does not publish reports; publication remains outside
+this chapter's authority. Process memory and a chat transcript cannot provide that
+guarantee.
 
 **Durable execution** means logical state survives process loss and can be rebuilt
 from committed records. The central question is not "How do we prevent every crash?"
@@ -52,7 +54,7 @@ flowchart LR
 **Takeaway:** a durable run moves through named, saved states instead of relying on
 one worker's memory.
 
-**Equivalent text description:** a request is accepted, becomes ready, starts working,
+**Step by step:** a request is accepted, becomes ready, starts working,
 waits when it needs an outside event, and then finishes. The detailed model below adds
 the alternate paths needed in a real runtime.
 
@@ -77,7 +79,7 @@ stateDiagram-v2
 **Takeaway:** waits, cancellation, checkpoints, and terminal outcomes are committed
 states, not facts remembered by one worker.
 
-**Equivalent text description:** an admitted run becomes ready and running. It can
+**Step by step:** an admitted run becomes ready and running. It can
 checkpoint and return to ready, wait for exact approval, cancel, complete, expire, or
 fail. Every path reaches a named durable state.
 
@@ -88,26 +90,27 @@ sequenceDiagram
     participant Q as Queue
     participant W1 as Worker 1
     participant S as State store
-    participant P as Publisher double
+    participant D as Draft store double
     participant W2 as Worker 2
     Q->>W1: activity A, lease identifier 1
     W1->>S: commit intent and idempotency key
-    W1->>P: publish with idempotency key
+    W1->>D: save internal draft with idempotency key
     W1--xS: crash before outcome commit
     Q->>W2: redeliver activity A
     W2->>S: load checkpoint and idempotency key
-    W2->>P: look up idempotency key
-    P-->>W2: existing receipt
+    W2->>D: look up idempotency key
+    D-->>W2: existing save receipt
     W2->>S: commit reconciled outcome
 ```
 
 **Takeaway:** redelivery is safe only when recovery can recognize or reconcile the
 same logical effect.
 
-**Equivalent text description:** worker 1 records an intent, publishes, and crashes
+**Step by step:** worker 1 records an intent, saves an internal draft, and crashes
 before storing the outcome. The queue redelivers the stable activity to worker 2.
-Worker 2 loads the intent, queries the publisher by idempotency key, receives the
-existing receipt, and records it instead of publishing again.
+Worker 2 loads the intent, queries the draft store by idempotency key, receives the
+existing receipt, and records it instead of saving the draft again. No publication
+capability is present.
 
 ### Approval is a durable boundary
 
@@ -124,7 +127,7 @@ flowchart LR
 **Takeaway:** a chat phrase is not approval; the durable record must bind identity,
 policy, exact payload digest, and expiry.
 
-**Equivalent text description:** the requester creates a run, the runtime creates an
+**Step by step:** the requester creates a run, the runtime creates an
 approval record, an authenticated approver decides, and a timer may expire it. Only a
 current exact match releases the effect; any mismatch stops it.
 
@@ -196,15 +199,15 @@ class Run:
     cancelled: bool = False
 
 
-class Publisher:
+class DraftStore:
     def __init__(self) -> None:
         self.receipts: dict[str, str] = {}
-        self.effects = 0
+        self.saves = 0
 
-    def publish(self, key: str) -> str:
+    def save(self, key: str) -> str:
         if key not in self.receipts:
-            self.effects += 1
-            self.receipts[key] = f"receipt-{self.effects}"
+            self.saves += 1
+            self.receipts[key] = f"receipt-{self.saves}"
         return self.receipts[key]
 
     def lookup(self, key: str) -> str | None:
@@ -217,25 +220,48 @@ def commit(current: Run, expected_version: int, updated: Run) -> Run:
     return replace(updated, version=current.version + 1)
 
 
-publisher = Publisher()
-run = Run(version=0, status="ready")
-key = "run-7:publish-report-v3"
+def dispatch_draft_save(current: Run, store: DraftStore, key: str) -> Run:
+    if current.cancelled or current.status == "cancelled":
+        return current
+    running = commit(
+        current, current.version, replace(current, status="running", intent_key=key)
+    )
+    receipt = store.save(key)
+    return commit(
+        running,
+        running.version,
+        replace(running, status="completed", receipt=receipt),
+    )
 
-# Worker 1 commits intent, performs the effect, then crashes.
+
+draft_store = DraftStore()
+run = Run(version=0, status="ready")
+key = "run-7:save-report-draft-v3"
+
+# Worker 1 commits intent, saves the internal draft, then crashes.
 run = commit(run, 0, replace(run, status="running", intent_key=key))
-lost_receipt = publisher.publish(key)
+lost_receipt = draft_store.save(key)
 assert lost_receipt == "receipt-1"
 
 # Worker 2 receives the same activity and reconciles before any retry.
-existing = publisher.lookup(run.intent_key or "")
+existing = draft_store.lookup(run.intent_key or "")
 assert existing == "receipt-1"
 run = commit(run, 1, replace(run, status="completed", receipt=existing))
-assert publisher.effects == 1
+assert draft_store.saves == 1
 assert run.receipt == "receipt-1"
 
-# Cancellation prevents a new activity from beginning.
+# Dispatch after cancellation performs no save, publication, or other effect and
+# cannot advance durable state.
 cancelled = Run(version=0, status="cancelled", cancelled=True)
-assert cancelled.cancelled and cancelled.status == "cancelled"
+saves_before = draft_store.saves
+published_effects: list[str] = []  # Northstar has no publisher; this stays empty.
+after_cancelled_dispatch = dispatch_draft_save(
+    cancelled, draft_store, "run-8:save-report-draft-v1"
+)
+assert after_cancelled_dispatch == cancelled
+assert after_cancelled_dispatch.version == 0
+assert draft_store.saves == saves_before
+assert published_effects == []
 
 try:
     commit(run, 1, run)
@@ -243,13 +269,13 @@ try:
 except RuntimeError as error:
     assert str(error) == "checkpoint conflict"
 
-print("PASS: crash recovered, duplicate effect prevented, stale commit rejected")
+print("PASS: draft recovered; cancellation blocked dispatch; stale commit rejected")
 ```
 
 Expected output:
 
 ```text
-PASS: crash recovered, duplicate effect prevented, stale commit rejected
+PASS: draft recovered; cancellation blocked dispatch; stale commit rejected
 ```
 
 ## Microsoft implementation
@@ -272,10 +298,10 @@ contracts, then tests each candidate against them.
 
 ## Failure lab
 
-Replace the reconciliation lookup with another unconditional `publish(key)` and then
-remove deduplication from `Publisher.publish`. The effect count becomes two. Restore
+Replace the reconciliation lookup with another unconditional `save(key)` and then
+remove deduplication from `DraftStore.save`. The save count becomes two. Restore
 stable-key deduplication and lookup-before-retry. The measurable correction is one
-effect and one durable receipt after redelivery.
+internal draft save and one durable receipt after redelivery.
 
 Also inject lease expiry, deadline expiry, retryable and terminal errors, approval
 expiry, cancellation during work, and a stale checkpoint version. Every case must
@@ -284,7 +310,7 @@ reach a named state with bounded attempts.
 ## Security and safety testing
 
 Use a synthetic approval for digest `report-v2`, then request `report-v3`. Expected
-behavior is rejection before publication. Also resume a run with an expired principal
+behavior is rejection before any approved consequential effect. Also resume a run with an expired principal
 or changed policy version. Evidence is a `policy_denied` or `awaiting_approval` state,
 no new provider effect, and a minimized audit event. Never use real credentials or
 destinations.
@@ -339,9 +365,10 @@ commit ordering, and reconciliation, not from hoping delivery never repeats.
 
 ## Design exercise
 
-Design a report-publication activity that may crash at every line. Specify committed
+Design an internal report-draft-save activity that may crash at every line. Specify committed
 records, versions, lease, deadline, approval digest, idempotency key, retry classes,
-reconciliation query, cancellation behavior, and terminal states.
+reconciliation query, cancellation behavior, and terminal states. Do not add a
+publication capability.
 
 ## Hands-on lab
 

@@ -360,7 +360,7 @@ A **test double (a controlled substitute used instead of a real dependency in te
 
 A double proves that our software handles a declared response. It does not prove a live model will produce that response or meet quality targets. Use deterministic tests for application logic and separate, explicitly enabled evaluations for live provider behavior.
 
-### Provider boundaries prevent accidental lock-in—and accidental authority
+### Provider boundaries prevent accidental lock-in and accidental authority
 
 Use a small interface owned by the application, not a provider’s broad client object:
 
@@ -699,81 +699,6 @@ Success means the economy candidate cannot pass while it rejects or truncates th
 | Cost surprise | Usage or retry budget exceeded | Stop and record `budget_exhausted` |
 | Provider outage | Circuit or health check opens | Pause or use preapproved non-model path |
 
-## Evaluation
-
-Evaluate a complete, pinned configuration. Preserve case-level results and slice labels.
-
-| Dimension | Example measure | Example hard check |
-|---|---|---|
-| Outcome | Required fields and task rubric | 100% critical fields valid |
-| Evidence | Claim-to-evidence support | At least 95%; 100% for critical claims |
-| Trajectory | Calls, retries, fallbacks | No unbounded retry; allowed routes only |
-| Safety | Critical violations by slice | Zero critical failures |
-| Context | Required lengths and positions | No silent truncation or required-case rejection |
-| Robustness | Paraphrases, missing data, contradictions | Correctly abstains on insufficient evidence |
-| Latency | End-to-end median and p95 | p95 within task budget |
-| Cost | Estimated and observed cost per valid result | p95 within cost budget |
-| Stability | Variation across repeated live runs | Important fields remain within tolerance |
-| Operations | Timeout, quota, cancellation, outage | Each produces the specified terminal behavior |
-
-Use deterministic evaluators for exact schema, identifiers, limits, and known fixtures. Use carefully defined human review for usefulness or nuanced support where rules are insufficient. A model-based evaluator, if later introduced, must itself be calibrated; it is not automatically objective.
-
-Compare with two baselines:
-
-1. a fixed workflow or lookup for cases that do not need generation; and
-2. the currently deployed model configuration, if one exists.
-
-Do not tune on the final holdout set. Report confidence intervals or uncertainty when sample sizes permit, and never imply precision unsupported by the number or representativeness of cases.
-
-## Production checklist
-
-- [ ] The task and non-model baseline are documented.
-- [ ] Model, prompt, schema, adapter, and settings versions are pinned and recorded.
-- [ ] Capability profiles contain measured—not assumed—behavior.
-- [ ] The provider-neutral boundary has offline contract tests.
-- [ ] Input, context, output, deadline, retry, and monetary limits are enforced.
-- [ ] Oversized context fails explicitly; selection or compaction is observable.
-- [ ] Output shape, evidence support, and business rules are validated.
-- [ ] Model output cannot grant authority or directly perform side effects.
-- [ ] Provider credentials and sensitive configuration stay outside prompts and logs.
-- [ ] Redacted telemetry includes model identity, usage, latency, finish reason, and errors.
-- [ ] Quality, latency, safety, context, and cost gates include important slices.
-- [ ] Fallback routes are allowlisted and meet the same data and authority policy.
-- [ ] Cancellation, timeout, quota, truncation, and provider outage are tested.
-- [ ] Live tests are opt-in, budget capped, and separate from offline tests.
-- [ ] Version drift triggers evaluation and canary or shadow checks before promotion.
-- [ ] Rollout, rollback, kill switch, and “no candidate passes” behavior are defined.
-- [ ] Volatile limits, SDK support, availability, and prices are freshly verified.
-
-## Review questions
-
-1. What is the difference between training and inference?
-2. Why can two responses differ even when the visible prompt looks the same?
-3. What do temperature and top-p change, and what do they not add?
-4. Why is a larger context window not proof of better answers?
-5. Why should cost be measured per valid result rather than per call alone?
-6. What belongs inside a provider adapter, and what must remain outside?
-7. What can a deterministic model double prove? What can it not prove?
-8. Why are schema validation and factual validation separate checks?
-9. When should a candidate with the highest average score still be rejected?
-10. Name two honest uncertainty signals and one unsafe substitute for calibration.
-11. When is a fixed workflow a better choice than inference?
-
-## Try it safely
-
-Use paper, coins, and no account or personal data.
-
-1. Write these next-word weights: `blue: 6`, `green: 3`, `spaceship: 1`.
-2. Put six blue marks, three green marks, and one spaceship mark into a bag, or map coin/die results to those counts.
-3. Draw ten times with replacement. Record the sequence.
-4. Repeat. Notice that the weights stayed the same while the sequence may differ.
-5. Now always choose `blue`; that imitates greedy decoding.
-6. Remove the least common option before drawing; that loosely imitates narrowing the sampling pool.
-
-Safety rule: use invented words or harmless colors, not private, medical, financial, or identifying information.
-
-The activity demonstrates weighted choice and variation. It does not simulate a language model’s learned representations, changing token distributions, or truthfulness.
-
 ## Security and safety testing
 
 ### Safe offline boundary test: an input asks for a forbidden model route
@@ -827,6 +752,81 @@ Evidence that the control worked consists of deterministic assertions showing:
 
 This test proves that this gateway rejects this synthetic request. It does not prove resistance to every injection, so keep model output untrusted and retain authorization checks at every consequential boundary.
 
+## Evaluation
+
+Evaluate a complete, pinned configuration. Preserve case-level results and slice labels.
+
+| Dimension | Example measure | Example hard check |
+|---|---|---|
+| Outcome | Required fields and task rubric | 100% critical fields valid |
+| Evidence | Claim-to-evidence support | At least 95%; 100% for critical claims |
+| Trajectory | Calls, retries, fallbacks | No unbounded retry; allowed routes only |
+| Safety | Critical violations by slice | Zero critical failures |
+| Context | Required lengths and positions | No silent truncation or required-case rejection |
+| Robustness | Paraphrases, missing data, contradictions | Correctly abstains on insufficient evidence |
+| Latency | End-to-end median and p95 | p95 within task budget |
+| Cost | Estimated and observed cost per valid result | p95 within cost budget |
+| Stability | Variation across repeated live runs | Important fields remain within tolerance |
+| Operations | Timeout, quota, cancellation, outage | Each produces the specified terminal behavior |
+
+Use deterministic evaluators for exact schema, identifiers, limits, and known fixtures. Use carefully defined human review for usefulness or nuanced support where rules are insufficient. A model-based evaluator, if later introduced, must itself be calibrated; it is not automatically objective.
+
+Compare with two baselines:
+
+1. a fixed workflow or lookup for cases that do not need generation; and
+2. the currently deployed model configuration, if one exists.
+
+Do not tune on the final holdout set. Report confidence intervals or uncertainty when sample sizes permit, and never imply precision unsupported by the number or representativeness of cases.
+
+## Production checklist
+
+- [ ] The task and non-model baseline are documented.
+- [ ] Model, prompt, schema, adapter, and settings versions are pinned and recorded.
+- [ ] Capability profiles contain measured rather than assumed behavior.
+- [ ] The provider-neutral boundary has offline contract tests.
+- [ ] Input, context, output, deadline, retry, and monetary limits are enforced.
+- [ ] Oversized context fails explicitly; selection or compaction is observable.
+- [ ] Output shape, evidence support, and business rules are validated.
+- [ ] Model output cannot grant authority or directly perform side effects.
+- [ ] Provider credentials and sensitive configuration stay outside prompts and logs.
+- [ ] Redacted telemetry includes model identity, usage, latency, finish reason, and errors.
+- [ ] Quality, latency, safety, context, and cost gates include important slices.
+- [ ] Fallback routes are allowlisted and meet the same data and authority policy.
+- [ ] Cancellation, timeout, quota, truncation, and provider outage are tested.
+- [ ] Live tests are opt-in, budget capped, and separate from offline tests.
+- [ ] Version drift triggers evaluation and canary or shadow checks before promotion.
+- [ ] Rollout, rollback, kill switch, and “no candidate passes” behavior are defined.
+- [ ] Volatile limits, SDK support, availability, and prices are freshly verified.
+
+## Review questions
+
+1. What is the difference between training and inference?
+2. Why can two responses differ even when the visible prompt looks the same?
+3. What do temperature and top-p change, and what do they not add?
+4. Why is a larger context window not proof of better answers?
+5. Why should cost be measured per valid result rather than per call alone?
+6. What belongs inside a provider adapter, and what must remain outside?
+7. What can a deterministic model double prove? What can it not prove?
+8. Why are schema validation and factual validation separate checks?
+9. When should a candidate with the highest average score still be rejected?
+10. Name two honest uncertainty signals and one unsafe substitute for calibration.
+11. When is a fixed workflow a better choice than inference?
+
+## Try it safely
+
+Use paper, coins, and no account or personal data.
+
+1. Write these next-word weights: `blue: 6`, `green: 3`, `spaceship: 1`.
+2. Put six blue marks, three green marks, and one spaceship mark into a bag, or map coin/die results to those counts.
+3. Draw ten times with replacement. Record the sequence.
+4. Repeat. Notice that the weights stayed the same while the sequence may differ.
+5. Now always choose `blue`; that imitates greedy decoding.
+6. Remove the least common option before drawing; that loosely imitates narrowing the sampling pool.
+
+Safety rule: use invented words or harmless colors, not private, medical, financial, or identifying information.
+
+The activity demonstrates weighted choice and variation. It does not simulate a language model’s learned representations, changing token distributions, or truthfulness.
+
 ## Common misunderstanding
 
 **“If temperature is zero and the JSON is valid, the answer is deterministic and true.”**
@@ -841,7 +841,7 @@ No. Low-variation decoding may reduce one source of variation, but providers, ve
 - Context is bounded, and fitting information does not guarantee correct use.
 - Keep providers behind a narrow interface, test logic with deterministic doubles, and validate every output.
 
-Chapter 7 adds **tools (typed capabilities through which an agent reads or changes an environment)**. The model may propose a tool call, but the runtime—not the model—will validate arguments, check authority, control side effects, and return an observable result.
+Chapter 7 adds **tools (typed capabilities through which an agent reads or changes an environment)**. The model may propose a tool call, but the runtime, not the model, will validate arguments, check authority, control side effects, and return an observable result.
 
 ## Design exercise
 

@@ -13,8 +13,8 @@ provides a narrow interface. Writing “publish it” must not publish anything.
 That gap is what tools solve. A **tool** (a typed capability, with declared input and
 output kinds, through which an agent reads or changes an environment) might look up a
 catalog item, calculate a route, or create a draft. The model output can contain a
-proposed tool call. The surrounding program—the **runtime** (the
-control loop that manages model calls, tools, limits, and stopping)—decides whether to
+proposed tool call. The surrounding program, the **runtime** (the
+control loop that manages model calls, tools, limits, and stopping), decides whether to
 run it.
 
 Without that separation, malformed arguments, excessive permissions, duplicate
@@ -490,7 +490,7 @@ Published primary sources use different names but support a common separation:
   data that a client handles (SRC-031, volatile).
 - Research on ReAct studies interleaving model reasoning and environment actions, while
   Toolformer studies learning when and how to invoke tools (SRC-008, SRC-038).
-The architectural lesson—our interpretation of these sources—is provider-neutral:
+The architectural lesson, based on our interpretation of these sources, is provider-neutral:
 model selection and software execution are separate boundaries. Provider SDKs reduce
 plumbing; they do not replace application authorization, confirmation, reliability, or
 evaluation.
@@ -514,6 +514,63 @@ For a write-tool simulation, keep an in-memory dictionary keyed by `operation_id
 Call it twice with the same key and assert that the effect counter remains `1`. Then
 simulate a timeout after storing the result. Reconciliation should find that result,
 not repeat the effect.
+
+## Security and safety testing
+
+Test controls independently of model quality. Replace the model with crafted calls so
+every gate receives hostile and boundary inputs:
+
+- send unknown names, extra fields, wrong types, huge strings, traversal paths, and
+  invalid Unicode; assert the tool-entry counter remains zero;
+- use a valid call with the wrong user, tenant, resource, and expired permission;
+- replay, alter, expire, and reuse confirmations; only the exact current action passes;
+- repeat a write key concurrently and after a simulated timeout; assert one effect;
+- return result text that asks for secrets or another tool call; assert it stays data;
+- make the dependency slow, unavailable, partially successful, or excessively large;
+- verify logs redact arguments, results, credentials, and personal information;
+- exhaust call, retry, byte, time, and cost budgets; assert a terminal safe stop.
+
+### Safe offline misuse test: a caller tries a tool without permission
+
+A realistic boundary failure is a model proposing a valid catalog lookup for a caller
+who lacks `catalog:read`. Use only the synthetic `B1` catalog entry from this chapter.
+After running the main Python example, run:
+
+```python
+tool_entries = 0
+original_tool = TOOLS["find_book_v1"]
+
+
+def counted_find_book(title: str) -> dict[str, str | None]:
+    global tool_entries
+    tool_entries += 1
+    return original_tool(title)
+
+
+TOOLS["find_book_v1"] = counted_find_book
+try:
+    blocked = execute(
+        Call("find_book_v1", {"title": "Charlotte's Web"}),
+        Context(permissions=frozenset(), deadline=monotonic() + 0.1),
+    )
+finally:
+    TOOLS["find_book_v1"] = original_tool
+
+assert blocked == {"status": "error", "code": "forbidden"}
+assert tool_entries == 0
+print(blocked, tool_entries)
+```
+
+The expected contained result is `forbidden`, with `tool_entries` equal to `0`.
+Those two assertions are the evidence: the runtime returned a typed denial and the
+tool body never ran. The test uses no network, credentials, personal data, or live
+target.
+
+Run these as deterministic regression tests on every contract, policy, model, prompt,
+and adapter change. In a separate isolated test environment, use only synthetic data
+and powerless credentials. Review consequential tools with the domain owner and
+security team before rollout, then start with read-only access and a rapid disable
+switch.
 
 ## Evaluation
 
@@ -581,70 +638,13 @@ Try a number instead of a name, a made-up tool, and missing permission. The tool
 not run. Then propose `give_away_snack`; require the owner to confirm the exact snack
 and quantity. No computer or personal data is needed.
 
-## Security and safety testing
-
-Test controls independently of model quality. Replace the model with crafted calls so
-every gate receives hostile and boundary inputs:
-
-- send unknown names, extra fields, wrong types, huge strings, traversal paths, and
-  invalid Unicode; assert the tool-entry counter remains zero;
-- use a valid call with the wrong user, tenant, resource, and expired permission;
-- replay, alter, expire, and reuse confirmations; only the exact current action passes;
-- repeat a write key concurrently and after a simulated timeout; assert one effect;
-- return result text that asks for secrets or another tool call; assert it stays data;
-- make the dependency slow, unavailable, partially successful, or excessively large;
-- verify logs redact arguments, results, credentials, and personal information;
-- exhaust call, retry, byte, time, and cost budgets; assert a terminal safe stop.
-
-### Safe offline misuse test: a caller tries a tool without permission
-
-A realistic boundary failure is a model proposing a valid catalog lookup for a caller
-who lacks `catalog:read`. Use only the synthetic `B1` catalog entry from this chapter.
-After running the main Python example, run:
-
-```python
-tool_entries = 0
-original_tool = TOOLS["find_book_v1"]
-
-
-def counted_find_book(title: str) -> dict[str, str | None]:
-    global tool_entries
-    tool_entries += 1
-    return original_tool(title)
-
-
-TOOLS["find_book_v1"] = counted_find_book
-try:
-    blocked = execute(
-        Call("find_book_v1", {"title": "Charlotte's Web"}),
-        Context(permissions=frozenset(), deadline=monotonic() + 0.1),
-    )
-finally:
-    TOOLS["find_book_v1"] = original_tool
-
-assert blocked == {"status": "error", "code": "forbidden"}
-assert tool_entries == 0
-print(blocked, tool_entries)
-```
-
-The expected contained result is `forbidden`, with `tool_entries` equal to `0`.
-Those two assertions are the evidence: the runtime returned a typed denial and the
-tool body never ran. The test uses no network, credentials, personal data, or live
-target.
-
-Run these as deterministic regression tests on every contract, policy, model, prompt,
-and adapter change. In a separate isolated test environment, use only synthetic data
-and powerless credentials. Review consequential tools with the domain owner and
-security team before rollout, then start with read-only access and a rapid disable
-switch.
-
 ## Common misunderstanding
 
 **“The model called the function, so the model has that power.”**
 
 No. The model produced data that resembles a request. Runtime code chose whether to map
 that request to a real function. If no dispatcher, credential, or permission exists,
-nothing happens. If broad power does exist, that is a system-design choice—not
+nothing happens. If broad power does exist, that is a system-design choice, not
 intelligence or magic inside the model.
 
 ## Recap and next step
@@ -695,18 +695,18 @@ accounts, network traffic, or external changes.
 All identifiers below are approved in `research/source-ledger.csv`. Product
 documentation marked volatile must be rechecked before implementation.
 
-- **SRC-008** — Yao et al., “ReAct: Synergizing Reasoning and Acting in Language
+- **SRC-008**: Yao et al., “ReAct: Synergizing Reasoning and Acting in Language
   Models,” ICLR 2023. Durable research basis for interleaving actions and observations.
   https://arxiv.org/abs/2210.03629
-- **SRC-017** — Anthropic, “Tool use with Claude.” Current schema and request/result
+- **SRC-017**: Anthropic, “Tool use with Claude.” Current schema and request/result
   behavior; **volatile**, accessed 2026-09-05.
   https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview
-- **SRC-022** — OpenAI, “Responses API reference.” Current response items and tool
+- **SRC-022**: OpenAI, “Responses API reference.” Current response items and tool
   lifecycle; **volatile**, accessed 2026-09-05.
   https://platform.openai.com/docs/api-reference/responses
-- **SRC-031** — Google, “Gemini API function calling.” Current declaration and
+- **SRC-031**: Google, “Gemini API function calling.” Current declaration and
   function-call interface; **volatile**, accessed 2026-09-05.
   https://ai.google.dev/gemini-api/docs/function-calling
-- **SRC-038** — Schick et al., “Toolformer: Language Models Can Teach Themselves to
+- **SRC-038**: Schick et al., “Toolformer: Language Models Can Teach Themselves to
   Use Tools,” 2023. Evolving research on learning when and how to invoke tools.
   https://arxiv.org/abs/2302.04761

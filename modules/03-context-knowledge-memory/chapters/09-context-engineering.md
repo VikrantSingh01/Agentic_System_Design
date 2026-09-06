@@ -122,7 +122,7 @@ the answer and the packing trace.
 | Context window | The model's bounded capacity for input and generated output, measured in tokens according to its interface. |
 | Conversation history | Selected earlier messages included because they matter to the current turn. |
 | Instruction | A trusted direction that defines a task, behavior, or boundary. |
-| Instruction hierarchy | The application's explicit precedence rules for conflicting directions. |
+| Application authority precedence | The application's software-defined order for resolving conflicting directions before context assembly. |
 | Provenance | Metadata showing where an item came from, when it was obtained, and how it can be checked. |
 | Relevance | How much an item helps answer the current question. |
 | Retrieved data | Material selected from an external collection for the current task. |
@@ -155,7 +155,7 @@ untrusted rule: quoted as data; embedded commands never gain authority
 answer rule: cite source IDs or say evidence is insufficient
 ```
 
-The runtime—not the model—enforces this contract.
+The runtime, not the model, enforces this contract.
 
 ### 2. Keep context parts typed and separate
 
@@ -172,8 +172,8 @@ through filtering, compaction, logging, and citation.
 
 ### 3. Apply authority before relevance
 
-Use a software-defined **instruction hierarchy** (explicit precedence rules for
-conflicting directions):
+Use **application authority precedence** (the application's software-defined
+order for resolving conflicting directions before context assembly):
 
 1. runtime policy and trusted application instructions;
 2. the authorized user's current request;
@@ -184,6 +184,12 @@ This list describes this chapter's sample application, not a universal provider
 message format. Product APIs may use different role names. Permissions,
 identity, and consequential approvals must remain in code outside the model
 context.
+
+Application authority precedence is distinct from Chapter 5's **instruction
+hierarchy**, which names a provider or model interface's handling of
+instructions from different message roles. Provider role handling may inform
+message construction, but it neither defines the application's authority order
+nor grants permissions.
 
 Filter forbidden sources before scoring relevance. Otherwise a perfect match
 from a record the requester may not access can leak into the model call.
@@ -319,7 +325,7 @@ score first” is insufficient. A safe sequence is:
 10. emit the context plus a trace.
 
 Ranking after access control avoids using forbidden text even transiently.
-Deterministic tie-breaking—such as score, timestamp, then item ID—makes tests
+Deterministic tie-breaking by score, timestamp, then item ID makes tests
 repeatable.
 
 ### Tradeoffs
@@ -618,8 +624,8 @@ of selection, compaction, model, and validation events).
 Build a versioned evaluation set containing normal questions, irrelevant
 history, conflicting evidence, stale records, oversized results, missing
 evidence, and synthetic hostile content. Compare against two baselines: a small
-fixed context and “include everything.” Change one factor at a time—selection,
-order, or compaction—and run repeated trials for nondeterministic models.
+fixed context and “include everything.” Change one factor at a time: selection,
+order, or compaction, and run repeated trials for nondeterministic models.
 
 Do not use the model's private chain-of-thought as evidence. Grade observable
 answers, citations, packed item IDs, tool calls, policy decisions, and costs.
@@ -691,7 +697,7 @@ helps.
 - Preserve provenance, contain untrusted content, and test compaction for loss.
 - Evaluate outcomes and packing traces against simpler baselines.
 
-The next chapter introduces **retrieval-augmented generation (RAG)**—finding
+The next chapter introduces **retrieval-augmented generation (RAG)**: finding
 outside material and supplying it to a model. Context engineering decides how
 those retrieved items are filtered, labeled, budgeted, ordered, and tested.
 
@@ -745,11 +751,11 @@ very tight budget.
 
 ## Sources
 
-- **SRC-006** — Liu et al., “Lost in the Middle: How Language Models Use Long
+- **SRC-006**: Liu et al., “Lost in the Middle: How Language Models Use Long
   Contexts,” TACL/arXiv, 2023, <https://arxiv.org/abs/2307.03172>. Supports the
   limited claim that position and context length affected performance in the
   studied tasks. **Evolving:** re-evaluate with current models and task data.
-- **SRC-014** — Anthropic, “Effective context engineering for AI agents,”
+- **SRC-014**: Anthropic, “Effective context engineering for AI agents,”
   <https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents>.
   Supports context selection and compaction guidance. **Evolving; updated
   periodically:** verify wording and publication state before release.

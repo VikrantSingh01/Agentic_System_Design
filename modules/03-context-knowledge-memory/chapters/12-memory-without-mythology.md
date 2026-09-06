@@ -18,8 +18,8 @@ purpose, under whose authority, for how long, and how it can be corrected or
 deleted.
 
 This chapter treats memory as an application data system with policies and
-tests. Cross-run memory starts **off**. Northstar adds one tiny kind—an
-explicitly approved report preference—only if an evaluation proves that it
+tests. Cross-run memory starts **off**. Northstar adds one tiny kind: an
+explicitly approved report preference only if an evaluation proves that it
 helps.
 
 ## Learning objectives
@@ -62,8 +62,8 @@ This gives us a useful map:
 The analogy has limits. A model is not a teacher or a person. It does not
 remember experiences, care about a user, or decide what deserves keeping.
 Weights are not readable notebook sentences. Context is encoded as tokens
-(small text units), and generated answers can be wrong. The application—not
-the model—must enforce identity, consent, storage, retention, and deletion.
+(small text units), and generated answers can be wrong. The application, not
+the model, must enforce identity, consent, storage, retention, and deletion.
 
 ### Six things commonly called “memory”
 
@@ -279,8 +279,8 @@ provenance = direct user request-42
 expires = 2026-12-05
 ```
 
-The label helps keep data separate from instructions, but policy checks—not the
-label alone—provide protection.
+The label helps keep data separate from instructions, but policy checks, not the
+label alone, provide protection.
 
 ### 5. Correct, conflict, consolidate
 
@@ -318,7 +318,7 @@ authorized, auditable, and visible to the deletion workflow. Do not silently
 turn every backup or log into a permanent hold. Export should similarly include
 the user's active records and useful provenance in a readable format.
 
-## A memory design template
+### A memory design template
 
 Complete this before implementation:
 
@@ -823,7 +823,7 @@ that measurably helps, with a way to inspect, correct, expire, and delete it.
   promoted automatically.
 - Both writes and reads require purpose, scope, authority, and provenance.
 - TTL, correction, deletion, tenant isolation, and evaluation are core
-  behavior—not cleanup work.
+  behavior, not cleanup work.
 - Memory earns admission only when a same-task ablation proves value without
   policy failures.
 
@@ -866,11 +866,11 @@ in this lab.
 
 ## Sources
 
-- **SRC-014 — Anthropic, “Effective context engineering for AI agents.”**
+- **SRC-014: Anthropic, “Effective context engineering for AI agents.”**
   https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents  
   Used for finite-context selection, compaction, and memory distinctions.
   Freshness: **evolving**; recheck before release.
-- **SRC-050 — AWS, “Amazon Bedrock AgentCore developer guide.”**
+- **SRC-050: AWS, “Amazon Bedrock AgentCore developer guide.”**
   https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html  
   Used only for the observation that managed runtimes may expose
   memory-related facilities; application policy remains the application's
