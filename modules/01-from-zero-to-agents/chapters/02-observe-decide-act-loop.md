@@ -77,23 +77,23 @@ checks. A tool performs the approved action.
 ```mermaid
 flowchart LR
     E[Outside world] -->|what came back| O[Look and remember]
-    O --> D[Choose within rules]
-    D -->|allowed step| A[Do one step]
+    O --> S{Stop now?}
+    S -->|no| D[Choose within rules]
+    D --> C{Step allowed?}
+    C -->|yes| A[Do one step]
     A -->|result| E
-    O --> S{Done or unsafe?}
-    D --> S
     S -->|yes| X[Stop with reason]
-    S -->|no| D
+    C -->|no| X
 ```
 
 **Takeaway:** Each new result must pass through memory, rules, and a stop check before
 another action.
 
 **Step by step:** First, the outside world supplies an observation. Second, the
-runtime adds it to state. Third, the policy proposes one action and controls check it.
-Fourth, a permitted action reads or changes the environment, which returns feedback.
-Before the next cycle, the runtime checks success, budgets, safety, and progress and
-records any stop reason.
+runtime adds it to state and checks success, budgets, safety, and progress. Third, if
+the run should continue, the policy proposes one action. Fourth, controls check that
+proposal. A permitted action reads or changes the environment and returns feedback;
+a failed stop or permission check ends the run with a recorded reason.
 
 ```mermaid
 flowchart LR
