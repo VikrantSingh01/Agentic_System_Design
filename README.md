@@ -1,6 +1,12 @@
-# Agentic System Design
+# Building Agentic Systems
+
+**From First Principles to Production**
+
+**Author:** Vikrant Singh, Microsoft
 
 A beginner-to-production guide for designing, building, evaluating, securing, deploying, and operating agentic systems.
+
+**Read the book:** [Web edition](https://vikrantsingh01.github.io/Agentic_System_Design/) | [PDF edition](book/building-agentic-systems.pdf)
 
 The project teaches durable, vendor-neutral engineering principles first. Runnable examples live in each chapter's **Build it in Python** section. Microsoft technologies are introduced through supported Python SDKs and architecture mappings where they add practical value.
 
@@ -74,5 +80,19 @@ python scripts/validate_repository.py
 python -m unittest discover -s tests -v
 python visuals\agent-system-journey\tests\check_asset_offline.py
 ```
+
+## Build the book
+
+The same source produces the PDF and the static GitHub Pages edition:
+
+```powershell
+npm install
+npm run setup:book-browser
+npm run build:book
+```
+
+The build writes `book/building-agentic-systems.pdf` and `docs/index.html`. It verifies
+the chapter sequence, renders all Mermaid diagrams, rejects diagram errors, and validates
+the PDF page count and metadata.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before authoring or reviewing content.

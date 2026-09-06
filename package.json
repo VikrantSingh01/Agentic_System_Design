@@ -1,0 +1,18 @@
+{
+  "name": "agentic-system-design-book",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup:book-browser": "puppeteer browsers install chrome-headless-shell@stable",
+    "build:book": "node scripts/build-book.mjs"
+  },
+  "dependencies": {
+    "katex": "^0.16.22",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "markdown-it-texmath": "^1.0.0",
+    "mermaid": "^11.12.0",
+    "pdf-lib": "^1.17.1",
+    "puppeteer": "^25.9.0"
+  }
+}
