@@ -65,13 +65,15 @@ flowchart LR
     A --> D{Meaningful drift?}
     D -->|no| M[Continue monitoring]
     D -->|yes| G[Human or policy gate]
-    G --> C[Candidate change]
+    G -->|approve experiment| C[Candidate change]
+    G -->|reject| M
     S --> X[Retention deletion]
-    D -->|safety invariant| I[Incident path]
+    A -->|safety violation| I[Incident path]
 ```
 
 **Takeaway:** purpose and privacy controls come before analysis, while drift
-decisions lead to governed experiments or incidents rather than automatic learning.
+can lead to an approved experiment or rejection; safety violations go directly
+from analysis to incident handling.
 
 **Equivalent text description:**
 
@@ -79,10 +81,12 @@ decisions lead to governed experiments or incidents rather than automatic learni
 2. Only approved, minimized samples enter a separate evaluation store.
 3. Analysis compares declared tenant, region, and task slices with a baseline.
 4. No meaningful drift continues monitoring.
-5. Meaningful drift reaches a human or policy gate before a candidate change.
-6. Safety violations enter incident handling, and retained samples reach deletion.
+5. Meaningful drift reaches a human or policy gate, which explicitly approves a
+   candidate experiment or rejects it and continues monitoring.
+6. Analysis sends safety violations directly to incident handling, while
+   retained samples reach deletion.
 
-### Migration is a gated state machine
+### Migration engineering deep dive: a gated state machine
 
 ```mermaid
 stateDiagram-v2
@@ -110,7 +114,7 @@ signals pause it; regression or a kill switch rolls it back. Passing canaries
 expand, complete and verify backfill, stop old writes, deprecate the old
 version, and retire it only after cleanup proof.
 
-### Compatibility is a graph
+### Compatibility engineering deep dive: a version graph
 
 ```mermaid
 flowchart TD

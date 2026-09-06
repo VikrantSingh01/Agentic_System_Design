@@ -33,7 +33,7 @@ By the end of this chapter, you can:
 1. Trace tenant context through every Northstar data and control boundary.
 2. Compare shared, partitioned, and dedicated isolation tiers using evidence.
 3. Route a tenant only to a permitted, healthy region with current policy and keys.
-4. Define and measure recovery point objective (RPO) and recovery time objective (RTO).
+4. Define and measure the data-loss limit and recovery time objective (RTO).
 5. Execute failover with write fencing, single-writer ownership, idempotency, and reconciliation.
 6. Test missing tenant predicates, noisy neighbors, stale policy, duplicate delivery, and residency denial.
 
@@ -53,32 +53,35 @@ tenant column and drawing a second box.
 
 ## Picture the idea
 
-### Tenant boundaries across shared components
+### Separate user and administrator isolation paths
 
 ```mermaid
 flowchart LR
-    A[Tenant A identity] --> API[API checks tenant]
-    B[Tenant B identity] --> API
-    API --> R[Runtime carries tenant]
+    A[Tenant A user identity] --> U[Application programming interface checks tenant]
+    B[Tenant B user identity] --> U
+    U --> R[Runtime carries tenant]
     R --> M[Model gateway quota]
     R --> D[(Tenant-keyed data)]
     R --> C[(Tenant-keyed cache)]
     R --> Q[Tenant queue]
     R --> T[Tenant-safe telemetry]
-    X[Administrator] --> P[Scoped control plane]
-    P --> R
+    X[Administrator identity] --> P[Separate control-plane authorization]
+    P --> S[Scoped administrative operation]
+    S --> R
 ```
 
 **Takeaway:** shared infrastructure is acceptable only when every path enforces
-the tenant context, including administration and telemetry.
+tenant context, while administrators enter through a separate authorization
+path and can perform only scoped operations.
 
 **Equivalent text description:**
 
 1. Tenant A and Tenant B enter through authenticated identities.
-2. The API resolves and checks tenant context.
+2. The application programming interface resolves and checks tenant context.
 3. The runtime carries that context to model quota, data, cache, queue, and telemetry.
 4. Data and cache keys remain tenant-partitioned.
-5. Administrators use a separately authorized, tenant-scoped control plane.
+5. Administrators do not use the user path: a separate control-plane
+   authorization gate limits them to tenant-scoped operations.
 
 ### Region routing is a policy decision
 
@@ -110,7 +113,7 @@ stateDiagram-v2
     [*] --> Normal
     Normal --> Declared: authorized incident trigger
     Declared --> Fenced: stop primary writes
-    Fenced --> RecoveryActive: policy, keys, RPO checked
+    Fenced --> RecoveryActive: policy, keys, data-loss limit checked
     RecoveryActive --> Reconcile: primary restored
     Reconcile --> Failback: conflicts resolved
     Failback --> Closed: evidence accepted
@@ -123,9 +126,9 @@ region invariants cannot be proven.
 
 **Equivalent text description:** normal operation moves to a declared incident
 under named authority. Primary writes are fenced before recovery becomes the
-single writer. Policy, keys, and RPO are checked. After restoration, records
-are reconciled before failback and closure. Missing policy, residency denial,
-or an invariant violation stops the procedure.
+single writer. Policy, keys, and the data-loss limit are checked. After
+restoration, records are reconciled before failback and closure. Missing policy,
+residency denial, or an invariant violation stops the procedure.
 
 ## Vocabulary
 
@@ -143,7 +146,7 @@ or an invariant violation stops the procedure.
 | Failback | Controlled return to the restored primary region. |
 | Single writer | The one region currently authorized to accept writes for a record set. |
 | Split brain | Two regions incorrectly accept conflicting writes as owners. |
-| RPO | Maximum declared data loss measured in time. |
+| Data-loss limit | Maximum acceptable data loss, measured as the age of the newest durable recovery copy. |
 | RTO | Maximum declared time to restore acceptable service. |
 | Reconciliation | Comparing and resolving state after interruption or replication. |
 | Game day | A planned exercise that measures recovery behavior. |
@@ -153,13 +156,14 @@ or an invariant violation stops the procedure.
 ### Carry context through every boundary
 
 Tenant identity is part of every domain key and request. Do not infer it from a
-record returned by an unscoped query. Checks apply at the API, runtime, model
-gateway, tools, stores, indexes, caches, queues, traces, evaluators, encryption
-context, billing records, and administrative operations.
+record returned by an unscoped query. Checks apply at the application
+programming interface, runtime, model gateway, tools, stores, indexes, caches,
+queues, traces, evaluators, encryption context, billing records, and
+administrative operations.
 
 | Boundary | Required tenant evidence | Deny example |
 |---|---|---|
-| API | Authenticated principal and resolved tenant | Missing or conflicting tenant |
+| Application programming interface | Authenticated principal and resolved tenant | Missing or conflicting tenant |
 | Runtime | Immutable tenant context and policy version | Context lost on resume |
 | Store and index | Tenant in partition key and predicate | Query lacks tenant predicate |
 | Cache | Tenant, authorization, source, and policy versions | Global query-text key |
@@ -184,7 +188,8 @@ and full cost from Chapter 33.
 
 A tenant-region policy records home region, permitted recovery regions,
 prohibited transfers, policy version, key availability, replication target,
-RPO, RTO, and failover authority. Missing or stale policy fails closed.
+data-loss limit, RTO, and failover authority. Missing or stale policy fails
+closed.
 
 Legal applicability is not inferred from a country name. Qualified reviewers
 must decide contractual, sector, jurisdictional, privacy, and transfer rules.
@@ -200,9 +205,9 @@ $$
 observed\ data\ loss = failure\ time - latest\ replicated\ write\ time
 $$
 
-Failover meets RPO when that duration is within the declared objective. RTO is
-measured from the authorized incident trigger until acceptable recovery service
-is ready. A diagram cannot create either guarantee.
+Failover meets the data-loss limit when that duration is within the declared
+maximum. RTO is measured from the authorized incident trigger until acceptable
+recovery service is ready. A diagram cannot create either guarantee.
 
 ### Fence before changing writers
 
@@ -242,7 +247,7 @@ class TenantPolicy:
     home: str
     recovery: str
     allowed_regions: frozenset[str]
-    rpo: int
+    data_loss_limit: int
     rto: int
 
 
@@ -282,9 +287,9 @@ class Simulator:
             timestamp for (tenant, region, _), (_, timestamp) in self.state.items()
             if tenant == policy.tenant_id and region == policy.recovery
         )
-        observed_rpo = started - latest
-        if observed_rpo > policy.rpo:
-            raise RuntimeError("rpo_exceeded")
+        observed_data_loss = started - latest
+        if observed_data_loss > policy.data_loss_limit:
+            raise RuntimeError("data_loss_limit_exceeded")
         self.fenced.add((policy.tenant_id, policy.home))
         self.clock += 2
         self.active_writer[policy.tenant_id] = policy.recovery
@@ -292,7 +297,7 @@ class Simulator:
         if observed_rto > policy.rto:
             raise RuntimeError("rto_exceeded")
         self.trace.append(f"failover:{policy.tenant_id}")
-        return observed_rpo, observed_rto
+        return observed_data_loss, observed_rto
 
     def apply_message(self, tenant: str, message_id: str) -> bool:
         key = (tenant, message_id)
@@ -313,8 +318,8 @@ assert sim.read("tenant-a", "east", "report-1") == "alpha draft"
 assert sim.read("tenant-b", "west", "report-1") == "beta draft"
 
 sim.replicate(alpha, "report-1", lag=2)
-rpo, rto = sim.failover(alpha, policy_version=3)
-assert rpo == 2 and rto == 2
+observed_data_loss, rto = sim.failover(alpha, policy_version=3)
+assert observed_data_loss == 2 and rto == 2
 assert sim.read("tenant-a", "west", "report-1") == "alpha draft"
 
 # Duplicate delivery produces one consequential effect.
@@ -329,13 +334,13 @@ except PermissionError as error:
 else:
     raise AssertionError("residency violation was not denied")
 
-print("PASS: isolation, residency, RPO, RTO, fencing, and dedupe verified")
+print("PASS: isolation, residency, data-loss limit, RTO, fencing, and dedupe verified")
 ```
 
 Expected output:
 
 ```text
-PASS: isolation, residency, RPO, RTO, fencing, and dedupe verified
+PASS: isolation, residency, data-loss limit, RTO, fencing, and dedupe verified
 ```
 
 ## Failure lab
@@ -346,13 +351,13 @@ PASS: isolation, residency, RPO, RTO, fencing, and dedupe verified
 | Unpartitioned cache | One tenant receives another tenant's cached report. | Key and authorize by tenant and policy version. |
 | Shared quota | A hot tenant consumes all concurrency. | Enforce per-tenant admission and measure other-tenant latency. |
 | Stale recovery policy | Recovery route has an old policy version. | Fail closed until the required version is verified. |
-| Replication beyond RPO | Recovery copy timestamp is too old. | Stop failover or enter an approved data-loss procedure. |
+| Replication beyond data-loss limit | Recovery copy timestamp is too old. | Stop failover or enter an approved data-loss procedure. |
 | Duplicate queue delivery | One message creates two effects. | Use tenant-scoped durable idempotency records. |
 | Stale approval | Approval binds the old region or policy. | Revalidate exact payload, region, policy, identity, and expiry. |
 | Residency violation | Router selects spare but prohibited capacity. | Deny before health and capacity selection. |
 
 For a safe failure exercise, increase `lag=2` to `lag=6`. The expected result
-is `rpo_exceeded`; recovery must not silently activate. Restore the lag and
+is `data_loss_limit_exceeded`; recovery must not silently activate. Restore the lag and
 confirm the original output.
 
 ## Security and safety testing
@@ -375,7 +380,7 @@ evidence for tested cases, not proof of universal isolation.
 | Cache and telemetry association | Zero cross-tenant associations in fixtures |
 | Resource interference | Other-tenant latency and admission remain within declared bounds |
 | Policy and key readiness | Missing or stale values always fail closed |
-| RPO | Measured data age at incident activation is within objective |
+| Data-loss limit | Measured data age at incident activation is within the declared maximum |
 | RTO | Measured time from declaration to acceptable recovery is within objective |
 | Duplicate effects | Zero after seeded redelivery |
 | Failback | Versions reconcile and only one writer remains |
@@ -410,7 +415,7 @@ proves isolation or recovery for this system.
 - [ ] Isolation-tier promotion and demotion criteria are measurable.
 - [ ] Home region and residency policy are versioned and fail closed.
 - [ ] Recovery verifies policy, keys, approvals, dependencies, and capacity.
-- [ ] RPO and RTO are measured in a game day.
+- [ ] The data-loss limit and RTO are measured in a game day.
 - [ ] Single-writer ownership, fencing, dedupe, and queue ownership are tested.
 - [ ] Failback reconciliation and incident evidence retention are defined.
 
@@ -430,7 +435,7 @@ default availability upgrade.
 1. Why is a tenant column not sufficient isolation?
 2. Which boundaries are often omitted from tenant tests?
 3. Why does spare capacity not authorize a regional route?
-4. How are RPO and RTO measured differently?
+4. How are the data-loss limit and RTO measured differently?
 5. Why must writes be fenced before recovery becomes active?
 6. What must be reconciled before failback?
 
@@ -459,7 +464,7 @@ Produce:
 1. a tenant-boundary matrix;
 2. promotion and demotion criteria;
 3. a home and recovery region policy;
-4. RPO and RTO objectives labeled as assumptions;
+4. data-loss-limit and RTO objectives labeled as assumptions;
 5. a failover authority and stop conditions;
 6. negative tests and evidence that would change the topology.
 
@@ -478,7 +483,7 @@ practice directory. Cleanup is deletion of that synthetic directory.
 - Tenant identity must survive every data and control boundary.
 - Isolation tiers are evidence-based choices, not labels.
 - Region routing checks residency, policy, keys, health, and capacity in order.
-- Failover needs fencing, one writer, measured RPO and RTO, and dedupe.
+- Failover needs fencing, one writer, a measured data-loss limit and RTO, and dedupe.
 - Failback requires reconciliation and another ownership transfer.
 
 Chapter 35 preserves these tenant and region rules while models, prompts,

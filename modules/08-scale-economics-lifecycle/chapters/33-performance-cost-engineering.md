@@ -67,22 +67,30 @@ flowchart LR
     R --> S
     T --> S
     S --> O[Telemetry]
+    M --> TC[Total cost]
+    R --> TC
+    T --> TC
+    S --> TC
+    O --> TC
+    C[Retries and idle capacity] --> TC
     O --> E{Quality and safety gates}
-    E -->|pass| Y[Accepted report]
+    E -->|pass| Y[Accepted count]
     E -->|fail| N[Rejected report]
-    C[Retries and idle capacity] --> E
+    TC --> U[Cost per accepted report]
+    Y --> U
 ```
 
-**Takeaway:** every cost category belongs in the numerator, while only reports
-that pass existing gates belong in the denominator.
+**Takeaway:** total cost, including retries and idle capacity, is divided by the
+count of reports that pass the quality and safety gates.
 
 **Equivalent text description:**
 
 1. Admission starts one report and records its scope.
-2. Model, retrieval, tool, state, and telemetry work add cost.
-3. Retries and reserved or idle capacity also add cost.
-4. Quality and safety evaluation classifies the result.
-5. Only a passing result increases the accepted-report count.
+2. Model, retrieval, tool, state, telemetry, retries, and reserved or idle
+   capacity all feed the total-cost numerator.
+3. Quality and safety evaluation classifies the report.
+4. Only a passing report increases the accepted-count denominator.
+5. Dividing total cost by accepted count produces cost per accepted report.
 
 ### Capacity needs a stopping boundary
 
@@ -117,7 +125,7 @@ flowchart TD
     S --> C[Cache candidate]
     S --> H[Batch candidate]
     S --> M[Route candidate]
-    B --> G{Quality, p95, quota, and cost gates}
+    B --> G{Quality, 95th-percentile latency, quota, and cost gates}
     C --> G
     H --> G
     M --> G
@@ -129,9 +137,9 @@ flowchart TD
 shows an improvement without crossing another threshold.
 
 **Equivalent text description:** the baseline and each candidate run the same
-fixture. Their quality, p95 latency, quota behavior, and cost per accepted
-report are checked. A candidate is adopted only when every gate passes and the
-declared objective improves; otherwise it is rejected.
+fixture. Their quality, 95th-percentile latency, quota behavior, and cost per
+accepted report are checked. A candidate is adopted only when every gate passes
+and the declared objective improves; otherwise it is rejected.
 
 ## Vocabulary
 
