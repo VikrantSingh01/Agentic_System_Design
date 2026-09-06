@@ -57,7 +57,7 @@ targets are release gates, not new measurements claimed by this chapter.
 | NS-BUDGET-01 | Every run obeys hard step, tool, token, time, retry, byte, and cost ceilings. | Boundary and exhaustion tests | Runtime owner |
 | NS-TENANT-01 | Tenant identity is checked at every state, data, cache, queue, tool, trace, and admin boundary. | Cross-tenant negative suite | Data owner |
 | NS-PRIV-01 | Telemetry is minimized and redacted by default. | Synthetic sensitive-data and trace-access tests | Observability owner |
-| NS-REL-01 | Durable runs recover without duplicate effects and meet accepted recovery objectives. | Worker-loss, restore, regional, and rollback drills | SRE owner |
+| NS-REL-01 | Durable runs recover without duplicate effects and meet accepted recovery objectives. | Worker-loss, restore, regional, and rollback drills | Site reliability engineering (SRE) owner |
 | NS-PORT-01 | Critical provider components can be replaced without changing domain contracts. | Adapter substitution exercise | Architecture owner |
 | NS-OPS-01 | Release, rollback, incident, kill, migration, and retirement paths have owners and tested evidence. | Readiness packet and drill records | Release owner |
 | NS-BASE-01 | The deterministic search-and-template baseline remains available unless an addition proves its gain. | Quality, latency, safety, and cost comparison | Product owner |
@@ -123,77 +123,43 @@ that is stale or unsupported. Put a supported candidate behind an adapter and ru
 gate. Failed gates create an unresolved item with an owner and fallback. Passed gates proceed
 to the readiness decision.
 
-### Stable core and volatile edge
+### Stable core and volatile edge: beginner view
 
 ```mermaid
-flowchart TB
-    subgraph S[Stable Northstar core]
-        UI[Experience contract]
-        RT[Runtime and policy contracts]
-        MG[Model gateway]
-        RG[Retrieval gateway]
-        TG[Tool and identity gateways]
-        WS[Workflow and state contracts]
-        EO[Evaluation and observability contracts]
-        GD[Governance and deployment contracts]
-    end
-    subgraph V[Volatile provider edge]
-        MA[Model and agent surface adapter]
-        FA[Optional framework adapter]
-        IA[Credential adapter]
-        X[Unresolved provider adapters]
-    end
-    UI --> RT
-    RT --> MG
-    RT --> RG
-    RT --> TG
-    RT --> WS
-    RT --> EO
-    GD --> RT
-    MG --> MA
-    RT --> FA
-    TG --> IA
-    RG --> X
-    WS --> X
-    EO --> X
-    GD --> X
+flowchart LR
+    S[Stable core] --> A[Adapters]
+    A --> P[Approved providers]
+    A --> U[Unresolved choices]
 ```
 
-**Takeaway:** Northstar owns durable meaning; dated provider adapters translate at the edge.
+**Takeaway:** keep Northstar's meaning stable, and reach changing or unresolved providers only
+through adapters.
 
-**Equivalent text description:** the stable boundary contains experience, runtime, policy,
-model, retrieval, tool, identity, workflow, state, evaluation, observability, governance, and
-deployment contracts. Model and agent, optional framework, and credential candidates sit
-outside that boundary behind adapters. Retrieval, workflow, state, telemetry, and deployment
-remain unresolved where approved evidence is absent. Tenant, principal, region policy, data
-classification, request IDs, and redacted evidence cross boundaries as explicit fields.
+**Equivalent text description:** first, the stable core defines Northstar's durable meaning.
+Second, adapters translate that meaning. Third, an adapter reaches either an approved provider
+or an explicitly unresolved choice. The full contract map appears in the engineering deep dive.
 
 ### Production-readiness evidence flow
 
 ```mermaid
 flowchart LR
-    I[IaC plan and policy checks] --> J[Readiness panel]
-    P[Python contract tests] --> J
-    E[Evaluation gates] --> J
-    S[Threat and identity tests] --> J
-    L[Load and recovery drills] --> J
-    O[Dashboards and runbooks] --> J
-    F[Freshness records] --> J
+    B["Build it right: infrastructure as code (IaC), policy, and contract tests"] --> J[Readiness panel]
+    S[Keep it safe: evaluation, threat, and identity checks] --> J
+    R[Run it well: recovery, operations, and freshness evidence] --> J
     J --> A{Decision}
-    A -->|all blockers pass| Y[Accepted]
+    A -->|all required checks pass| Y[Accepted]
     A -->|bounded conditions| C[Conditionally accepted]
     A -->|any blocker fails| N[Rejected]
 ```
 
 **Takeaway:** no single product feature or test makes the system production ready.
 
-**Equivalent text description:** platform and security engineers review infrastructure plans;
-application engineers review Python contract tests; evaluation and product owners review
-quality gates; security, privacy, and identity owners review threats and data flows; SRE reviews
-load, recovery, dashboards, and runbooks; source and release owners review claim freshness.
-Their evidence converges on one decision. Any failed safety, authority, tenant, freshness,
-recovery, rollback, or ownership gate rejects release. Only non-safety, time-bounded conditions
-may produce conditional acceptance.
+**Equivalent text description:** first, gather "build it right" evidence from infrastructure as
+code (IaC) plans, policy checks, and Python contract tests. Second, gather "keep it safe"
+evidence from evaluation, threat, privacy, and identity checks. Third, gather "run it well"
+evidence from load and recovery drills, dashboards, runbooks, and freshness records. The panel
+then accepts when all required checks pass, conditionally accepts only bounded non-safety
+conditions, or rejects when a required check fails.
 
 ## Vocabulary
 
@@ -301,6 +267,55 @@ authority, tenant isolation, freshness, rollback, recovery, and ownership cannot
 conditions.
 
 ## Engineering deep dive
+
+### Engineering appendix: full stable-core contract map
+
+The beginner view showed one path. This full engineering map expands the contracts and
+provider-facing adapters used to implement it.
+
+```mermaid
+flowchart TB
+    subgraph S[Stable Northstar core]
+        UI[Experience contract]
+        RT[Runtime and policy contracts]
+        MG[Model gateway]
+        RG[Retrieval gateway]
+        TG[Tool and identity gateways]
+        WS[Workflow and state contracts]
+        EO[Evaluation and observability contracts]
+        GD[Governance and deployment contracts]
+    end
+    subgraph V[Volatile provider edge]
+        MA[Model and agent surface adapter]
+        FA[Optional framework adapter]
+        IA[Credential adapter]
+        X[Unresolved provider adapters]
+    end
+    UI --> RT
+    RT --> MG
+    RT --> RG
+    RT --> TG
+    RT --> WS
+    RT --> EO
+    GD --> RT
+    MG --> MA
+    RT --> FA
+    TG --> IA
+    RG --> X
+    WS --> X
+    EO --> X
+    GD --> X
+```
+
+**Takeaway:** Northstar owns durable meaning; dated provider adapters translate at the edge.
+
+**Equivalent text description:** first, experience and governance feed the stable runtime and
+policy contracts. Second, the runtime uses stable model, retrieval, tool, identity, workflow,
+state, evaluation, and observability gateways. Third, model and agent, optional framework, and
+credential candidates sit behind adapters; retrieval, workflow, state, telemetry, and
+deployment remain unresolved where approved evidence is absent. Tenant, principal, region
+policy, data classification, request IDs, and redacted evidence cross boundaries as explicit
+fields.
 
 ### Stable core, volatile edge
 
@@ -764,7 +779,7 @@ context, trust boundaries, mappings, freshness, code, infrastructure plans, eval
 threat treatments, identity and data flows, dashboards, runbooks, recovery, rollback, cost,
 open decisions, and retirement plan.
 
-- `accepted`: all blockers pass and authorized owners hold residual risks.
+- `accepted`: all required checks pass and authorized owners hold residual risks.
 - `conditionally_accepted`: only time-bounded, non-safety conditions remain, each with an
   owner, deadline, evidence requirement, and automatic consequence.
 - `rejected`: any safety invariant, delegated-authority boundary, tenant isolation, freshness,
