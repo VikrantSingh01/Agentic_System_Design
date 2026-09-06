@@ -410,8 +410,8 @@ Published foundations describe agents in terms of what they perceive and do in
 an environment, with behavior judged against a performance objective
 (SRC-001). Reinforcement-learning literature formalizes an agent interacting
 with an environment through observations, actions, policies, and feedback
-(SRC-012). Classic agent research also emphasizes reactive behavior—responding
-to change—alongside goal-directed behavior (SRC-002).
+(SRC-012). Classic agent research also emphasizes reactive behavior, which responds
+to change, alongside goal-directed behavior (SRC-002).
 
 The engineering interpretation for this chapter is: make the interaction
 boundary explicit, keep the trajectory observable, and judge the policy by
@@ -600,17 +600,17 @@ accounts, payments, provider calls, and consequential side effects.
 
 Approved source-ledger entries used:
 
-- **SRC-001 — Pearson, _Artificial Intelligence: A Modern Approach, Fourth
+- **SRC-001: Pearson, _Artificial Intelligence: A Modern Approach, Fourth
   Edition_ (2020).** Rational-agent framing, environments, and performance
   objectives. <https://aima.cs.berkeley.edu/>. Freshness: durable.
-- **SRC-002 — IEEE, Wooldridge and Jennings, “Intelligent Agents: Theory and
+- **SRC-002: IEEE, Wooldridge and Jennings, “Intelligent Agents: Theory and
   Practice” (1995).** Reactivity and goal-directed agent properties.
   <https://doi.org/10.1017/S0269888900008122>. Freshness: durable.
-- **SRC-012 — Sutton and Barto, _Reinforcement Learning: An Introduction,
+- **SRC-012: Sutton and Barto, _Reinforcement Learning: An Introduction,
   Second Edition_ (2018).** Agent-environment interaction, policies, actions,
   and feedback. <http://incompleteideas.net/book/the-book-2nd.html>.
   Freshness: durable.
-- **SRC-027 — Google DeepMind, “Mastering Atari, Go, Chess and Shogi by
+- **SRC-027: Google DeepMind, “Mastering Atari, Go, Chess and Shogi by
   Planning with a Learned Model” (2020).** Example of policy, value, planning,
   and environment interaction. <https://www.nature.com/articles/s41586-020-03051-4>.
   Freshness: durable.

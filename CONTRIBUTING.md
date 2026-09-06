@@ -45,6 +45,16 @@ A chapter pull request must include:
 
 Review findings belong in `reviews/<chapter>/<role>.md`. Reviewers report issues but do not patch author-owned files.
 
+## Validate changes
+
+Before submitting content or visual changes, run:
+
+```powershell
+python scripts/validate_repository.py
+python -m unittest discover -s tests -v
+python visuals\agent-system-journey\tests\check_asset_offline.py
+```
+
 ## Source policy
 
 Prefer official papers, system cards, standards, documentation, engineering posts, and source repositories. Record each factual claim in the source ledger with its publication date, access date, supported claim, chapter, and freshness class.

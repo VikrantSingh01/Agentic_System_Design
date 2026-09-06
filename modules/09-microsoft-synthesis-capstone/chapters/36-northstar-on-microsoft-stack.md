@@ -1,8 +1,29 @@
 # Chapter 36: Northstar on the Microsoft Stack
 
-> Status: drafting  
-> Owner: Chapter 36 author  
+> Status: reviewing  
+> Owner: Agentic System Design maintainers  
 > Last verified: 2026-09-06
+
+**On this page**
+
+- [The problem](#the-problem), [learning objectives](#learning-objectives), and
+  [accepted requirements first](#accepted-requirements-first)
+- [First pass](#first-pass), [picture the idea](#picture-the-idea),
+  [vocabulary](#vocabulary), and [how it works](#how-it-works)
+- [Engineering deep dive](#engineering-deep-dive) and
+  [Build it in Python](#build-it-in-python)
+- [Microsoft implementation](#microsoft-implementation):
+  [central Copilot to specialists](#central-copilot-to-specialists),
+  [low-code connected agents](#path-a-low-code-connected-agents),
+  [code-first Foundry and Agent Framework](#path-b-code-first-foundry-and-agent-framework),
+  [authority, governance, and operations](#authority-governance-and-operations), and
+  [phased PoC to production](#phased-poc-to-production)
+- [How leading teams approach it](#how-leading-teams-approach-it),
+  [failure lab](#failure-lab), [security and safety testing](#security-and-safety-testing),
+  [evaluation](#evaluation), and [production checklist](#production-checklist)
+- [Review questions](#review-questions), [try it safely](#try-it-safely),
+  [common misunderstanding](#common-misunderstanding), [recap and next step](#recap-and-next-step),
+  [design exercise](#design-exercise), [hands-on lab](#hands-on-lab), and [sources](#sources)
 
 ## The problem
 
@@ -1168,3 +1189,8 @@ network. Cleanup removes only files created in the temporary practice directory.
 The delegation additions were frozen 2026-09-05 and last verified 2026-09-06 from these primary
 sources. Revalidate every volatile claim within 30 days of the actual release: source freshness
 supports review; it does not prove that a candidate satisfies Northstar's requirements.
+
+---
+
+**Navigation:** [← Previous: Chapter 35 — Continuous Improvement](../../08-scale-economics-lifecycle/chapters/35-continuous-improvement.md)
+· [Module 09 README](../README.md)

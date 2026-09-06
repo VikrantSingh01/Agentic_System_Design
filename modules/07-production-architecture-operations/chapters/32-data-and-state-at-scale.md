@@ -73,7 +73,7 @@ small set of buckets or a load-control strategy.
 becomes hot; splitting it into a few buckets, aggregation, admission control, or dedicated
 isolation can reduce skew.
 
-**Diagram D4 — Engineering migration view: change stored data without breaking old readers.**
+**Diagram D4: Engineering migration view: change stored data without breaking old readers.**
 
 ```mermaid
 sequenceDiagram

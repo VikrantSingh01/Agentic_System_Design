@@ -209,7 +209,7 @@ authorization on every request.
 ### 5. Retrieve candidates
 
 Retrieval takes the normalized question, authorized chunks, a score rule, and a limit.
-It returns ranked chunk identities and scores—not an answer. Define a minimum score and
+It returns ranked chunk identities and scores, not an answer. Define a minimum score and
 what “enough evidence” means. Top three does not mean good three.
 
 ### 6. Assemble bounded evidence
@@ -247,7 +247,7 @@ When no authorized chunk clears the evidence threshold, return:
 
 - what could not be answered;
 - which approved corpus and version were searched;
-- whether results were absent, unauthorized, stale, or too weak—without naming forbidden
+- whether results were absent, unauthorized, stale, or too weak, without naming forbidden
   sources;
 - safe ways to improve the query or request access; and
 - no invented answer or citation.
@@ -776,10 +776,10 @@ and safe to delete.
 
 Approved source-ledger entries used:
 
-- **SRC-005 — Lewis et al., “Retrieval-Augmented Generation for Knowledge-Intensive NLP
+- **SRC-005: Lewis et al., “Retrieval-Augmented Generation for Knowledge-Intensive NLP
   Tasks” (NeurIPS, 2020).** Evidence for combining generation with external retrieval.
   <https://arxiv.org/abs/2005.11401>. Freshness: durable.
-- **SRC-043 — Microsoft, “Azure AI Search vector search overview.”** Current vector and
+- **SRC-043: Microsoft, “Azure AI Search vector search overview.”** Current vector and
   hybrid retrieval concepts in Azure AI Search.
   <https://learn.microsoft.com/azure/search/vector-search-overview>. Freshness: volatile;
   ledger accessed 2026-09-05; reverify within 30 days of release.

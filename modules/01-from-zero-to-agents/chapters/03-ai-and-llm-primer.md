@@ -242,7 +242,7 @@ Using rounded values:
 
 Candidate A has the largest probability, but sampling can still select B or C. These are probabilities of next tokens under the model and context, not probabilities that whole claims are correct.
 
-The application—not the model alone—owns the control boundary. It decides what context to send, whether tools may run, how to validate output, and whether any action is allowed.
+The application, not the model alone, owns the control boundary. It decides what context to send, whether tools may run, how to validate output, and whether any action is allowed.
 
 ## Engineering deep dive
 

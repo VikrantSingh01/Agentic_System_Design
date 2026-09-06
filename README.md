@@ -2,7 +2,7 @@
 
 A beginner-to-production guide for designing, building, evaluating, securing, deploying, and operating agentic systems.
 
-The project teaches durable, vendor-neutral engineering principles first. Runnable examples use Python. Microsoft technologies are introduced through supported Python SDKs and architecture mappings where they add practical value.
+The project teaches durable, vendor-neutral engineering principles first. Runnable examples live in each chapter's **Build it in Python** section. Microsoft technologies are introduced through supported Python SDKs and architecture mappings where they add practical value.
 
 ## Choose your path
 
@@ -25,7 +25,7 @@ Each chapter follows the same learning rhythm:
 3. Study the mechanism, tradeoffs, and a Python example.
 4. Test a failure or misuse case with synthetic offline data.
 5. Apply evaluation, security, and production checks.
-6. Finish with review questions, a design exercise, and a hands-on lab.
+6. Finish with review questions and a design exercise.
 
 If a chapter feels too advanced, read its **First pass**, **Picture the idea**, and
 **Vocabulary** sections first. Return to the engineering sections when you need implementation
@@ -47,13 +47,13 @@ The material is organized as 36 chapters across nine modules:
 
 ## Recurring case study
 
-**Northstar Research Assistant** begins as a transparent agent loop and grows into an enterprise system that searches approved sources, creates cited reports, acts under delegated user identity, requests approval for consequential actions, resumes long-running work, and supports multiple tenants and regions.
+**Northstar Research Assistant** begins as a transparent agent loop and grows into an enterprise system that searches approved sources, creates cited reports, acts under delegated user identity, requests approval for consequential actions, resumes long-running work, and supports multiple tenants and regions. Its files are an architecture and requirements contract for the recurring case study, not a runnable reference implementation.
 
 ## Repository map
 
 - `modules/`: chapter content, module exercises, and local asset manifests
-- `labs/python/`: runnable generic and Microsoft Python labs
-- `case-study/northstar/`: cumulative production reference implementation
+- `case-study/northstar/`: architecture and requirements contract for the Northstar case study
+- `visuals/agent-system-journey/`: offline interactive journey through an agent system
 - `research/dossiers/`: independently owned research-agent outputs
 - `research/source-ledger.csv`: approved claims and source freshness
 - `coordination/contracts/`: frozen authoring and architecture contracts
@@ -72,6 +72,7 @@ source-freshness work continue in small, independently reviewed changes.
 ```powershell
 python scripts/validate_repository.py
 python -m unittest discover -s tests -v
+python visuals\agent-system-journey\tests\check_asset_offline.py
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before authoring or reviewing content.

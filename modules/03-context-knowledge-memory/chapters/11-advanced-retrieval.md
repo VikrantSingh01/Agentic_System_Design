@@ -163,7 +163,7 @@ rare terms. Production systems commonly use variants of BM25, a ranking method
 that rewards query terms while reducing the influence of very common words and
 very long documents.
 
-Keyword search is explainable—“these terms matched”—and needs no embedding
+Keyword search is explainable because “these terms matched,” and it needs no embedding
 model. It can miss synonyms: “pollinator decline” may not match “bees having a
 hard time.” Stemming, spelling correction, and synonym lists help, but each can
 also broaden a query incorrectly.
@@ -225,7 +225,7 @@ There are two kinds of filters:
 - **Security filters** express authority: tenant, user, group, classification,
   legal hold, or source policy.
 
-Construct security filters from trusted identity and policy services—not from
+Construct security filters from trusted identity and policy services, not from
 user text or a model. Apply them inside the retrieval request whenever the
 backend supports it. Defense in depth then rechecks every returned record
 before its text, title, score, snippet, or count reaches a model, cache, trace,
@@ -485,7 +485,7 @@ A production mapping is:
 | Reranking | Semantic ranking where suitable |
 | Workload identity | `DefaultAzureCredential`, preferably managed identity in Azure |
 
-Illustrative shape—not an offline lab and not a pinned API recipe:
+Illustrative shape only, not an offline lab or a pinned API recipe:
 
 ```python
 from azure.identity import DefaultAzureCredential
@@ -768,15 +768,15 @@ or payment.
 
 ## Sources
 
-- **SRC-005 — Lewis et al., “Retrieval-Augmented Generation for
+- **SRC-005: Lewis et al., “Retrieval-Augmented Generation for
   Knowledge-Intensive NLP Tasks” (NeurIPS 2020).** Approved, durable. Supports
   the foundational claim that retrieval can provide external evidence to a
   generator. <https://arxiv.org/abs/2005.11401>
-- **SRC-006 — Liu et al., “Lost in the Middle: How Language Models Use Long
+- **SRC-006: Liu et al., “Lost in the Middle: How Language Models Use Long
   Contexts” (2023).** Approved, evolving. Supports the claim that relevant
   information's position in long context can affect task performance.
   <https://arxiv.org/abs/2307.03172>
-- **SRC-043 — Microsoft, “Azure AI Search vector search overview.”** Approved,
+- **SRC-043: Microsoft, “Azure AI Search vector search overview.”** Approved,
   **volatile** because product features, APIs, and limits change. Supports the
   dated Microsoft mapping for vector and hybrid search. Recheck within 30 days
   of release. <https://learn.microsoft.com/azure/search/vector-search-overview>
