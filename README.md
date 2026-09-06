@@ -127,6 +127,8 @@ npm run build:book
 
 The build writes `book/building-agentic-systems.pdf` and `docs/index.html`. It verifies
 the chapter sequence, renders all Mermaid diagrams, rejects diagram errors, and validates
-the PDF page count and metadata.
+the PDF page count and metadata. The PDF includes an expandable side-panel table of contents
+with links to the reader guide, every module, and every chapter. Supporting viewers open the
+document-outline pane by default; readers can show or hide it with the viewer's contents control.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before authoring or reviewing content.

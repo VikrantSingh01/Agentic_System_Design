@@ -8,7 +8,7 @@ import katex from "katex";
 import MarkdownIt from "markdown-it";
 import anchor from "markdown-it-anchor";
 import texmath from "markdown-it-texmath";
-import { PDFDocument } from "pdf-lib";
+import { PDFDict, PDFDocument, PDFHexString, PDFName, PDFNumber } from "pdf-lib";
 import puppeteer from "puppeteer";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -269,6 +269,93 @@ async function findBrowser() {
   throw new Error("Microsoft Edge, Google Chrome, or Chromium is required to build the PDF");
 }
 
+function replacePdfOutline(document, modules) {
+  const { catalog, context } = document;
+  const originalRoot = context.lookup(catalog.get(PDFName.of("Outlines")), PDFDict);
+  const topLevel = [];
+  const seen = new Set();
+  let current = originalRoot.get(PDFName.of("First"));
+  while (current) {
+    const key = current.toString();
+    if (seen.has(key)) throw new Error(`PDF outline cycle at ${key}`);
+    seen.add(key);
+    const item = context.lookup(current, PDFDict);
+    const title = item.get(PDFName.of("Title"))?.decodeText?.() ?? "";
+    const destination = item.get(PDFName.of("Dest"));
+    const action = item.get(PDFName.of("A"));
+    if (!destination && !action) throw new Error(`PDF outline item has no destination: ${title}`);
+    topLevel.push({ title, destination, action });
+    current = item.get(PDFName.of("Next"));
+  }
+
+  const targetFor = (prefix, label) => {
+    const normalizedPrefix = prefix.replace(/\s+/g, "");
+    const target = topLevel.find((item) => item.title.replace(/\s+/g, "").startsWith(normalizedPrefix));
+    if (!target) throw new Error(`PDF outline is missing ${label}: ${prefix}`);
+    return target;
+  };
+  const chapters = modules.flatMap((module) => module.chapters);
+  const entries = [
+    { title: "Cover", target: topLevel[0] },
+    { title: "How to Use This Book", target: targetFor("How to Use This Book", "reader guide") },
+    { title: "Contents", target: targetFor("Contents", "contents") },
+    ...modules.map((module) => ({
+      title: module.title,
+      target: targetFor(module.title.replace(/^Module \d+:\s*/, ""), module.title),
+      children: module.chapters.map((chapter) => {
+        const prefix = chapter.title.match(/^Chapter \d+:/)?.[0];
+        if (!prefix) throw new Error(`Cannot build PDF outline prefix for ${chapter.title}`);
+        return {
+          title: chapter.title,
+          target: targetFor(prefix, chapter.title),
+        };
+      }),
+    })),
+  ];
+
+  const root = context.obj({});
+  const rootRef = context.register(root);
+  root.set(PDFName.of("Type"), PDFName.of("Outlines"));
+
+  const writeLevel = (level, parentRef) => {
+    const nodes = level.map((entry) => {
+      const dictionary = context.obj({});
+      return { entry, dictionary, reference: context.register(dictionary) };
+    });
+    let total = 0;
+    nodes.forEach((node, index) => {
+      const { entry, dictionary } = node;
+      dictionary.set(PDFName.of("Title"), PDFHexString.fromText(entry.title));
+      dictionary.set(PDFName.of("Parent"), parentRef);
+      if (entry.target.destination) dictionary.set(PDFName.of("Dest"), entry.target.destination);
+      else dictionary.set(PDFName.of("A"), entry.target.action);
+      if (index > 0) dictionary.set(PDFName.of("Prev"), nodes[index - 1].reference);
+      if (index + 1 < nodes.length) dictionary.set(PDFName.of("Next"), nodes[index + 1].reference);
+      if (entry.children?.length) {
+        const childLevel = writeLevel(entry.children, node.reference);
+        dictionary.set(PDFName.of("First"), childLevel.first);
+        dictionary.set(PDFName.of("Last"), childLevel.last);
+        dictionary.set(PDFName.of("Count"), PDFNumber.of(childLevel.total));
+        total += childLevel.total;
+      }
+      total += 1;
+    });
+    return { first: nodes[0].reference, last: nodes.at(-1).reference, total };
+  };
+
+  const outline = writeLevel(entries, rootRef);
+  const expected = 3 + modules.length + chapters.length;
+  if (outline.total !== expected) {
+    throw new Error(`PDF outline validation failed: expected ${expected} entries, found ${outline.total}`);
+  }
+  root.set(PDFName.of("First"), outline.first);
+  root.set(PDFName.of("Last"), outline.last);
+  root.set(PDFName.of("Count"), PDFNumber.of(outline.total));
+  catalog.set(PDFName.of("Outlines"), rootRef);
+  catalog.set(PDFName.of("PageMode"), PDFName.of("UseOutlines"));
+  return outline.total;
+}
+
 async function main() {
   await fs.mkdir(buildRoot, { recursive: true });
   await fs.mkdir(outputRoot, { recursive: true });
@@ -334,6 +421,8 @@ async function main() {
       format: "A4",
       printBackground: true,
       preferCSSPageSize: true,
+      tagged: true,
+      outline: true,
       displayHeaderFooter: true,
       headerTemplate: "<span></span>",
       footerTemplate: '<div style="width:100%;font:8px Segoe UI;color:#667;text-align:center"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
@@ -350,11 +439,12 @@ async function main() {
   document.setAuthor("Vikrant Singh, Microsoft");
   document.setSubject("Designing agentic systems from first principles through production scale");
   document.setCreator("Building Agentic Systems reproducible book build");
+  const outlineEntries = replacePdfOutline(document, modules);
   const finalBytes = await document.save();
   await fs.writeFile(pdfPath, finalBytes);
   const pages = document.getPageCount();
   if (pages < 100 || finalBytes.length < 500_000) throw new Error(`PDF validation failed: ${pages} pages, ${finalBytes.length} bytes`);
-  console.log(`Built ${path.relative(root, pdfPath)}: ${pages} pages, ${(finalBytes.length / 1_048_576).toFixed(1)} MiB, ${sourceDiagramCount} Mermaid diagrams rendered.`);
+  console.log(`Built ${path.relative(root, pdfPath)}: ${pages} pages, ${(finalBytes.length / 1_048_576).toFixed(1)} MiB, ${sourceDiagramCount} Mermaid diagrams rendered, ${outlineEntries} PDF bookmarks.`);
   console.log(`Built ${path.relative(root, webPath)}: responsive GitHub Pages edition with local fonts and diagrams.`);
 }
 
