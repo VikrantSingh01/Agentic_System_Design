@@ -8,12 +8,19 @@ import katex from "katex";
 import MarkdownIt from "markdown-it";
 import anchor from "markdown-it-anchor";
 import texmath from "markdown-it-texmath";
-import { PDFDict, PDFDocument, PDFHexString, PDFName, PDFNumber } from "pdf-lib";
+import { parse as parseCsv } from "csv-parse/sync";
+import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFNumber } from "pdf-lib";
 import puppeteer from "puppeteer";
 
 const root = path.resolve(import.meta.dirname, "..");
 const modulesRoot = path.join(root, "modules");
 const readerGuidePath = path.join(root, "front-matter", "reader-guide.md");
+const sourceLedgerPath = path.join(root, "research", "source-ledger.csv");
+const appendixPaths = [
+  path.join(root, "back-matter", "appendix-a-production-rollout.md"),
+  path.join(root, "back-matter", "appendix-b-evaluation-test-plan.md"),
+  path.join(root, "back-matter", "appendix-c-security-review.md"),
+];
 const buildRoot = path.join(root, "build", "book");
 const outputRoot = path.join(root, "book");
 const docsRoot = path.join(root, "docs");
@@ -101,6 +108,7 @@ async function collectBook() {
         number,
         title: heading,
         id: `chapter-${String(number).padStart(2, "0")}`,
+        source: chapterSource,
         body: markdown.render(withoutFirstHeading(removeReaderNavigation(chapterSource))),
       };
       moduleRecord.chapters.push(chapter);
@@ -116,12 +124,15 @@ async function collectBook() {
   return { modules, chapters };
 }
 
-function tableOfContents(modules) {
-  return modules.map((module) => `
+function tableOfContents(modules, supplementalEntries) {
+  const entry = (id, title) => `<a class="toc-entry" href="#${id}"><span class="toc-title">${title}</span><span class="toc-leader" aria-hidden="true"></span><span class="toc-page" data-toc-target="${id}" aria-label="Page number"></span></a>`;
+  const moduleEntries = modules.map((module) => `
     <li>
-      <a href="#${module.id}">${module.title}</a>
-      <ol>${module.chapters.map((chapter) => `<li><a href="#${chapter.id}">${chapter.title}</a></li>`).join("")}</ol>
+      ${entry(module.id, module.title)}
+      <ol>${module.chapters.map((chapter) => `<li>${entry(chapter.id, chapter.title)}</li>`).join("")}</ol>
     </li>`).join("");
+  const backMatterEntries = supplementalEntries.map((item) => `<li class="toc-supplemental">${entry(item.id, item.title)}</li>`).join("");
+  return moduleEntries + backMatterEntries;
 }
 
 function bookSections(modules) {
@@ -137,6 +148,73 @@ function bookSections(modules) {
         <h1>${chapter.title}</h1>
         ${chapter.body}
       </article>`).join("")}`).join("");
+}
+
+function renderAppendix(source, id, title) {
+  const inBookLinks = withoutFirstHeading(source).replace(
+    /\(\.\.\/modules\/[^)]+\/chapters\/(\d{2})-[^)]+\.md(?:#[^)]*)?\)/g,
+    (_, chapter) => `(#chapter-${chapter})`,
+  );
+  return `<section class="back-matter appendix" id="${id}"><p class="part-label">Appendix</p><h1>${title}</h1>${markdown.render(inBookLinks)}</section>`;
+}
+
+function glossarySection(modules) {
+  const terms = new Map();
+  for (const chapter of modules.flatMap((module) => module.chapters)) {
+    const section = chapter.source.match(/^## Vocabulary\s*\n([\s\S]*?)(?=^## )/m)?.[1];
+    if (!section) throw new Error(`Glossary generation failed: ${chapter.title} has no vocabulary section`);
+    for (const line of section.split(/\r?\n/)) {
+      if (!line.startsWith("|")) continue;
+      const cells = line.slice(1, line.endsWith("|") ? -1 : undefined).split("|").map((cell) => cell.trim());
+      if (cells.length !== 2 || cells[0] === "Term" || /^-+$/.test(cells[0])) continue;
+      const term = cells[0].replace(/\[([^\]]+)]\([^)]+\)/g, "$1").replace(/[*_`]/g, "").trim();
+      const key = term.toLocaleLowerCase("en-US");
+      const existing = terms.get(key);
+      if (existing) existing.chapters.push(chapter);
+      else terms.set(key, { term, definition: cells[1], chapters: [chapter] });
+    }
+  }
+  const sorted = [...terms.values()].sort((left, right) => left.term.localeCompare(right.term, "en-US", { sensitivity: "base" }));
+  const groups = new Map();
+  for (const item of sorted) {
+    const letter = item.term[0].toUpperCase();
+    if (!groups.has(letter)) groups.set(letter, []);
+    groups.get(letter).push(item);
+  }
+  const body = [...groups].map(([letter, entries]) => `<section class="glossary-group"><h2>${escapeHtml(letter)}</h2><div class="glossary-grid">${entries.map((item) => {
+    const chapters = [...new Map(item.chapters.map((chapter) => [chapter.number, chapter])).values()];
+    const links = chapters.map((chapter) => `<a href="#${chapter.id}">${chapter.number}</a>`).join(", ");
+    return `<div class="glossary-entry"><h3>${markdown.renderInline(item.term)}</h3><p>${markdown.renderInline(item.definition)} <span class="glossary-chapters">Chapters ${links}</span></p></div>`;
+  }).join("")}</div></section>`).join("");
+  return {
+    id: "glossary",
+    title: "Glossary and Term Index",
+    html: `<section class="back-matter glossary" id="glossary"><p class="part-label">Back matter</p><h1>Glossary and Term Index</h1><p>This glossary consolidates each chapter's vocabulary. The first occurrence supplies the canonical definition; chapter links show where the term is taught or reused.</p>${body}</section>`,
+    count: sorted.length,
+  };
+}
+
+function referencesSection(sourceLedger) {
+  const rows = parseCsv(sourceLedger, { columns: true, skip_empty_lines: true, bom: true });
+  rows.forEach((row, index) => {
+    const expected = `SRC-${String(index + 1).padStart(3, "0")}`;
+    if (row.id !== expected || row.status !== "approved") {
+      throw new Error(`Reference validation failed at row ${index + 1}: expected approved ${expected}, found ${row.id} (${row.status})`);
+    }
+  });
+  const items = rows.map((row) => {
+    const chapterLinks = row.chapter.split(",").map((value) => value.trim()).filter(Boolean).map((number) => {
+      const numeric = Number(number);
+      return `<a href="#chapter-${String(numeric).padStart(2, "0")}">${numeric}</a>`;
+    }).join(", ");
+    return `<li id="reference-${row.id.toLowerCase()}"><span class="reference-id">${escapeHtml(row.id)}</span> <b>${escapeHtml(row.publisher)}.</b> <cite>${escapeHtml(row.title)}</cite>. Published or updated: ${escapeHtml(row.published_date)}. Accessed: ${escapeHtml(row.accessed_date)}. <a class="reference-url" href="${escapeHtml(row.url)}">${escapeHtml(row.url)}</a><span class="reference-meta">Freshness: ${escapeHtml(row.freshness)}. Used in Chapters ${chapterLinks}. Supported use: ${escapeHtml(row.claim)}</span></li>`;
+  }).join("");
+  return {
+    id: "references",
+    title: "References",
+    html: `<section class="back-matter references" id="references"><p class="part-label">Back matter</p><h1>References</h1><p>These are the approved sources used across the book. Durable sources support stable foundations; evolving sources require scoped interpretation; volatile sources require release-time reverification.</p><ol class="references-list">${items}</ol></section>`,
+    count: rows.length,
+  };
 }
 
 function styles(katexCss) {
@@ -208,10 +286,28 @@ img, svg { max-width:100%; height:auto; }
 .contents li { margin:.18rem 0; break-inside:avoid; font-family:"Segoe UI",Calibri,sans-serif; font-size:9pt; }
 .contents > ol > li { margin:0 0 .7rem; color:var(--blue); font-weight:700; }
 .contents ol ol { padding-left:1rem; font-weight:400; }
+.contents .toc-entry { display:flex; align-items:flex-end; gap:.35rem; width:100%; }
+.contents .toc-title { min-width:0; }
+.contents .toc-leader { min-width:1rem; flex:1 1 auto; margin-bottom:.28em; border-bottom:1px dotted #89979c; }
+.contents .toc-page { flex:0 0 3ch; color:var(--ink); font-variant-numeric:tabular-nums; text-align:right; }
+.contents .toc-supplemental { list-style:none; margin-left:-1.3rem; }
+.contents .toc-supplemental:first-of-type { margin-top:1rem; }
 .module-opener { min-height:220mm; padding-top:22mm; break-before:page; break-after:page; }
 .module-opener .part-label { color:var(--teal); font:700 10pt/1 "Segoe UI",sans-serif; text-transform:uppercase; }
 .module-opener h1 { font-size:32pt; }
 .chapter { break-before:page; }
+.back-matter { break-before:page; }
+.back-matter > .part-label { color:var(--teal); font:700 10pt/1 "Segoe UI",sans-serif; text-transform:uppercase; }
+.glossary-group { break-before:auto; }
+.glossary-grid { columns:2; column-gap:9mm; }
+.glossary-entry { margin:0 0 .65rem; break-inside:avoid; }
+.glossary-entry h3 { margin:0 0 .12rem; font-size:10pt; }
+.glossary-entry p { margin:0; font-size:8.3pt; line-height:1.4; }
+.glossary-chapters, .reference-meta { display:block; margin-top:.12rem; color:var(--muted); font-family:"Segoe UI",Calibri,sans-serif; font-size:.88em; }
+.references-list { padding-left:1.4rem; }
+.references-list li { margin:0 0 .7rem; padding-left:.2rem; break-inside:avoid; font-size:8.3pt; line-height:1.4; overflow-wrap:anywhere; }
+.reference-id { color:var(--teal); font-family:"Segoe UI",Calibri,sans-serif; font-weight:700; }
+.reference-url { font-size:.9em; }
 .web-only { display:none; }
 .chapter > blockquote:first-of-type { font-family:"Segoe UI",Calibri,sans-serif; font-size:8.5pt; }
 .chapter > hr { margin:2rem 0; border:0; border-top:1px solid var(--line); }
@@ -230,8 +326,10 @@ img, svg { max-width:100%; height:auto; }
   .web-header a { color:white; }
   .cover { min-height:calc(100vh - 44px); height:auto; padding:clamp(2rem,8vw,5rem) max(1.5rem,calc((100% - 920px)/2)); }
   .cover-content { min-height:calc(100vh - 10rem); }
-  .reader-guide, .contents, main { width:min(100%,920px); margin:0 auto; padding:2rem clamp(1rem,4vw,3.5rem); background:white; }
+  .reader-guide, .contents, main, .back-matter { width:min(100%,920px); margin:0 auto; padding:2rem clamp(1rem,4vw,3.5rem); background:white; }
   .reader-guide, .contents { min-height:100vh; }
+  .contents .toc-entry { display:inline; }
+  .contents .toc-leader, .contents .toc-page { display:none; }
   .module-opener, .chapter { min-height:0; padding-top:4rem; scroll-margin-top:3rem; }
   .back-to-contents { float:right; margin:.5rem 0 1rem 1rem; color:var(--teal); font:600 9pt/1.3 "Segoe UI",sans-serif; }
 }
@@ -257,6 +355,7 @@ img, svg { max-width:100%; height:auto; }
   .cover .cover-mark::before { flex:0 0 auto; width:1.6rem; height:1.6rem; }
   .cover-grid span:nth-child(4) { display:none; }
   .contents > ol { columns:1; }
+  .glossary-grid { columns:1; }
   table { display:block; max-width:100%; overflow-x:auto; font-size:8pt; }
   pre { max-width:100%; overflow-x:auto; white-space:pre; }
   pre code { display:block; width:max-content; min-width:100%; }
@@ -305,8 +404,9 @@ async function findBrowser() {
   throw new Error("Microsoft Edge, Google Chrome, or Chromium is required to build the PDF");
 }
 
-function replacePdfOutline(document, modules) {
+function readPdfOutlineTargets(document) {
   const { catalog, context } = document;
+  const pageNumbers = new Map(document.getPages().map((page, index) => [page.ref.toString(), index + 1]));
   const originalRoot = context.lookup(catalog.get(PDFName.of("Outlines")), PDFDict);
   const topLevel = [];
   const seen = new Set();
@@ -320,7 +420,11 @@ function replacePdfOutline(document, modules) {
     const destination = item.get(PDFName.of("Dest"));
     const action = item.get(PDFName.of("A"));
     if (!destination && !action) throw new Error(`PDF outline item has no destination: ${title}`);
-    topLevel.push({ title, destination, action });
+    const actionDictionary = action ? context.lookup(action, PDFDict) : undefined;
+    const destinationArray = context.lookup(destination ?? actionDictionary?.get(PDFName.of("D")), PDFArray);
+    const pageNumber = pageNumbers.get(destinationArray.get(0).toString());
+    if (!pageNumber) throw new Error(`PDF outline item has an invalid page destination: ${title}`);
+    topLevel.push({ title, destination, action, pageNumber });
     current = item.get(PDFName.of("Next"));
   }
 
@@ -330,6 +434,29 @@ function replacePdfOutline(document, modules) {
     if (!target) throw new Error(`PDF outline is missing ${label}: ${prefix}`);
     return target;
   };
+  return { targetFor, topLevel };
+}
+
+function contentPageNumbers(document, modules, supplementalEntries) {
+  const { targetFor } = readPdfOutlineTargets(document);
+  const entries = [];
+  for (const module of modules) {
+    entries.push([module.id, targetFor(module.title.replace(/^Module \d+:\s*/, ""), module.title).pageNumber]);
+    for (const chapter of module.chapters) {
+      const prefix = chapter.title.match(/^Chapter \d+:/)?.[0];
+      if (!prefix) throw new Error(`Cannot build PDF page-number prefix for ${chapter.title}`);
+      entries.push([chapter.id, targetFor(prefix, chapter.title).pageNumber]);
+    }
+  }
+  for (const entry of supplementalEntries) {
+    entries.push([entry.id, targetFor(entry.title, entry.title).pageNumber]);
+  }
+  return Object.fromEntries(entries);
+}
+
+function replacePdfOutline(document, modules, supplementalEntries) {
+  const { catalog, context } = document;
+  const { targetFor, topLevel } = readPdfOutlineTargets(document);
   const chapters = modules.flatMap((module) => module.chapters);
   const entries = [
     { title: "Cover", target: topLevel[0] },
@@ -347,6 +474,7 @@ function replacePdfOutline(document, modules) {
         };
       }),
     })),
+    ...supplementalEntries.map((entry) => ({ title: entry.title, target: targetFor(entry.title, entry.title) })),
   ];
 
   const root = context.obj({});
@@ -380,7 +508,7 @@ function replacePdfOutline(document, modules) {
   };
 
   const outline = writeLevel(entries, rootRef);
-  const expected = 3 + modules.length + chapters.length;
+  const expected = 3 + modules.length + chapters.length + supplementalEntries.length;
   if (outline.total !== expected) {
     throw new Error(`PDF outline validation failed: expected ${expected} entries, found ${outline.total}`);
   }
@@ -399,13 +527,24 @@ async function main() {
   await fs.cp(path.join(root, "node_modules", "katex", "dist", "fonts"), path.join(buildRoot, "fonts"), { recursive: true });
   await fs.cp(path.join(root, "node_modules", "katex", "dist", "fonts"), path.join(docsRoot, "fonts"), { recursive: true });
 
-  const [{ modules }, readerGuideSource, mermaidSource, katexCss] = await Promise.all([
+  const [{ modules }, readerGuideSource, sourceLedger, appendixSources, mermaidSource, katexCss] = await Promise.all([
     collectBook(),
     fs.readFile(readerGuidePath, "utf8"),
+    fs.readFile(sourceLedgerPath, "utf8"),
+    Promise.all(appendixPaths.map((appendixPath) => fs.readFile(appendixPath, "utf8"))),
     fs.readFile(path.join(root, "node_modules", "mermaid", "dist", "mermaid.min.js"), "utf8"),
     fs.readFile(path.join(root, "node_modules", "katex", "dist", "katex.min.css"), "utf8"),
   ]);
 
+  const appendices = appendixSources.map((source, index) => {
+    const title = titleFrom(source, /^# (Appendix .+)$/m, appendixPaths[index]);
+    const id = `appendix-${String.fromCharCode(97 + index)}`;
+    return { id, title, html: renderAppendix(source, id, title) };
+  });
+  const glossary = glossarySection(modules);
+  const references = referencesSection(sourceLedger);
+  const supplementalEntries = [...appendices, glossary, references];
+  const backMatterHtml = supplementalEntries.map((entry) => entry.html).join("");
   const sourceDiagramCount = modules.reduce((total, module) => total + module.chapters.reduce(
     (chapterTotal, chapter) => chapterTotal + (chapter.body.match(/class="mermaid"/g) ?? []).length, 0), 0);
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Building Agentic Systems: From First Principles to Production</title><style>${styles(katexCss)}</style></head>
@@ -438,8 +577,9 @@ async function main() {
     </div>
   </section>
   <section class="reader-guide" id="reader-guide"><h1>How to Use This Book</h1>${markdown.render(withoutFirstHeading(readerGuideSource))}</section>
-  <nav class="contents" id="contents"><h1>Contents</h1><ol>${tableOfContents(modules)}</ol></nav>
+  <nav class="contents" id="contents"><h1>Contents</h1><ol>${tableOfContents(modules, supplementalEntries)}</ol></nav>
   <main>${bookSections(modules)}</main>
+  ${backMatterHtml}
   <script>${mermaidSource}</script>
   <script>
     mermaid.initialize({ startOnLoad:false, securityLevel:"strict", theme:"base", themeVariables:{ primaryColor:"#eef5f6", primaryTextColor:"#18222b", primaryBorderColor:"#0b5c7a", lineColor:"#53606a", secondaryColor:"#f2f8f7", tertiaryColor:"#fff7e6", fontFamily:"Segoe UI, sans-serif" }, flowchart:{ useMaxWidth:true, htmlLabels:true } });
@@ -450,6 +590,20 @@ async function main() {
   await fs.writeFile(webPath, html, "utf8");
   await fs.writeFile(path.join(docsRoot, ".nojekyll"), "", "utf8");
 
+  const pdfOptions = {
+    path: pdfPath,
+    format: "A4",
+    printBackground: true,
+    preferCSSPageSize: true,
+    tagged: true,
+    outline: true,
+    displayHeaderFooter: true,
+    headerTemplate: "<span></span>",
+    footerTemplate: '<div style="width:100%;font:8px Segoe UI;color:#667;text-align:center"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
+    margin: { top: "17mm", right: "16mm", bottom: "19mm", left: "16mm" },
+    timeout: 120_000,
+  };
+  let printedContentPages;
   const browser = await puppeteer.launch({ executablePath: await findBrowser(), headless: true, args: ["--allow-file-access-from-files", "--disable-gpu"] });
   try {
     const page = await browser.newPage();
@@ -464,19 +618,18 @@ async function main() {
     if (renderState.diagrams !== sourceDiagramCount || renderState.errors || renderState.message) {
       throw new Error(`Mermaid render failed: source=${sourceDiagramCount}, rendered=${renderState.diagrams}, errors=${renderState.errors}, message=${renderState.message}`);
     }
-    await page.pdf({
-      path: pdfPath,
-      format: "A4",
-      printBackground: true,
-      preferCSSPageSize: true,
-      tagged: true,
-      outline: true,
-      displayHeaderFooter: true,
-      headerTemplate: "<span></span>",
-      footerTemplate: '<div style="width:100%;font:8px Segoe UI;color:#667;text-align:center"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
-      margin: { top: "17mm", right: "16mm", bottom: "19mm", left: "16mm" },
-      timeout: 120_000,
-    });
+    await page.pdf(pdfOptions);
+    const provisionalDocument = await PDFDocument.load(await fs.readFile(pdfPath));
+    printedContentPages = contentPageNumbers(provisionalDocument, modules, supplementalEntries);
+    await page.evaluate((pageNumbers) => {
+      for (const pageNumber of document.querySelectorAll(".toc-page")) {
+        const value = pageNumbers[pageNumber.dataset.tocTarget];
+        if (!value) throw new Error(`Missing contents page number for ${pageNumber.dataset.tocTarget}`);
+        pageNumber.textContent = String(value);
+        pageNumber.setAttribute("aria-label", `Page ${value}`);
+      }
+    }, printedContentPages);
+    await page.pdf(pdfOptions);
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 });
     await page.emulateMediaType("print");
     await page.evaluate(() => {
@@ -501,16 +654,23 @@ async function main() {
     throw new Error(`Cover image validation failed: ${coverWidth}x${coverHeight}, ${coverBytes.length} bytes`);
   }
   const document = await PDFDocument.load(bytes);
+  const finalContentPages = contentPageNumbers(document, modules, supplementalEntries);
+  for (const [id, printedPage] of Object.entries(printedContentPages)) {
+    if (finalContentPages[id] !== printedPage) {
+      throw new Error(`Contents page validation failed for ${id}: printed ${printedPage}, final ${finalContentPages[id]}`);
+    }
+  }
   document.setTitle("Building Agentic Systems: From First Principles to Production");
   document.setAuthor("Vikrant Singh, Microsoft");
   document.setSubject("Designing agentic systems from first principles through production scale");
   document.setCreator("Building Agentic Systems reproducible book build");
-  const outlineEntries = replacePdfOutline(document, modules);
+  const outlineEntries = replacePdfOutline(document, modules, supplementalEntries);
   const finalBytes = await document.save();
   await fs.writeFile(pdfPath, finalBytes);
   const pages = document.getPageCount();
   if (pages < 100 || finalBytes.length < 500_000) throw new Error(`PDF validation failed: ${pages} pages, ${finalBytes.length} bytes`);
   console.log(`Built ${path.relative(root, pdfPath)}: ${pages} pages, ${(finalBytes.length / 1_048_576).toFixed(1)} MiB, ${sourceDiagramCount} Mermaid diagrams rendered, ${outlineEntries} PDF bookmarks.`);
+  console.log(`Included ${glossary.count} glossary terms, ${references.count} approved references, and ${appendices.length} appendices.`);
   console.log(`Built ${path.relative(root, coverImagePath)}: ${coverWidth}x${coverHeight}, ${(coverBytes.length / 1024).toFixed(0)} KiB.`);
   console.log(`Built ${path.relative(root, webPath)}: responsive GitHub Pages edition with local fonts and diagrams.`);
 }

@@ -82,6 +82,7 @@ The material is organized as 42 chapters across ten modules:
 Reader and source content:
 
 - `front-matter/`: reader guidance included in the PDF and web editions
+- `back-matter/`: production rollout, evaluation/test, and security review appendices
 - `modules/`: 42 chapters across ten modules, with exercises and local asset manifests
 - `case-study/northstar/`: architecture and requirements contract for the Northstar case study
 - `visuals/agent-system-journey/`: offline interactive journey through an agent system
@@ -132,5 +133,8 @@ the chapter sequence, renders all Mermaid diagrams, rejects diagram errors, and 
 the PDF page count and metadata. The PDF includes an expandable side-panel table of contents
 with links to the reader guide, every module, and every chapter. Supporting viewers open the
 document-outline pane by default; readers can show or hide it with the viewer's contents control.
+The printed contents lists verified page numbers for every module, chapter, appendix, glossary,
+and reference section. The glossary is generated from chapter vocabulary, and the global
+bibliography is generated from the approved source ledger so these views cannot drift manually.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before authoring or reviewing content.
