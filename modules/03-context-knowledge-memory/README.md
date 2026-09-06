@@ -13,8 +13,8 @@ the capability that the next problem requires:
 2. retrieve cited evidence from approved sources;
 3. improve retrieval without weakening permissions or traceability;
 4. retain one user-approved preference only when tests show value; and
-5. use uncertain screen, image, or audio observations to save—but never
-   autonomously submit—the report in an offline simulation.
+5. use uncertain screen, image, or audio observations to save, but never
+   autonomously submit, the report in an offline simulation.
 
 ## Chapters
 

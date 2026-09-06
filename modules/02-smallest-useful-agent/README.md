@@ -13,10 +13,10 @@ output never supplies identity, permission, approval, or extra budget.
 
 ## Chapters
 
-5. [**Messages, Prompts, and Structured Output**](chapters/05-messages-prompts-structured-output.md) — separate instructions from untrusted research text and validate `DraftReportV1`.
-6. [**Models and Inference**](chapters/06-models-and-inference.md) — compare replaceable model routes against the same contract and hard limits.
-7. [**Tools and Function Calling**](chapters/07-tools-and-function-calling.md) — turn a generated proposal into a checked request for one narrow capability.
-8. [**The Agent Runtime**](chapters/08-agent-runtime.md) — assemble messages, model boundary, tools, state, budgets, traces, and named stopping conditions.
+5. [**Messages, Prompts, and Structured Output**](chapters/05-messages-prompts-structured-output.md): separate instructions from untrusted research text and validate `DraftReportV1`.
+6. [**Models and Inference**](chapters/06-models-and-inference.md): compare replaceable model routes against the same contract and hard limits.
+7. [**Tools and Function Calling**](chapters/07-tools-and-function-calling.md): turn a generated proposal into a checked request for one narrow capability.
+8. [**The Agent Runtime**](chapters/08-agent-runtime.md): assemble messages, model boundary, tools, state, budgets, traces, and named stopping conditions.
 
 The progression is cumulative: Chapter 5 defines the data contract; Chapter 6 chooses
 how to produce a candidate; Chapter 7 controls access to the environment; and Chapter
