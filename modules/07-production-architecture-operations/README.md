@@ -6,11 +6,11 @@ Turn an evaluated prototype into an observable, resilient, deployable, and recov
 
 ## Chapters
 
-28. **Reference Architecture**
-29. **Reliability Engineering**
-30. **Observability and SRE**
-31. **Deployment and Delivery**
-32. **Data and State at Scale**
+28. [**Reference Architecture**](chapters/28-reference-architecture.md)
+29. [**Reliability Engineering**](chapters/29-reliability-engineering.md)
+30. [**Observability and SRE**](chapters/30-observability-and-sre.md)
+31. [**Deployment and Delivery**](chapters/31-deployment-and-delivery.md)
+32. [**Data and State at Scale**](chapters/32-data-and-state-at-scale.md)
 
 ## Northstar milestone
 
