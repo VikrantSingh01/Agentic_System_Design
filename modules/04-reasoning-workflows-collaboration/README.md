@@ -6,11 +6,11 @@ Choose among deterministic workflows, planning, durable execution, and multi-age
 
 ## Chapters
 
-14. **Workflow Patterns**
-15. **Planning and Reasoning**
-16. **Durable Execution**
-17. **Multi-Agent Systems**
-18. **Interoperability Protocols**
+14. [**Workflow Patterns**](chapters/14-workflow-patterns.md)
+15. [**Planning and Reasoning**](chapters/15-planning-and-reasoning.md)
+16. [**Durable Execution**](chapters/16-durable-execution.md)
+17. [**Multi-Agent Systems**](chapters/17-multi-agent-systems.md)
+18. [**Interoperability Protocols**](chapters/18-interoperability-protocols.md)
 
 ## Northstar milestone
 
