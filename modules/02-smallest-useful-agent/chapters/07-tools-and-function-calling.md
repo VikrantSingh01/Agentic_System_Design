@@ -101,8 +101,9 @@ flowchart LR
     A -- No --> S[Stop safely]
     A -- Yes --> T[Small tool runs]
     T --> R[Untrusted result is checked]
-    R --> M
-    M --> U
+    R --> N{More work?}
+    N -- Yes --> M
+    N -- No --> F[Answer person]
 ```
 
 **Takeaway:** every proposed call must pass software-controlled gates before a tool can
@@ -111,7 +112,8 @@ run.
 Step by step: (1) a person asks for help, (2) the model proposes a named call with
 arguments, (3) the runtime validates it, (4) the runtime checks permission and requests
 confirmation when needed, (5) a small tool runs only after those checks, and (6) its
-untrusted result is checked before returning to the model. Any failed gate stops safely.
+untrusted result is checked. Finally, the runtime either asks the model for another
+bounded proposal or returns an answer to the person. Any failed gate stops safely.
 
 ## Vocabulary
 

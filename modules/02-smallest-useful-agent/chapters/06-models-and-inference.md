@@ -121,7 +121,7 @@ Step by step:
 
 ```mermaid
 flowchart LR
-    A[Same test cases] --> B[Provider-neutral gateway]
+    A[Same test cases] --> B[Same test program]
     B --> C[Candidate small model]
     B --> D[Candidate larger model]
     C --> E[Validate and measure]
@@ -135,7 +135,7 @@ flowchart LR
 
 Step by step:
 
-1. Send the same versioned test cases through one provider-neutral gateway.
+1. Use the same test program to send every candidate the same versioned test cases.
 2. Run each candidate with its pinned settings.
 3. Validate outputs and measure quality, latency, context behavior, safety, and estimated cost.
 4. Reject every candidate that breaks a hard limit.

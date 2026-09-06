@@ -85,24 +85,25 @@ capability meets the environment).
 
 ```mermaid
 flowchart LR
-    G[Goal and state] --> O[Observe: build messages]
+    G[Goal and state] --> D{Done?}
+    D -- no --> O[Observe: build messages]
     O --> M[Model proposes]
     M --> C{Valid, allowed, in budget?}
     C -- no --> X[Stop or await approval]
     C -- yes --> A[Act with one typed tool]
     A --> R[Record result and trace]
     R --> G
-    G --> D{Done?}
     D -- yes --> X
 ```
 
 **Takeaway:** The model suggests, but the runtime checks, records, and decides
 whether another turn is allowed.
 
-Step by step: (1) the runtime reads the goal and state; (2) it builds structured
-messages; (3) the model proposes one action; (4) checks stop or pause an invalid,
-unsafe, or over-budget proposal; (5) one valid typed tool acts; (6) the runtime
-records the result; and (7) it either stops or begins the next bounded turn.
+Step by step: (1) the runtime reads the goal and state; (2) it stops if the goal
+is already complete; (3) otherwise it builds structured messages; (4) the model
+proposes one action; (5) checks stop or pause an invalid, unsafe, or over-budget
+proposal; (6) one valid typed tool acts; and (7) the runtime records the result
+before checking whether another bounded turn is needed.
 
 ## Vocabulary
 
@@ -226,6 +227,10 @@ may receive part of a parent's budget but must never create more.
 
 ```mermaid
 stateDiagram-v2
+    state "Working" as Running
+    state "Done" as Completed
+    state "Waiting for approval" as AwaitingApproval
+    state "Out of budget" as BudgetExhausted
     [*] --> Running
     Running --> Completed: goal met
     Running --> AwaitingApproval: consequential proposal

@@ -99,7 +99,7 @@ flowchart TB
         A[One blob of words] --> G[Code must guess the parts]
     end
     subgraph S[Structured answer]
-        J[Named JSON fields] --> K[Code checks each field]
+        J[Named fields] --> K[Code checks each field]
     end
 ```
 
@@ -109,7 +109,7 @@ flowchart TB
 
 1. In the loose-answer path, the model returns one blob of words.
 2. Code must guess which words are the title, priority, and tags.
-3. In the structured-answer path, the model returns named JSON fields.
+3. In the structured-answer path, the model returns named fields in a JSON object.
 4. Code checks every named field against the schema instead of guessing.
 
 The comparison is compact, not complete. A structured answer can still be false or unsafe, so the process visual later in this chapter shows the required checks.
