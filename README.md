@@ -58,7 +58,7 @@ The material is organized as 36 chapters across nine modules:
 - `research/source-ledger.csv`: approved claims and source freshness
 - `coordination/contracts/`: frozen authoring and architecture contracts
 - `coordination/dependency-graph.yml`: multi-agent stages and join gates
-- `reviews/`: independent pedagogy, technical, and production reviews
+- `reviews/`: editorial and publication-quality review records
 - `scripts/`: repository validation tools
 
 ## Current status

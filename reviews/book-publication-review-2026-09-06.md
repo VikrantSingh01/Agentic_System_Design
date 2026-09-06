@@ -16,6 +16,17 @@ This review records **observations at the time of the audit**. Several items bel
 have remediation underway; each finding carries a `Status` field so later passes can update
 it in place instead of re-litigating settled points.
 
+## Post-audit remediation
+
+The final publication pass closed findings 1, 2, 3, 4, 6, 8, 9, and 10. The repository map
+now describes shipped artifacts accurately, the offline visual validator runs locally and in
+CI, all chapters use consistent review status and ownership metadata, Chapter 36 has an
+in-page outline, and every chapter has previous, module, and next navigation where applicable.
+A repository `CODEOWNERS` file assigns the maintained surface explicitly. Findings 5 and 7
+remain documented maintenance work: review disciplines should gain dedicated artifacts, and
+the synchronized R1-R9 research snapshots should eventually be replaced by one canonical
+storage location.
+
 ## Evidence summary
 
 - 36 chapter files across 9 modules; 86 Markdown files repository-wide.
@@ -40,7 +51,7 @@ Ordered by severity. Each finding lists exact location(s), reader/maintainer imp
 surgical fix, and current status.
 
 ### 1. README repository map references a directory that does not exist
-- **Location:** `README.md:55` — `` `labs/python/`: runnable generic and Microsoft Python
+- **Location:** `README.md:55`: `` `labs/python/`: runnable generic and Microsoft Python
   labs``.
 - **Evidence:** recursive search of the working tree finds no `labs/` directory anywhere.
   All runnable examples are embedded as fenced Python blocks inside each chapter's
@@ -52,7 +63,7 @@ surgical fix, and current status.
 - **Status:** open.
 
 ### 2. `case-study/northstar/` is described as containing more than it does
-- **Location:** `README.md:56` — `` `case-study/northstar/`: cumulative production
+- **Location:** `README.md:56`: `` `case-study/northstar/`: cumulative production
   reference implementation``.
 - **Evidence:** `case-study/northstar/` contains exactly one file,
   `architecture-contract.md` (a design contract). No implementation code exists in that
@@ -91,11 +102,11 @@ surgical fix, and current status.
   untouched drafts from the status line alone.
 - **Fix:** run the mechanical status pass the prior review already recommended: set
   `Status:` to the correct template value per chapter, owned by one person, in one PR.
-- **Status:** fix in progress — remediation identified in the prior editorial review and
+- **Status:** fix in progress. Remediation identified in the prior editorial review and
   now scheduled; not yet applied to any chapter file as of this audit.
 
 ### 5. `reviews/` does not yet contain the review types the map promises
-- **Location:** `README.md:61` — `` `reviews/`: independent pedagogy, technical, and
+- **Location:** `README.md:61`: `` `reviews/`: independent pedagogy, technical, and
   production reviews``; convention defined in `CONTRIBUTING.md:46`
   (`reviews/<chapter>/<role>.md`).
 - **Evidence:** at the time of this audit, `reviews/` contained one file,
@@ -108,13 +119,13 @@ surgical fix, and current status.
 - **Fix:** produce technical- and production-review artifacts (or summarize the
   already-applied technical fixes retroactively), and/or narrow the README bullet to what
   currently exists.
-- **Status:** fix in progress — this publication review is itself part of closing the gap;
+- **Status:** fix in progress. This publication review is itself part of closing the gap;
   a dedicated technical-review and production-review artifact are still outstanding.
 
 ### 6. Chapter 36 is an overlong page with no in-page navigation
 - **Location:**
   `modules/09-microsoft-synthesis-capstone/chapters/36-northstar-on-microsoft-stack.md`.
-- **Evidence:** 9,217 words / 1,170 lines / 43 H2+H3 headings — 2.6x the current
+- **Evidence:** 9,217 words / 1,170 lines / 43 H2+H3 headings, 2.6x the current
   36-chapter mean (3,525 words) and 6.8x the shortest chapter (1,362 words). No table of
   contents or anchor-link index precedes its 43 headings.
 - **Impact:** the capstone chapter is hardest to scan exactly where readers most need to
