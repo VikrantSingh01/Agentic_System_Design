@@ -1,0 +1,111 @@
+version: 1
+freeze_date: 2026-09-05
+
+stages:
+  - id: S0
+    name: editorial-foundation
+    owner: editor-in-chief
+    predecessors: []
+    outputs:
+      - coordination/contracts/editorial-contract.md
+      - coordination/contracts/chapter-template.md
+      - coordination/dependency-graph.yml
+      - modules/README.md
+    validation: python scripts/validate_repository.py
+
+  - id: S1
+    name: research-fan-out
+    predecessors: [S0]
+    parallel_nodes: [R1, R2, R3, R4, R5, R6, R7, R8, R9]
+    output_pattern: research/dossiers/<node>.md
+    join: J1
+
+  - id: J1
+    name: evidence-reconciliation
+    owner: source-editor
+    predecessors: [R1, R2, R3, R4, R5, R6, R7, R8, R9]
+    outputs:
+      - research/source-ledger.csv
+
+  - id: S2
+    name: curriculum-and-architecture
+    predecessors: [J1]
+    parallel_nodes: [CURRICULUM, NORTHSTAR]
+    join: J2
+
+  - id: J2
+    name: module-contract-freeze
+    owner: editor-in-chief
+    predecessors: [CURRICULUM, NORTHSTAR]
+    output_pattern: coordination/contracts/modules/<module>.md
+
+  - id: S3
+    name: module-blueprints
+    predecessors: [J2]
+    parallel_nodes: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+    join: J3
+
+  - id: J3
+    name: chapter-contract-freeze
+    owner: curriculum-architect
+    predecessors: [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+
+  - id: S4
+    name: chapter-authoring
+    predecessors: [J3]
+    concurrency_limit: 10
+    output_pattern: modules/<module>/chapters/<chapter>.md
+    join: J4
+
+  - id: S5
+    name: companion-assets
+    predecessors: [J3]
+    parallel_roles: [lab, diagram, exercise, microsoft-mapping]
+    join: J4
+
+  - id: J4
+    name: chapter-integration
+    owner_pattern: chapter-author
+    predecessors: [S4, S5]
+    output_pattern: modules/<module>/manifests/<chapter>.yml
+
+  - id: S6
+    name: independent-review
+    predecessors: [J4]
+    parallel_roles: [pedagogy, technical, lab, security, sre, data, responsible-ai]
+    output_pattern: reviews/<chapter>/<role>.md
+    join: J5
+
+  - id: J5
+    name: module-acceptance
+    owner_pattern: module-lead
+    predecessors: [S6]
+    output_pattern: reviews/modules/<module>-acceptance.md
+
+  - id: S7
+    name: synthesis
+    predecessors: [J5]
+    parallel_nodes: [CH36, CAPSTONE, CROSSREF, GLOSSARY, ACCESSIBILITY, CITATIONS]
+    join: J6
+
+  - id: J6
+    name: github-release-candidate
+    owner: editor-in-chief
+    predecessors: [CH36, CAPSTONE, CROSSREF, GLOSSARY, ACCESSIBILITY, CITATIONS]
+
+  - id: S8
+    name: freshness-and-release
+    owner: release-editor
+    predecessors: [J6]
+    freshness_window_days: 30
+
+research_nodes:
+  R1: foundations-and-academia
+  R2: anthropic
+  R3: openai
+  R4: google-deepmind
+  R5: meta
+  R6: microsoft
+  R7: amazon
+  R8: standards-and-frontier
+  R9: regulation-and-governance
