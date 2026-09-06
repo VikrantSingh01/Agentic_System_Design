@@ -6,9 +6,9 @@ Model workload economics, control latency and capacity, isolate tenants, survive
 
 ## Chapters
 
-33. **Performance and Cost Engineering**
-34. **Multi-Tenant and Multi-Region Design**
-35. **Continuous Improvement**
+33. **[Performance and Cost Engineering](chapters/33-performance-cost-engineering.md)**
+34. **[Multi-Tenant and Multi-Region Design](chapters/34-multi-tenant-multi-region-design.md)**
+35. **[Continuous Improvement](chapters/35-continuous-improvement.md)**
 
 ## Northstar milestone
 
