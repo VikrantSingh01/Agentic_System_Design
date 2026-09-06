@@ -74,7 +74,7 @@ flowchart LR
 tenant context, while administrators enter through a separate authorization
 path and can perform only scoped operations.
 
-**Equivalent text description:**
+**Step by step:** Follow tenant context from identity through every shared boundary.
 
 1. Tenant A and Tenant B enter through authenticated identities.
 2. The application programming interface resolves and checks tenant context.
@@ -100,7 +100,7 @@ flowchart TD
 
 **Takeaway:** spare capacity never overrides residency, policy, identity, or key requirements.
 
-**Equivalent text description:** the router checks whether the region is the
+**Step by step:** The router checks whether the region is the
 tenant's home or approved recovery region, whether residency permits it,
 whether current policy and keys are present, and only then whether health and
 capacity permit admission. A failed governance check denies the route; a
@@ -113,7 +113,9 @@ stateDiagram-v2
     [*] --> Normal
     Normal --> Declared: authorized incident trigger
     Declared --> Fenced: stop primary writes
-    Fenced --> RecoveryActive: policy, keys, data-loss limit checked
+    Fenced --> PositionKnown: establish last replicated position
+    PositionKnown --> FreshnessChecked: calculate and check data-loss limit
+    FreshnessChecked --> RecoveryActive: activate recovery as single writer
     RecoveryActive --> Reconcile: primary restored
     Reconcile --> Failback: conflicts resolved
     Failback --> Closed: evidence accepted
@@ -124,11 +126,12 @@ stateDiagram-v2
 **Takeaway:** recovery proceeds through explicit gates and stops when tenant or
 region invariants cannot be proven.
 
-**Equivalent text description:** normal operation moves to a declared incident
-under named authority. Primary writes are fenced before recovery becomes the
-single writer. Policy, keys, and the data-loss limit are checked. After
-restoration, records are reconciled before failback and closure. Missing policy,
-residency denial, or an invariant violation stops the procedure.
+**Step by step:** Normal operation moves to a declared incident
+under named authority. Primary writes are fenced, the durable replication
+position is established, and freshness is calculated and checked before
+recovery becomes the single writer. After restoration, records are reconciled
+before failback and closure. Missing policy, residency denial, or an invariant
+violation stops the procedure.
 
 ## Vocabulary
 
@@ -216,9 +219,10 @@ Active-active operation is not assumed. Before recovery accepts writes:
 1. declare the incident under named authority;
 2. stop or fence primary writes;
 3. establish queue ownership and the last replicated position;
-4. verify tenant policy, keys, approvals, and dependencies;
-5. make recovery the single writer;
-6. deduplicate redelivered work using durable idempotency records.
+4. calculate freshness from that stable position and enforce the data-loss limit;
+5. verify tenant policy, keys, approvals, and dependencies;
+6. make recovery the single writer only after those checks;
+7. deduplicate redelivered work using durable idempotency records.
 
 An approval bound to old policy, region, payload, or expiry may be stale after
 failover. Revalidate it rather than replaying it.
@@ -279,23 +283,31 @@ class Simulator:
         self.state[(policy.tenant_id, policy.recovery, record)] = (value, written)
         self.trace.append(f"replicate:{policy.tenant_id}:{lag}")
 
-    def failover(self, policy: TenantPolicy, policy_version: int) -> tuple[int, int]:
+    def failover(
+        self, policy: TenantPolicy, policy_version: int, after_freshness_check=None
+    ) -> tuple[int, int]:
         started = self.clock
         if policy_version != policy.version:
             raise PermissionError("stale_policy")
+        self.fenced.add((policy.tenant_id, policy.home))
+        self.trace.append(f"fenced:{policy.tenant_id}:{policy.home}")
         latest = max(
             timestamp for (tenant, region, _), (_, timestamp) in self.state.items()
             if tenant == policy.tenant_id and region == policy.recovery
         )
+        self.trace.append(f"replication_position:{policy.tenant_id}:{latest}")
         observed_data_loss = started - latest
         if observed_data_loss > policy.data_loss_limit:
             raise RuntimeError("data_loss_limit_exceeded")
-        self.fenced.add((policy.tenant_id, policy.home))
+        self.trace.append(f"freshness_checked:{policy.tenant_id}:{observed_data_loss}")
+        if after_freshness_check is not None:
+            after_freshness_check()
         self.clock += 2
-        self.active_writer[policy.tenant_id] = policy.recovery
         observed_rto = self.clock - started
         if observed_rto > policy.rto:
             raise RuntimeError("rto_exceeded")
+        self.active_writer[policy.tenant_id] = policy.recovery
+        self.trace.append(f"recovery_activated:{policy.tenant_id}:{policy.recovery}")
         self.trace.append(f"failover:{policy.tenant_id}")
         return observed_data_loss, observed_rto
 
@@ -318,9 +330,31 @@ assert sim.read("tenant-a", "east", "report-1") == "alpha draft"
 assert sim.read("tenant-b", "west", "report-1") == "beta draft"
 
 sim.replicate(alpha, "report-1", lag=2)
-observed_data_loss, rto = sim.failover(alpha, policy_version=3)
+late_write_blocked = []
+
+
+def try_late_primary_write() -> None:
+    try:
+        sim.write(alpha, "east", "report-1", "late primary value")
+    except PermissionError as error:
+        assert str(error) == "writes_fenced"
+        late_write_blocked.append(True)
+    else:
+        raise AssertionError("late primary write slipped past freshness check")
+
+
+observed_data_loss, rto = sim.failover(
+    alpha, policy_version=3, after_freshness_check=try_late_primary_write
+)
 assert observed_data_loss == 2 and rto == 2
 assert sim.read("tenant-a", "west", "report-1") == "alpha draft"
+assert sim.read("tenant-a", "east", "report-1") == "alpha draft"
+assert late_write_blocked == [True]
+assert sim.trace.index("fenced:tenant-a:east") < sim.trace.index(
+    "replication_position:tenant-a:0"
+) < sim.trace.index("freshness_checked:tenant-a:2") < sim.trace.index(
+    "recovery_activated:tenant-a:west"
+)
 
 # Duplicate delivery produces one consequential effect.
 assert sim.apply_message("tenant-a", "message-9") is True
@@ -343,6 +377,24 @@ Expected output:
 PASS: isolation, residency, data-loss limit, RTO, fencing, and dedupe verified
 ```
 
+## Microsoft implementation
+
+Azure Architecture Center can provide evolving design patterns and regional
+architecture review input for a Microsoft implementation (SRC-045). It does
+not establish that a particular product, region, replication mode, service
+limit, or recovery target meets Northstar's requirements. Those claims are
+volatile and require current product evidence and a measured game day. The
+required lab remains vendor-neutral and uses no SDK.
+
+## How leading teams approach it
+
+Azure Architecture Center publishes current cloud architecture guidance that
+can inform deployment-stamp and regional design reviews (SRC-045). *Designing
+Data-Intensive Applications* explains durable tradeoffs among partitioning,
+replication, consistency, and failure recovery (SRC-072). This chapter combines
+those inputs into a Northstar-specific policy and test plan; neither source
+proves isolation or recovery for this system.
+
 ## Failure lab
 
 | Seeded failure | Evidence | Containment or recovery |
@@ -352,6 +404,7 @@ PASS: isolation, residency, data-loss limit, RTO, fencing, and dedupe verified
 | Shared quota | A hot tenant consumes all concurrency. | Enforce per-tenant admission and measure other-tenant latency. |
 | Stale recovery policy | Recovery route has an old policy version. | Fail closed until the required version is verified. |
 | Replication beyond data-loss limit | Recovery copy timestamp is too old. | Stop failover or enter an approved data-loss procedure. |
+| Late primary write | A write races after the freshness check and makes the checked position stale. | Fence before establishing position; keep the fence through recovery activation. |
 | Duplicate queue delivery | One message creates two effects. | Use tenant-scoped durable idempotency records. |
 | Stale approval | Approval binds the old region or policy. | Revalidate exact payload, region, policy, identity, and expiry. |
 | Residency violation | Router selects spare but prohibited capacity. | Deny before health and capacity selection. |
@@ -389,24 +442,6 @@ evidence for tested cases, not proof of universal isolation.
 Record sample size, topology, policy versions, replication schedule, outage
 time, and assumptions. A recovery exercise that meets RTO by violating
 residency or tenant isolation fails.
-
-## Microsoft implementation
-
-Azure Architecture Center can provide evolving design patterns and regional
-architecture review input for a Microsoft implementation (SRC-045). It does
-not establish that a particular product, region, replication mode, service
-limit, or recovery target meets Northstar's requirements. Those claims are
-volatile and require current product evidence and a measured game day. The
-required lab remains vendor-neutral and uses no SDK.
-
-## How leading teams approach it
-
-Azure Architecture Center publishes current cloud architecture guidance that
-can inform deployment-stamp and regional design reviews (SRC-045). *Designing
-Data-Intensive Applications* explains durable tradeoffs among partitioning,
-replication, consistency, and failure recovery (SRC-072). This chapter combines
-those inputs into a Northstar-specific policy and test plan; neither source
-proves isolation or recovery for this system.
 
 ## Production checklist
 
@@ -455,6 +490,17 @@ Shared code can omit a predicate, cache globally, charge the wrong quota, or
 expose telemetry. Isolation is an end-to-end invariant enforced and tested at
 every data and control boundary.
 
+## Recap and next step
+
+- Tenant identity must survive every data and control boundary.
+- Isolation tiers are evidence-based choices, not labels.
+- Region routing checks residency, policy, keys, health, and capacity in order.
+- Failover needs fencing, one writer, a measured data-loss limit and RTO, and dedupe.
+- Failback requires reconciliation and another ownership transfer.
+
+Chapter 35 preserves these tenant and region rules while models, prompts,
+indexes, schemas, and other components change or retire.
+
 ## Design exercise
 
 Choose an isolation tier for three fictional tenants: one small internal team,
@@ -477,17 +523,6 @@ tenant-partitioned cache, synthetic queue ownership, stale approval, and
 deterministic failback. Produce `tenant_region_policy.json`, a boundary matrix,
 an isolation-tier decision, expected trace, and game-day report in a temporary
 practice directory. Cleanup is deletion of that synthetic directory.
-
-## Recap and next step
-
-- Tenant identity must survive every data and control boundary.
-- Isolation tiers are evidence-based choices, not labels.
-- Region routing checks residency, policy, keys, health, and capacity in order.
-- Failover needs fencing, one writer, a measured data-loss limit and RTO, and dedupe.
-- Failback requires reconciliation and another ownership transfer.
-
-Chapter 35 preserves these tenant and region rules while models, prompts,
-indexes, schemas, and other components change or retire.
 
 ## Sources
 

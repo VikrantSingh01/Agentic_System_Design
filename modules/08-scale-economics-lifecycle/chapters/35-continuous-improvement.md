@@ -62,29 +62,33 @@ flowchart LR
     P[Production outcome] --> S[Minimized approved sample]
     S --> E[(Evaluation store)]
     E --> A[Slice analysis]
-    A --> D{Meaningful drift?}
+    A --> H{Hard safety or invariant violation?}
+    H -->|yes| K[Kill candidate]
+    K --> I[Open incident]
+    I --> R[Roll back]
+    H -->|no| D{Meaningful drift?}
     D -->|no| M[Continue monitoring]
     D -->|yes| G[Human or policy gate]
     G -->|approve experiment| C[Candidate change]
     G -->|reject| M
     S --> X[Retention deletion]
-    A -->|safety violation| I[Incident path]
 ```
 
-**Takeaway:** purpose and privacy controls come before analysis, while drift
-can lead to an approved experiment or rejection; safety violations go directly
-from analysis to incident handling.
+**Takeaway:** purpose and privacy controls come before analysis. Hard safety
+and invariant violations bypass scores and go directly through kill, incident,
+and rollback; ordinary drift can lead to explicit approval or rejection.
 
-**Equivalent text description:**
+**Step by step:** Follow approved feedback through hard gates before ordinary drift decisions.
 
 1. Production produces observable outcomes.
 2. Only approved, minimized samples enter a separate evaluation store.
 3. Analysis compares declared tenant, region, and task slices with a baseline.
-4. No meaningful drift continues monitoring.
-5. Meaningful drift reaches a human or policy gate, which explicitly approves a
+4. A hard safety or invariant violation immediately kills the candidate, opens
+   an incident, and rolls back; an aggregate score cannot hide it.
+5. No meaningful drift continues monitoring.
+6. Meaningful drift reaches a human or policy gate, which explicitly approves a
    candidate experiment or rejects it and continues monitoring.
-6. Analysis sends safety violations directly to incident handling, while
-   retained samples reach deletion.
+7. Retained samples reach deletion.
 
 ### Migration engineering deep dive: a gated state machine
 
@@ -95,8 +99,11 @@ stateDiagram-v2
     Shadowing --> Canary: outcome gates pass
     Shadowing --> Failed: candidate fails
     Canary --> Paused: warning threshold
-    Canary --> RollingBack: regression or kill switch
-    Canary --> Expanding: all gates pass
+    Canary --> Killing: hard safety or invariant gate fails
+    Killing --> Incident: candidate disabled
+    Incident --> RollingBack: incident recorded
+    Canary --> RollingBack: ordinary gate rejects
+    Canary --> Expanding: gate explicitly approves
     Paused --> Canary: approved resume
     Paused --> RollingBack: reject
     RollingBack --> Failed: baseline restored
@@ -108,7 +115,7 @@ stateDiagram-v2
 **Takeaway:** every transition requires evidence, and rollback remains possible
 until destructive cleanup intentionally closes its window.
 
-**Equivalent text description:** a proposal enters privacy and compatibility
+**Step by step:** A proposal enters privacy and compatibility
 checks before shadowing. A successful shadow can become a small canary. Warning
 signals pause it; regression or a kill switch rolls it back. Passing canaries
 expand, complete and verify backfill, stop old writes, deprecate the old
@@ -130,7 +137,7 @@ flowchart TD
 
 **Takeaway:** rollback works only when the chosen versions and stored state are compatible.
 
-**Equivalent text description:** the candidate model depends on a candidate
+**Step by step:** The candidate model depends on a candidate
 prompt, evaluator, connector, index, schema, and checkpoint representation. The
 baseline model follows its own prompt but may share the index. Each edge is a
 tested compatibility claim, so changing one node can invalidate rollout or rollback.
@@ -210,9 +217,12 @@ signals, Chapter 33 cost and latency, and Chapter 34 tenant and region rules.
 Error budgets may control rollout speed, but they never authorize a safety,
 privacy, approval, or isolation violation.
 
-Pause on ambiguous warnings. Roll back on a declared regression. Invoke the
-kill switch on an invariant violation under named authority. Record typed
-decisions and outcomes, not private model reasoning.
+Represent those checks as separate, structured gate outcomes. Evaluate hard
+safety and invariant gates before quality or an aggregate score. Pause on
+ambiguous warnings and explicitly approve or reject ordinary outcomes. A hard
+failure immediately invokes the kill switch, opens an incident, and rolls back
+under named authority. Record typed decisions and outcomes, not private model
+reasoning.
 
 ### Expand, backfill, contract
 
@@ -246,10 +256,38 @@ class Stage(str, Enum):
     PROPOSED = "proposed"
     SHADOWING = "shadowing"
     CANARY = "canary"
+    EXPANDING = "expanding"
     ROLLING_BACK = "rolling_back"
     FAILED = "failed"
     DEPRECATED = "deprecated"
     RETIRED = "retired"
+
+
+class GateDecision(str, Enum):
+    APPROVE = "approve"
+    REJECT = "reject"
+    INCIDENT = "incident"
+
+
+@dataclass(frozen=True)
+class GateResults:
+    quality_score: float
+    quality_minimum: float
+    safety_pass: bool
+    invariants_pass: bool
+    reliability_pass: bool
+    latency_pass: bool
+    cost_pass: bool
+    tenant_region_pass: bool
+
+    def ordinary_gates_pass(self) -> bool:
+        return (
+            self.quality_score >= self.quality_minimum
+            and self.reliability_pass
+            and self.latency_pass
+            and self.cost_pass
+            and self.tenant_region_pass
+        )
 
 
 @dataclass
@@ -286,22 +324,47 @@ class Controller:
         self.trace.append(f"shadow_score:{result:.2f}")
         return result
 
-    def start_canary(self, shadow_score: float, gate: float) -> None:
-        if shadow_score < gate:
-            raise RuntimeError("shadow_gate_failed")
+    def start_canary(self, gates: GateResults) -> GateDecision:
+        decision = self._gate_decision(gates, "shadow")
+        if decision != GateDecision.APPROVE:
+            return decision
         self.candidate.routed = True
         self.candidate.credential = True
         self.stage = Stage.CANARY
         self.trace.append("canary_started:tenant-a:west")
+        return decision
 
-    def canary_result(self, score: float, gate: float) -> None:
-        if score < gate:
-            self.stage = Stage.ROLLING_BACK
+    def canary_result(self, gates: GateResults) -> GateDecision:
+        decision = self._gate_decision(gates, "canary")
+        if decision == GateDecision.APPROVE:
+            self.stage = Stage.EXPANDING
+        elif decision == GateDecision.REJECT:
+            self._rollback()
+        return decision
+
+    def _gate_decision(self, gates: GateResults, phase: str) -> GateDecision:
+        # Hard gates are checked first and never folded into the quality score.
+        if not gates.safety_pass or not gates.invariants_pass:
+            self.trace.append("kill:candidate")
             self.candidate.routed = False
             self.candidate.credential = False
-            self.baseline.routed = True
-            self.stage = Stage.FAILED
-            self.trace.append("rollback_complete")
+            self.trace.append("incident:opened")
+            self._rollback()
+            self.trace.append(f"gate_incident:{phase}")
+            return GateDecision.INCIDENT
+        if not gates.ordinary_gates_pass():
+            self.trace.append(f"gate_reject:{phase}")
+            return GateDecision.REJECT
+        self.trace.append(f"gate_approve:{phase}")
+        return GateDecision.APPROVE
+
+    def _rollback(self) -> None:
+        self.stage = Stage.ROLLING_BACK
+        self.candidate.routed = False
+        self.candidate.credential = False
+        self.baseline.routed = True
+        self.stage = Stage.FAILED
+        self.trace.append("rollback_complete")
 
     def retire(self, component: Component) -> None:
         if component.routed or component.credential:
@@ -328,26 +391,69 @@ assert change < -0.05
 controller.start_shadow("prompt-4", privacy_approved=True)
 shadow_score = controller.shadow((0.91, 0.90, 0.89))
 assert controller.effects == []
-controller.start_canary(shadow_score, gate=0.85)
+passing = GateResults(shadow_score, 0.85, True, True, True, True, True, True)
+assert controller.start_canary(passing) == GateDecision.APPROVE
+assert "gate_approve:shadow" in controller.trace
 
-# The tenant-region canary regresses and is rolled back.
-controller.canary_result(score=0.72, gate=0.85)
+# Regression test: excellent aggregate quality cannot hide a safety incident.
+safety_incident = GateResults(0.99, 0.85, False, True, True, True, True, True)
+assert controller.canary_result(safety_incident) == GateDecision.INCIDENT
 assert controller.stage == Stage.FAILED
 assert old.routed is True and new.routed is False
 assert new.credential is False
+kill = controller.trace.index("kill:candidate")
+incident = controller.trace.index("incident:opened")
+rollback = controller.trace.index("rollback_complete")
+assert kill < incident < rollback
+
+# Ordinary gates also expose explicit reject and approve outcomes.
+rejecting_controller = Controller(old, Component("report-model", "2b", "prompt-4"))
+rejecting_controller.start_shadow("prompt-4", privacy_approved=True)
+ordinary_reject = GateResults(0.72, 0.85, True, True, True, True, True, True)
+assert rejecting_controller.start_canary(ordinary_reject) == GateDecision.REJECT
+assert rejecting_controller.candidate.routed is False
+
+approving_controller = Controller(old, Component("report-model", "2c", "prompt-4"))
+approving_controller.start_shadow("prompt-4", privacy_approved=True)
+assert approving_controller.start_canary(passing) == GateDecision.APPROVE
+assert approving_controller.canary_result(passing) == GateDecision.APPROVE
+assert approving_controller.stage == Stage.EXPANDING
 
 # A never-routed candidate can be retired after cleanup proof.
 controller.retire(new)
 assert new.status == "retired"
 assert new.routed is False and new.credential is False
-print("PASS: drift, shadow isolation, rollback, and retirement verified")
+print("PASS: drift, hard gates, explicit decisions, rollback, and retirement verified")
 ```
 
 Expected output:
 
 ```text
-PASS: drift, shadow isolation, rollback, and retirement verified
+PASS: drift, hard gates, explicit decisions, rollback, and retirement verified
 ```
+
+## Microsoft implementation
+
+This chapter does not select a Microsoft product. Its frozen sources contain no
+approved claim-level Microsoft product mapping for lifecycle orchestration,
+registries, or migration SDKs. Chapter 36 owns final Microsoft synthesis.
+Product names, APIs, regional support, quotas, and data handling must not be
+asserted without an approved ledger entry and current verification. The domain
+registry and migration state machine remain replaceable and vendor-neutral.
+
+## How leading teams approach it
+
+Sutton and Barto describe policies, rewards, and feedback from environment
+interaction (SRC-012). This chapter distinguishes those learning concepts from
+automatic online learning: Northstar uses governed production change.
+
+Site Reliability Engineering provides durable principles for service levels,
+monitoring, automation, incidents, and error budgets (SRC-028). ISO/IEC 42001
+offers evolving AI management-system requirements as governance input, not a
+compliance declaration (SRC-064). *Hidden Technical Debt in Machine Learning
+Systems* documents hidden dependencies and surrounding system risks
+(SRC-070). The state machine here is a Northstar engineering synthesis, not a
+workflow prescribed by any one source.
 
 ## Failure lab
 
@@ -361,6 +467,7 @@ PASS: drift, shadow isolation, rollback, and retirement verified
 | Checkpoint mismatch | New runtime cannot decode durable state. | Keep compatible reader or roll back before migration. |
 | Late rollback | Old representation was destructively removed. | Use restoration plan; do not claim instant rollback. |
 | Region mismatch | Candidate policy differs in recovery region. | Stop rollout and restore approved regional policy. |
+| Safety hidden by average | A high quality score accompanies a failed hard safety gate. | Kill, open an incident, and roll back before considering ordinary gates. |
 | Retired traffic | Route, job, or credential still reaches old version. | Kill route, revoke credential, investigate, and repeat cleanup proof. |
 
 To reproduce incompatibility, call `start_shadow("prompt-3", True)`. The
@@ -370,11 +477,12 @@ retirement, set `new.credential = True` before `retire`; the expected result is
 
 ## Security and safety testing
 
-The lab proves that shadow evaluation cannot append to `effects`, a regressed
-canary removes candidate routing and credentials, and retirement refuses a
-component with live access. Extend the suite with synthetic secret markers and
-assert they never enter feedback storage or traces. Verify tenant and region
-on every sample, route, registry record, and migration job.
+The lab proves that shadow evaluation cannot append to `effects`, a hard safety
+failure cannot hide inside a high score, kill precedes incident and rollback,
+ordinary gates expose approve or reject, and retirement refuses a component
+with live access. Extend the suite with synthetic secret markers and assert they
+never enter feedback storage or traces. Verify tenant and region on every
+sample, route, registry record, and migration job.
 
 Expected blocked or contained results are explicit exceptions, zero shadow
 effects, restored baseline routing, no cross-tenant sample, and no traffic or
@@ -399,29 +507,6 @@ A monitor alert alone is not improvement evidence. Compare the controlled
 candidate with the deterministic baseline and current production version. Use
 both statistical and practical thresholds, inspect delayed labels, and require
 qualified human review for consequential judgments.
-
-## Microsoft implementation
-
-This chapter does not select a Microsoft product. Its frozen sources contain no
-approved claim-level Microsoft product mapping for lifecycle orchestration,
-registries, or migration SDKs. Chapter 36 owns final Microsoft synthesis.
-Product names, APIs, regional support, quotas, and data handling must not be
-asserted without an approved ledger entry and current verification. The domain
-registry and migration state machine remain replaceable and vendor-neutral.
-
-## How leading teams approach it
-
-Sutton and Barto describe policies, rewards, and feedback from environment
-interaction (SRC-012). This chapter distinguishes those learning concepts from
-automatic online learning: Northstar uses governed production change.
-
-Site Reliability Engineering provides durable principles for service levels,
-monitoring, automation, incidents, and error budgets (SRC-028). ISO/IEC 42001
-offers evolving AI management-system requirements as governance input, not a
-compliance declaration (SRC-064). *Hidden Technical Debt in Machine Learning
-Systems* documents hidden dependencies and surrounding system risks
-(SRC-070). The state machine here is a Northstar engineering synthesis, not a
-workflow prescribed by any one source.
 
 ## Production checklist
 
@@ -471,6 +556,18 @@ Feedback can be sensitive, biased, incomplete, delayed, or collected for a
 different purpose. Govern collection and reuse, evaluate representative slices,
 and test a candidate behind privacy, compatibility, outcome, and rollback gates.
 
+## Recap and next step
+
+- Feedback needs purpose, minimization, representation, access, and deletion controls.
+- Drift starts investigation; it does not prove a candidate is better.
+- Compatibility and rollback are properties of a version graph, not one model.
+- Shadowing has no user-visible or consequential effects.
+- Migration and retirement require measurable gates and complete cleanup proof.
+
+Module 08 now supplies workload economics, tenant and region boundaries, and a
+controlled component lifecycle. Chapter 36 can map those requirements to
+Microsoft targets without changing the vendor-neutral contracts.
+
 ## Design exercise
 
 Northstar must migrate `index-v4/schema-v2` to `index-v5/schema-v3` while
@@ -496,18 +593,6 @@ successful candidate after the seeded failed one. Produce
 specification, drift-monitor catalog, change record, expected traces, and
 retirement checklist in a temporary practice directory. Cleanup is deletion of
 that synthetic directory.
-
-## Recap and next step
-
-- Feedback needs purpose, minimization, representation, access, and deletion controls.
-- Drift starts investigation; it does not prove a candidate is better.
-- Compatibility and rollback are properties of a version graph, not one model.
-- Shadowing has no user-visible or consequential effects.
-- Migration and retirement require measurable gates and complete cleanup proof.
-
-Module 08 now supplies workload economics, tenant and region boundaries, and a
-controlled component lifecycle. Chapter 36 can map those requirements to
-Microsoft targets without changing the vendor-neutral contracts.
 
 ## Sources
 

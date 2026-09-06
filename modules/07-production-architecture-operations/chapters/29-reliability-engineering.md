@@ -34,25 +34,26 @@ flowchart LR
 
 **Takeaway:** overload is controlled before all work becomes slow or fails.
 
-**Equivalent text description:** normal traffic receives full service; rising load triggers
+**Step by step:** normal traffic receives full service; rising load triggers
 backpressure; exhausted capacity causes explicit rejection or a labeled reduced mode.
 
 ```mermaid
 flowchart TD
-    E[Typed error] --> D{Deadline remains?}
-    D -->|no| S[Stop]
-    D -->|yes| I{Operation idempotent?}
-    I -->|no| Q[Reconcile outcome]
-    I -->|yes| T{Transient and budget remains?}
-    T -->|no| S
-    T -->|yes| J[Backoff plus seeded jitter]
+    E[Typed outcome] --> A{Explicitly allowlisted transient?}
+    A -->|no| P{Documented reconciliation path?}
+    P -->|no| S[Stop]
+    P -->|yes| Q[Query authoritative state]
+    A -->|yes| I{Idempotent, deadline and budget remain?}
+    I -->|no| S
+    I -->|yes| J[Backoff plus seeded jitter]
     J --> X[Retry]
 ```
 
 **Takeaway:** retry is a budgeted decision, not a default response to failure.
 
-**Equivalent text description:** classify the error, check deadline and idempotency, reconcile
-unknown effects, retry only transient errors within budget, and stop otherwise.
+**Step by step:** classify the outcome against an explicit transient allowlist.
+Only an idempotent operation with deadline and budget remaining may retry. Every other outcome
+stops unless a documented reconciliation path queries authoritative state before another effect.
 
 ```mermaid
 stateDiagram-v2
@@ -65,7 +66,7 @@ stateDiagram-v2
 
 **Takeaway:** a circuit breaker pauses calls and uses a limited probe before recovery.
 
-**Equivalent text description:** calls flow while closed; repeated failure opens the breaker;
+**Step by step:** calls flow while closed; repeated failure opens the breaker;
 after a delay one half-open probe runs; success closes it and failure opens it again.
 
 ## Vocabulary
@@ -85,9 +86,12 @@ after a delay one half-open probe runs; success closes it and failure opens it a
 ## How it works
 
 Set an end-to-end deadline, then allocate dependency timeouts inside it. Classify errors as
-transient, persistent, overload, caller defect, policy denial, conflict, or unknown. Retry
-only declared transient failures when the operation is idempotent and attempt, elapsed-time,
-and budget limits remain. Policy denials and invalid requests are terminal.
+transient, persistent, overload, caller defect, policy denial, conflict, or unknown. Retry only
+an explicit allowlist of declared transient failures when the operation is idempotent and
+attempt, elapsed-time, and budget limits remain. Persistent failures, overload, conflicts,
+invalid requests, policy denials, unknown outcomes, and unrecognized classifications stop.
+A stopped outcome may enter a separately documented reconciliation path; reconciliation is not
+a retry and must query authoritative state before any new effect.
 
 Scope breakers and bulkheads to the dependency and failure domain. Apply queue limits and
 per-tenant concurrency before saturation. A fallback must preserve authorization,
@@ -111,6 +115,10 @@ ratify them. Error budget never permits an authorization or tenant-isolation vio
 from dataclasses import dataclass
 from random import Random
 
+RETRYABLE = frozenset({"timeout", "connection_reset", "temporarily_unavailable"})
+STOP = frozenset({"persistent", "overload", "conflict", "invalid",
+                  "policy_denied", "unknown"})
+
 
 @dataclass(frozen=True)
 class Policy:
@@ -119,7 +127,12 @@ class Policy:
     base_delay: int = 2
 
 
-def run(outcomes: tuple[str, ...], key: str, receipts: set[str]) -> tuple[str, list[int]]:
+def run(
+    outcomes: tuple[str, ...],
+    key: str,
+    receipts: set[str],
+    reconciliation_paths: frozenset[str] = frozenset(),
+) -> tuple[str, list[int]]:
     if key in receipts:
         return "duplicate_suppressed", []
     clock, delays = 0, []
@@ -128,7 +141,9 @@ def run(outcomes: tuple[str, ...], key: str, receipts: set[str]) -> tuple[str, l
         if outcome == "ok":
             receipts.add(key)
             return "completed", delays
-        if outcome in {"policy_denied", "invalid"}:
+        if outcome in STOP or outcome not in RETRYABLE:
+            if outcome in reconciliation_paths:
+                return "reconcile", delays
             return "terminal", delays
         delay = Policy().base_delay * 2 ** (attempt - 1) + random.randrange(2)
         if clock + delay >= Policy().deadline:
@@ -141,7 +156,12 @@ def run(outcomes: tuple[str, ...], key: str, receipts: set[str]) -> tuple[str, l
 receipts: set[str] = set()
 assert run(("timeout", "timeout", "ok"), "publish-1", receipts) == ("completed", [3, 4])
 assert run(("ok",), "publish-1", receipts)[0] == "duplicate_suppressed"
-assert run(("policy_denied",), "publish-2", receipts)[0] == "terminal"
+for terminal in (*sorted(STOP), "new_unclassified_failure"):
+    # Regression: the old code retried every outcome except denial and invalid.
+    assert run((terminal, "ok"), f"stop-{terminal}", receipts) == ("terminal", [])
+assert run(("unknown",), "publish-2", receipts, frozenset({"unknown"})) == (
+    "reconcile", []
+)
 print("PASS: bounded retry, terminal stop, and deduplication")
 ```
 

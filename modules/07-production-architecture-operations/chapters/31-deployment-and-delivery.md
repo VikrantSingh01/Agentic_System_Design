@@ -36,15 +36,18 @@ flowchart LR
 
 **Takeaway:** expose a change narrowly and promote only from measured user outcomes.
 
-**Equivalent text description:** keep an accepted version, send a controlled slice to the
+**Step by step:** keep an accepted version, send a controlled slice to the
 canary, compare required measures, widen only on acceptance, and return traffic on breach.
 
 ```mermaid
 flowchart LR
     S[Source] --> B[Isolated build]
     B --> P[Immutable artifact and provenance]
-    P --> T[Test, evaluation, security, privacy]
-    T --> D[Development]
+    P --> H{Named hard invariants}
+    H -->|any fail| X[Block promotion]
+    H -->|all pass| T[Aggregate soft quality measures]
+    T -->|below threshold| X
+    T -->|passes| D[Development]
     D --> Q[Test stage]
     Q --> C[Production-like canary]
     C --> F[Full release]
@@ -52,9 +55,10 @@ flowchart LR
 
 **Takeaway:** build once, attach evidence, and promote the same identified artifact.
 
-**Equivalent text description:** source enters an isolated build; one immutable artifact gets
-provenance; required gates run; the same digest moves through development, test, canary, and
-full release.
+**Step by step:** source enters an isolated build; one immutable artifact gets
+provenance. Safety, security, privacy, redaction, compatibility, operations, and authorization
+must each pass. Only then may soft quality measures aggregate. The same digest moves through
+development, test, canary, and full release only when both stages pass.
 
 ```mermaid
 flowchart TD
@@ -70,7 +74,7 @@ flowchart TD
 
 **Takeaway:** rollback is a compatibility procedure, not merely changing a traffic pointer.
 
-**Equivalent text description:** detect a breach, stop expansion, classify state
+**Step by step:** detect a breach, stop expansion, classify state
 compatibility, route back when safe or pause work and repair compatibility, verify recovery,
 then preserve the decision record.
 
@@ -99,10 +103,13 @@ network, data, telemetry, and policy boundaries and receive review.
 
 ## Engineering deep dive
 
-Promotion gates cover deterministic tests, representative evaluation, security, privacy,
-data compatibility, operational readiness, and authorized approval. A canary states its
+Promotion gates cover deterministic tests and representative evaluation plus named hard
+invariants for safety, security, privacy, redaction, data compatibility, operational readiness,
+and authorized approval. Every hard invariant is evaluated separately; one failure blocks
+promotion and cannot be hidden by averaging it with passing checks. A canary states its
 hypothesis, population, minimum evidence, thresholds, comparison method, and automatic stop.
-Missing telemetry or failed redaction blocks promotion.
+Soft quality measures such as task success and latency may aggregate only after every hard gate
+passes. Missing telemetry or failed redaction blocks promotion.
 
 Define old-worker and in-flight-run behavior for every event, checkpoint, API, prompt, model,
 policy, and schema version. Some changes roll back; others need expand-and-contract,
@@ -128,23 +135,53 @@ class Release:
         return sha256(self.payload).hexdigest()
 
 
+@dataclass(frozen=True)
+class HardInvariants:
+    safety: bool
+    security: bool
+    privacy: bool
+    redaction: bool
+    compatibility: bool
+    operations: bool
+    authorization: bool
+
+    def failed(self) -> tuple[str, ...]:
+        return tuple(name for name, passed in self.__dict__.items() if not passed)
+
+    def all_pass(self) -> bool:
+        return not self.failed()
+
+
 REQUIRED = {"tests", "evaluation", "security", "privacy", "operations"}
 
 
-def promote(accepted: Release, canary: Release, outcomes: tuple[bool, ...]) -> Release:
+def promote(
+    accepted: Release,
+    canary: Release,
+    hard: HardInvariants,
+    soft_quality: tuple[float, ...],
+) -> Release:
     assert REQUIRED <= set(canary.gates)
     assert 1 in canary.checkpoint_readers
-    assert len(outcomes) >= 4
-    if sum(outcomes) / len(outcomes) < 0.85:
+    if not hard.all_pass():
+        return accepted
+    assert len(soft_quality) >= 4
+    if sum(soft_quality) / len(soft_quality) < 0.85:
         return accepted
     return canary
 
 
 accepted = Release("1", b"accepted", (1,), tuple(sorted(REQUIRED)))
 canary = Release("2", b"candidate", (1, 2), tuple(sorted(REQUIRED)))
-result = promote(accepted, canary, (True, False, False, True))
+failed_safety = HardInvariants(False, True, True, True, True, True, True)
+# Regression: six passing booleans once averaged above 0.85 and hid failed safety.
+assert sum(failed_safety.__dict__.values()) / 7 > 0.85
+assert failed_safety.failed() == ("safety",)
+result = promote(accepted, canary, failed_safety, (1.0, 1.0, 1.0, 1.0))
 assert result.digest == accepted.digest
-print("PASS: seeded canary regression rolled back to compatible artifact")
+passing = HardInvariants(True, True, True, True, True, True, True)
+assert promote(accepted, canary, passing, (0.9, 0.9, 0.9, 0.9)) == canary
+print("PASS: hard invariants block independently before soft quality aggregation")
 ```
 
 This Python 3.11 simulation is deterministic, creates no service, and uses no secret.
@@ -171,16 +208,19 @@ minimum evidence, and explicit compatibility handling.
 
 ## Security and safety testing
 
-Seed a credential-like marker in configuration and omit the privacy gate. Expected result:
-the build or promotion fails before canary traffic. Evidence records the rule and artifact
-digest, never the synthetic marker value.
+Seed a credential-like marker in configuration and omit the privacy gate. Also run a candidate
+with six passing hard invariants and failed safety. Expected result: each candidate fails before
+canary traffic regardless of aggregate soft quality. Evidence names the failed invariant and
+artifact digest, never the synthetic marker value.
 
 ## Evaluation
 
-Require reproducible digest, complete provenance and gates, zero incompatible resume in the
-fixture matrix, seeded-regression detection, false-promotion rate within the declared bound,
-logical rollback within candidate RTO, and 100% resumable or safely paused durable runs.
-Quality, safety, latency, cost, RPO, and RTO targets remain candidate until measured.
+Require reproducible digest, complete provenance and gates, zero promotion with any failed hard
+invariant, zero incompatible resume in the fixture matrix, seeded-regression detection,
+false-promotion rate within the declared bound, logical rollback within candidate RTO, and 100%
+resumable or safely paused durable runs. Soft quality, latency, and cost may aggregate only after
+hard safety, security, privacy, redaction, compatibility, operations, and authorization pass.
+RPO and RTO targets remain candidate until measured.
 
 ## Production checklist
 

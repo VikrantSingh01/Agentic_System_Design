@@ -72,7 +72,8 @@ flowchart LR
     T --> TC
     S --> TC
     O --> TC
-    C[Retries and idle capacity] --> TC
+    C[Retry cost] --> TC
+    F[Fixed and idle capacity cost] --> TC
     O --> E{Quality and safety gates}
     E -->|pass| Y[Accepted count]
     E -->|fail| N[Rejected report]
@@ -83,11 +84,11 @@ flowchart LR
 **Takeaway:** total cost, including retries and idle capacity, is divided by the
 count of reports that pass the quality and safety gates.
 
-**Equivalent text description:**
+**Step by step:** Follow the cost from admission to the accepted-report denominator.
 
 1. Admission starts one report and records its scope.
-2. Model, retrieval, tool, state, telemetry, retries, and reserved or idle
-   capacity all feed the total-cost numerator.
+2. Model, retrieval, tool, state, telemetry, retry, fixed, and idle-capacity
+   costs all feed the total-cost numerator.
 3. Quality and safety evaluation classifies the report.
 4. Only a passing report increases the accepted-count denominator.
 5. Dividing total cost by accepted count produces cost per accepted report.
@@ -109,7 +110,7 @@ flowchart LR
 **Takeaway:** bounded admission turns overload into an explicit decision rather
 than unbounded waiting or accidental spending.
 
-**Equivalent text description:**
+**Step by step:** Follow each arrival through admission, waiting, service, and outcome.
 
 1. Requests reach an admission gate.
 2. The gate rejects work that exceeds quota or budget and records why.
@@ -136,7 +137,7 @@ flowchart TD
 **Takeaway:** an optimization is optional until the same controlled fixture
 shows an improvement without crossing another threshold.
 
-**Equivalent text description:** the baseline and each candidate run the same
+**Step by step:** The baseline and each candidate run the same
 fixture. Their quality, 95th-percentile latency, quota behavior, and cost per
 accepted report are checked. A candidate is adopted only when every gate passes
 and the declared objective improves; otherwise it is rejected.
@@ -181,11 +182,11 @@ minimized and aggregated without retaining private content.
 ### Attribute the complete cost
 
 For a run, sum model input and output, retrieval, tools, state, telemetry,
-networking assumptions, retries, and allocated idle or reserved capacity:
+retries, fixed charges, and allocated idle or reserved capacity:
 
 $$
 C_{accepted} =
-\frac{C_{model}+C_{retrieval}+C_{tools}+C_{state}+C_{telemetry}+C_{retry}+C_{idle}}
+\frac{C_{model}+C_{retrieval}+C_{tools}+C_{state}+C_{telemetry}+C_{retry}+C_{fixed}+C_{idle}}
 {N_{accepted}}
 $$
 
@@ -255,6 +256,7 @@ per-tenant quotas, and a hard run budget.
 
 ```python
 from dataclasses import dataclass
+import heapq
 from statistics import median
 
 
@@ -266,19 +268,33 @@ class Task:
     service: int
     quality: float
     model_cost: int
+    retrieval_cost: int
+    tools_cost: int
+    state_cost: int
+    telemetry_cost: int
+    retry_cost: int
+
+    def variable_cost(self) -> int:
+        return (
+            self.model_cost + self.retrieval_cost + self.tools_cost
+            + self.state_cost + self.telemetry_cost + self.retry_cost
+        )
 
 
 TASKS = (
-    Task("a1", "tenant-a", 0, 3, 0.91, 5),
-    Task("b1", "tenant-b", 0, 2, 0.88, 4),
-    Task("a2", "tenant-a", 1, 3, 0.93, 5),
-    Task("a3", "tenant-a", 1, 2, 0.90, 4),
-    Task("b2", "tenant-b", 2, 2, 0.70, 2),
+    Task("a1", "tenant-a", 0, 3, 0.91, 5, 2, 1, 1, 1, 0),
+    Task("b1", "tenant-b", 0, 2, 0.88, 4, 1, 1, 1, 1, 0),
+    Task("a2", "tenant-a", 1, 4, 0.93, 5, 2, 1, 1, 1, 1),
+    Task("a3", "tenant-a", 1, 2, 0.90, 4, 1, 1, 1, 1, 0),
+    Task("b2", "tenant-b", 2, 2, 0.70, 2, 1, 1, 1, 1, 1),
 )
 QUALITY_GATE = 0.85
 TENANT_QUOTA = 2
 QUEUE_LIMIT = 3
-BUDGET = 18
+WORKERS = 2
+FIXED_COST = 3
+IDLE_COST_PER_WORKER_TICK = 1
+BUDGET = 45
 
 
 def percentile(values: list[int], fraction: float) -> int:
@@ -289,47 +305,83 @@ def percentile(values: list[int], fraction: float) -> int:
 
 def simulate(tasks: tuple[Task, ...]) -> dict[str, object]:
     admitted_by_tenant: dict[str, int] = {}
-    queue: list[Task] = []
+    waiting: list[Task] = []
+    running: list[tuple[int, int, Task, int]] = []
     rejected: list[tuple[str, str]] = []
-    spent = 0
-    for task in tasks:
+    cost = {
+        "model": 0, "retrieval": 0, "tools": 0, "state": 0,
+        "telemetry": 0, "retry": 0, "fixed": FIXED_COST, "idle": 0,
+    }
+    committed = FIXED_COST
+    sequence = 0
+    max_waiting_depth = 0
+    busy_ticks = 0
+    latencies: list[int] = []
+    queue_times: list[int] = []
+    completed: list[Task] = []
+
+    def start(task: Task, now: int) -> None:
+        nonlocal sequence, busy_ticks
+        sequence += 1
+        queue_times.append(now - task.arrival)
+        busy_ticks += task.service
+        heapq.heappush(running, (now + task.service, sequence, task, now))
+
+    def complete_until(now: int) -> None:
+        while running and running[0][0] <= now:
+            finished, _, task, _ = heapq.heappop(running)
+            latencies.append(finished - task.arrival)
+            completed.append(task)
+            if waiting:
+                start(waiting.pop(0), finished)
+
+    for task in sorted(tasks, key=lambda item: item.arrival):
+        complete_until(task.arrival)
         used = admitted_by_tenant.get(task.tenant_id, 0)
         if used >= TENANT_QUOTA:
             rejected.append((task.task_id, "tenant_quota"))
-        elif len(queue) >= QUEUE_LIMIT:
+        elif len(waiting) >= QUEUE_LIMIT:
             rejected.append((task.task_id, "queue_full"))
-        elif spent + task.model_cost > BUDGET:
+        elif committed + task.variable_cost() > BUDGET:
             rejected.append((task.task_id, "hard_budget"))
         else:
-            queue.append(task)
-            spent += task.model_cost
+            committed += task.variable_cost()
             admitted_by_tenant[task.tenant_id] = used + 1
+            for name in ("model", "retrieval", "tools", "state", "telemetry", "retry"):
+                cost[name] += getattr(task, f"{name}_cost")
+            if len(running) < WORKERS:
+                start(task, task.arrival)
+            else:
+                waiting.append(task)
+                max_waiting_depth = max(max_waiting_depth, len(waiting))
 
-    clock = 0
-    latencies: list[int] = []
-    queue_times: list[int] = []
-    accepted = 0
-    for task in queue:
-        start = max(clock, task.arrival)
-        queue_times.append(start - task.arrival)
-        clock = start + task.service
-        latencies.append(clock - task.arrival)
-        accepted += task.quality >= QUALITY_GATE
+    while running:
+        complete_until(running[0][0])
+    clock = max(task.arrival + latency for task, latency in zip(completed, latencies))
+    available_worker_ticks = WORKERS * clock
+    cost["idle"] = (available_worker_ticks - busy_ticks) * IDLE_COST_PER_WORKER_TICK
+    total_cost = sum(cost.values())
+    if total_cost > BUDGET:
+        raise RuntimeError("hard budget exceeded")
+    accepted = sum(task.quality >= QUALITY_GATE for task in completed)
 
     if accepted == 0:
         raise ValueError("failed experiment: zero accepted reports")
     return {
         "accepted": accepted,
-        "acceptance_rate": accepted / len(queue),
+        "acceptance_rate": accepted / len(completed),
         "rejected": rejected,
         "p50": median(latencies),
         "p95": percentile(latencies, 0.95),
         "p99": percentile(latencies, 0.99),
         "max_queue_time": max(queue_times),
-        "throughput_per_tick": len(queue) / clock,
-        "saturated": len(queue) == QUEUE_LIMIT,
-        "total_cost": spent,
-        "cost_per_accepted": spent / accepted,
+        "throughput_per_tick": len(completed) / clock,
+        "max_waiting_depth": max_waiting_depth,
+        "worker_utilization": busy_ticks / available_worker_ticks,
+        "saturated": max_waiting_depth == QUEUE_LIMIT,
+        "cost_by_category": cost,
+        "total_cost": total_cost,
+        "cost_per_accepted": total_cost / accepted,
     }
 
 
@@ -337,7 +389,17 @@ report = simulate(TASKS)
 assert report["accepted"] == 3
 assert report["total_cost"] <= BUDGET
 assert ("a3", "tenant_quota") in report["rejected"]
-assert report["p95"] == report["p99"] == 7
+assert report["p95"] == report["p99"] == 5
+assert set(report["cost_by_category"]) == {
+    "model", "retrieval", "tools", "state", "telemetry", "retry", "fixed", "idle"
+}
+assert all(amount > 0 for amount in report["cost_by_category"].values())
+assert report["total_cost"] == sum(report["cost_by_category"].values())
+
+# Four admitted tasks do not imply a three-place waiting queue was saturated.
+assert report["max_waiting_depth"] == 1
+assert report["saturated"] is False
+assert report["worker_utilization"] == 11 / 12
 
 # A cache key without tenant scope is rejected before use.
 def cache_key(tenant_id: str, query: str) -> tuple[str, str]:
@@ -355,6 +417,24 @@ Expected output:
 ```text
 PASS: bounded load, tenant quota, budget, and unit cost verified
 ```
+
+## Microsoft implementation
+
+The design remains vendor-neutral. Azure Well-Architected Framework guidance
+can inform cost and performance review questions for a Microsoft deployment
+(SRC-046). This is evolving guidance, not proof of Northstar capacity or cost.
+Product prices, quotas, limits, regions, SDK behavior, and data handling are
+volatile and must be reverified at release time. The required lab uses no
+Microsoft service or SDK.
+
+## How leading teams approach it
+
+Azure Well-Architected Framework treats performance efficiency and cost
+optimization as workload review concerns rather than isolated model choices
+(SRC-046). The AWS Generative AI Lens likewise supplies evolving workload
+design questions (SRC-052). This chapter interprets those sources as support
+for full-system measurement. Neither source supplies Northstar's measurements
+or selects a provider.
 
 ## Failure lab
 
@@ -400,24 +480,6 @@ Report confidence ranges and sensitivity to arrival rate, service time, price,
 acceptance threshold, and idle-capacity allocation. A cheaper failed report is
 not an improvement.
 
-## Microsoft implementation
-
-The design remains vendor-neutral. Azure Well-Architected Framework guidance
-can inform cost and performance review questions for a Microsoft deployment
-(SRC-046). This is evolving guidance, not proof of Northstar capacity or cost.
-Product prices, quotas, limits, regions, SDK behavior, and data handling are
-volatile and must be reverified at release time. The required lab uses no
-Microsoft service or SDK.
-
-## How leading teams approach it
-
-Azure Well-Architected Framework treats performance efficiency and cost
-optimization as workload review concerns rather than isolated model choices
-(SRC-046). The AWS Generative AI Lens likewise supplies evolving workload
-design questions (SRC-052). This chapter interprets those sources as support
-for full-system measurement. Neither source supplies Northstar's measurements
-or selects a provider.
-
 ## Production checklist
 
 - [ ] Workload classes include units, windows, sources, and confidence.
@@ -462,6 +524,17 @@ A low call price can increase retries, tool use, latency, or rejection. Compare
 full cost per accepted report after quality, safety, reliability, and latency
 gates. The correct recommendation may be the baseline with no optimization.
 
+## Recap and next step
+
+- Capacity means useful work within thresholds, not raw call volume.
+- Cost per accepted report exposes rejected work and retries.
+- Bounded queues, quotas, backpressure, and budgets make overload explicit.
+- Cache, batch, and routing changes must earn adoption through measurement.
+- Tenant dimensions belong in performance, cost, and isolation evidence.
+
+Chapter 34 carries those tenant dimensions into identity, data, quota, region,
+recovery, and administration boundaries.
+
 ## Design exercise
 
 Northstar expects a five-minute burst for three tenants. Choose one of these:
@@ -486,17 +559,6 @@ Run the fenced Python with Python 3.11. Then add one strategy at a time:
 Keep the seed and fixtures fixed. Store `workload.json`, `cost_model.json`,
 `capacity_policy.json`, the metrics report, and expected trace in a temporary
 practice directory. Cleanup is deletion of that synthetic directory.
-
-## Recap and next step
-
-- Capacity means useful work within thresholds, not raw call volume.
-- Cost per accepted report exposes rejected work and retries.
-- Bounded queues, quotas, backpressure, and budgets make overload explicit.
-- Cache, batch, and routing changes must earn adoption through measurement.
-- Tenant dimensions belong in performance, cost, and isolation evidence.
-
-Chapter 34 carries those tenant dimensions into identity, data, quota, region,
-recovery, and administration boundaries.
 
 ## Sources
 
