@@ -4,6 +4,17 @@
 > Owner: unassigned  
 > Last verified: YYYY-MM-DD
 
+**On this page**
+
+- [Understand the idea](#the-problem): problem, objectives, first pass, picture, and vocabulary
+- [Build the mechanism](#how-it-works): how it works, engineering detail, and Python
+- [Apply it](#microsoft-implementation): implementation choices, failures, safety, and evaluation
+- [Practice and continue](#review-questions): review, exercises, lab, recap, and sources
+
+Keep this outline short and grouped by reader intent. Do not repeat all section headings.
+Within each section, state the direct answer or decision first, then add explanation,
+examples, caveats, and optional depth.
+
 ## The problem
 
 Open with a concrete situation that makes the chapter necessary.
@@ -108,3 +119,5 @@ Link to the Python lab, fixtures, expected trace, tests, and cleanup instruction
 ## Sources
 
 List approved source-ledger identifiers and mark volatile claims.
+
+**Navigation:** [Previous: Chapter NN: Title](previous.md) | [Module NN overview](../README.md) | [Next: Chapter NN: Title](next.md)

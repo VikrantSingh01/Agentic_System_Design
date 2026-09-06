@@ -24,8 +24,8 @@ CI, all chapters use consistent review status and ownership metadata, Chapter 36
 in-page outline, and every chapter has previous, module, and next navigation where applicable.
 A repository `CODEOWNERS` file assigns the maintained surface explicitly. Findings 5 and 7
 remain documented maintenance work: review disciplines should gain dedicated artifacts, and
-the synchronized R1-R9 research snapshots should eventually be replaced by one canonical
-storage location.
+the distinct R1-R9 coordination briefs and research dossiers need an explicit relationship
+and canonical-source policy.
 
 ## Evidence summary
 
@@ -37,13 +37,14 @@ storage location.
   of those link only to the same external visuals transcript, not to another chapter.
 - `visuals/agent-system-journey/tests/check_asset_offline.py` executed directly: 6 of 6
   checks reported `PASS`.
-- `research/source-ledger.csv`: 91 rows; freshness classes `durable` (16), `evolving` (24),
-  `volatile` (51); all rows show `accessed_date` of 2026-09-05 or 2026-09-06; all rows
+- `research/source-ledger.csv`: 102 rows; freshness classes `durable` (16), `evolving` (33),
+  `volatile` (53); all rows show `accessed_date` of 2026-09-05 or 2026-09-06; all rows
   `status = approved`.
-- `research/dossiers/R1..R9` compared byte-for-byte against `coordination/agents/research/
-  R1..R9`: identical content in both locations.
-- `.github/workflows/validate.yml` runs exactly two steps:
-  `python scripts/validate_repository.py` and `python -m unittest discover -s tests -v`.
+- `research/dossiers/R1..R9` contain full evidence dossiers, while
+  `coordination/agents/research/R1..R9` contain shorter mission and coordination briefs.
+  They are different artifact classes and must not be deleted as presumed duplicates.
+- `.github/workflows/validate.yml` runs the repository validator, unit tests, and the
+  dependency-free offline animation validator.
 
 ## Findings
 
@@ -136,19 +137,18 @@ surgical fix, and current status.
   into a linked companion document since it is already framed as an appendix.
 - **Status:** open.
 
-### 7. Research briefs are maintained in two places
+### 7. The relationship between research briefs and dossiers is undocumented
 - **Location:** `research/dossiers/R1-foundations-academia.md` … `R9-*.md` and
   `coordination/agents/research/R1-*.md` … `R9-*.md`.
-- **Evidence:** byte-for-byte diff confirms identical content between the two locations
-  for all nine `R*` files. Two supplemental dossiers
-  (`microsoft-agent-delegation.md`, `child-friendly-agent-architecture-animation.md`)
-  exist only under `research/dossiers/`. The validator
-  (`scripts/validate_repository.py`) reads only `coordination/agents/research/`.
-- **Impact:** doubled maintenance surface for the same nine files with no documented sync
-  rule; an edit applied to one copy and not the other would silently diverge undetected.
-- **Fix:** designate one location as canonical (the validator already treats
-  `coordination/agents/research/` as canonical) and remove or symlink the duplicate,
-  updating `research/dossiers/README.md` accordingly.
+- **Evidence:** the coordination files are short mission or assignment briefs, while the
+  research files are substantially longer evidence dossiers. Supplemental dossiers also
+  exist only under `research/dossiers/`. The validator checks the coordination briefs.
+- **Impact:** similar names can lead maintainers to mistake separate inputs and outputs for
+  duplicates, delete evidence, or assume an undocumented synchronization rule.
+- **Fix:** document that `coordination/agents/research/` defines assignments and
+  `research/dossiers/` preserves research outputs. If a canonical-source policy is later
+  adopted, preserve both artifact roles or migrate them explicitly rather than deleting
+  files based on names alone.
 - **Status:** open.
 
 ### 8. In-chapter cross-links are nearly absent
@@ -201,8 +201,8 @@ surgical fix, and current status.
   keyboard controls, forced-colors support, and a full caption transcript.
 - **Link integrity is solid.** Zero genuinely broken relative links were found among the
   82 checked repository-wide.
-- **Source freshness discipline is real.** The 91-row source ledger uses explicit
-  `durable`/`evolving`/`volatile` classes; all 51 volatile-class rows show access dates
+- **Source freshness discipline is real.** The 102-row source ledger uses explicit
+  `durable`/`evolving`/`volatile` classes; all 53 volatile-class rows show access dates
   within the two days preceding this audit, with no detected stale volatile claims.
 - **Contributor-facing vs. reader-facing content is correctly separated.**
   `research/dossiers/README.md:3` explicitly states dossiers are "evidence input, not
@@ -223,8 +223,8 @@ surgical fix, and current status.
    (closes finding 5).
 5. Any chapter exceeding roughly twice the repository's mean word count carries an
    in-page anchor outline (closes finding 6).
-6. Each duplicated asset class has one canonical location, with non-canonical copies
-   removed or symlinked (closes finding 7).
+6. The distinct roles and lifecycle of coordination briefs and research dossiers are
+   documented so neither artifact class is mistaken for a duplicate (closes finding 7).
 7. Every chapter links to its immediate neighboring chapters and its module index
    (closes finding 8).
 8. Every chapter states an owner resolvable to a person, team, or an explicit

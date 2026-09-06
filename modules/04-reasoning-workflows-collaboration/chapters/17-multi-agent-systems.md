@@ -127,7 +127,12 @@ the deterministic fallback.
 Use multiple agents only when work has independently verifiable artifacts, useful
 context isolation, distinct expertise, or genuine parallelism. A worker contract
 names role, input, output schema, allowed tools, source scope, deadline, budget, and
-terminal statuses.
+terminal statuses. A production contract also carries `contract_version`,
+`invocation_id`, `parent_task_id`, expected evidence, cancellation owner, delegation
+depth, prohibited actions, and an idempotency key. That field set is an engineering
+synthesis, not a schema standardized by the papers below. MetaGPT provides bounded
+empirical evidence for role-specific procedures and structured intermediate handovers
+on selected software-engineering tasks (SRC-098).
 
 ### The coordinator's assignment desk
 
@@ -136,7 +141,11 @@ small, inspectable loop:
 
 1. **Discover capabilities.** Read a registry of specialist names, supported task
    types, contract versions, and maximum permissions. Registration advertises ability;
-   it does not grant authority.
+   it does not authenticate the publisher or grant authority. Pin identity,
+   destination, version, expiry, and allowed task type before routing. AgentVerse
+   reports dynamic expert recruitment in its tested framework, not a universal routing
+   guarantee (SRC-097). Chapter 18 applies the versioned A2A Agent Card contract
+   (SRC-092).
 2. **Route narrowly.** Match the task type and constraints to one eligible specialist.
    If no safe match exists, keep the task local or use the simpler workflow.
 3. **Send a typed task.** Include a task ID, bounded goal, input references, result
@@ -145,15 +154,20 @@ small, inspectable loop:
    that assignment, not the entire transcript or unrelated secrets.
 5. **Propagate identity and authority.** Preserve who requested the work and intersect
    their permission with the coordinator's and specialist's limits. A hop may reduce
-   authority, never silently widen it.
+   authority, never silently widen it. Enforce:
+   `child authority = requester ∩ coordinator ∩ child maximum ∩ task policy ∩ current approval`.
+   A child cannot mint authority, budget, fan-out, or delegation depth.
 6. **Control execution.** Time out stalled work. Retry only transient failures, with a
    small attempt limit and the same idempotency key so duplicate delivery cannot repeat
-   a consequential action.
+   a consequential action. The parent owns call, token, byte, time, cost, retry,
+   fan-out, and depth counters; child-reported usage is telemetry, not authority.
 7. **Pause when needed.** Require a human decision before publishing, spending,
    deleting, changing access, or taking another hard-to-reverse action.
 8. **Validate the result.** Check task ID, schema, status, evidence, tools used,
    uncertainty, and conflicts. Treat specialist prose and retrieved text as untrusted
-   data, not new instructions.
+   data, not new instructions. Validate in deterministic order: invocation binding,
+   terminal state, schema and size, authority and tool use, evidence resolution and
+   support, then conflicts and uncertainty.
 9. **Trace the chain.** Record correlation and task IDs, route choice, authority,
    approvals, attempts, timing, validation decisions, and terminal status in an audit
    trail without logging unnecessary secrets.
@@ -184,7 +198,9 @@ Common patterns include:
 - **Debate:** independent proposals expose disagreement, with external verification.
 - **Blackboard:** workers contribute typed records to controlled shared state.
 
-None guarantees improvement. Majority agreement can amplify a shared false claim.
+None guarantees improvement. Debate and voting improved selected benchmarks in
+particular experiments, but agreement is not independent evidence and can preserve or
+amplify a shared false claim (SRC-094, SRC-100).
 
 ## Engineering deep dive
 
@@ -196,12 +212,22 @@ unrestricted transcripts.
 
 Joins validate schema, source references, uncertainty, status, and conflicts. Claims
 need independent evidence checks, not votes alone. The parent defines partial-result
-policy and a fallback whose final interface is identical.
+policy and a fallback whose final interface is identical. Durable child states such as
+`created`, `dispatched`, `working`, `input_required`, `completed`, `failed`,
+`cancelled`, and `expired` are an application design, not a paper result. The parent
+owns transitions, late-result policy, cancellation intent, and reconciliation.
+Cross-framework trace analysis found system-design, inter-agent-misalignment, and
+task-verification failures; its taxonomy is observational, not exhaustive (SRC-102).
 
-Preregister a rule before testing. For example: retain the multi-agent path only if
+No reviewed paper supplies a universal adoption threshold. Preregister a rule before
+testing with the same cases and frozen budgets for every baseline. For example: retain
+the multi-agent path only if
 correctness improves by at least 10 percentage points or simulated p95 latency by at
 least 20 percent, while citation correctness and safety do not regress and calls stay
-under six. Otherwise disable it.
+under six. Treat those numbers as illustrative, require zero authority violations, and
+otherwise narrow or disable the path. Reported gains in debate, recruitment,
+role-structured collaboration, orchestration, and larger inference ensembles remain
+specific to their tested tasks, models, prompts, and budgets (SRC-094, SRC-097–SRC-100).
 
 ## Build it in Python
 
@@ -404,7 +430,9 @@ registered with broad abilities receives only the intersection allowed for this 
 (**overbroad permissions**). The validator must deny the attempted publish, emit no
 side effect, record the reason and correlation ID, and select the deterministic
 fallback. This is a synthetic offline containment test, not evidence that a production
-model resists every attack.
+model resists every attack. Prompt Infection experimentally demonstrated
+self-propagating prompt injection in tested multi-agent configurations; its combined
+defenses reduced spread but did not establish a universal defense (SRC-101).
 
 ## Evaluation
 
@@ -412,7 +440,10 @@ Measure report correctness, citation correctness, safety, p50 and p95 simulated
 latency, calls, communication bytes, failure rate, recovery, and containment. Include
 correlated-error fixtures so agreement is not mistaken for truth. Apply the
 preregistered threshold exactly. Report retain, narrow, or reject, and keep the
-disable switch.
+disable switch. Also measure route accuracy, false-progress rate, budget-attribution
+completeness, cancellation latency, late-result handling, and validator false
+acceptance. Final-answer quality cannot hide coordination or verification failures
+(SRC-102).
 
 ## Production checklist
 
@@ -476,5 +507,17 @@ retain, narrow, or reject. The lab is offline, deterministic, and has no cleanup
 - SRC-020, OpenAI, *A practical guide to building agents*, updated periodically.
 - SRC-042, Microsoft, *Microsoft Agent Framework repository*, updated continuously;
   volatile, revalidate within 30 days of release.
+- SRC-092, A2A Project, *Agent2Agent (A2A) Protocol Specification, Version 1.0.0*;
+  versioned primary specification.
+- SRC-094, *Improving Factuality and Reasoning in Language Models through Multiagent
+  Debate*; bounded empirical results.
+- SRC-095, NeurIPS, *CAMEL*; framework demonstration and empirical studies.
+- SRC-096, *AutoGen*; framework paper with application-specific experiments.
+- SRC-097, *AgentVerse*; empirical framework results.
+- SRC-098, *MetaGPT*; empirical structured-handover results on selected software tasks.
+- SRC-099, *Magentic-One*; empirical orchestration, ablation, error, and risk evidence.
+- SRC-100, TMLR, *More Agents Is All You Need*; empirical inference-ensemble results.
+- SRC-101, *Prompt Infection*; empirical cross-agent prompt-injection evidence.
+- SRC-102, *Why Do Multi-Agent LLM Systems Fail?*; empirical failure analysis.
 
 **Navigation:** [Previous: Chapter 16: Durable Execution](16-durable-execution.md) | [Module 04 overview](../README.md) | [Next: Chapter 18: Interoperability Protocols](18-interoperability-protocols.md)

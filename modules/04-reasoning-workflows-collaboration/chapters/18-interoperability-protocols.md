@@ -201,7 +201,9 @@ independent agent. As of the 2026-09-06 specification check, optional MCP Tasks 
 Skills-related features can overlap with A2A mechanics by supporting asynchronous
 work, progress/status, cancellation, and durable task handles where the negotiated
 feature and dated specification support them. That overlap does not make the trust,
-ownership, or authorization boundaries interchangeable (SRC-016, SRC-034).
+ownership, or authorization boundaries interchangeable. The concrete lifecycle claims
+below are pinned to A2A 1.0.0 and the experimental MCP 2025-11-25 Tasks utility
+(SRC-092, SRC-093); living overview pages remain navigation aids (SRC-016, SRC-034).
 
 ### A2A task boundary
 
@@ -227,6 +229,15 @@ thought or exact tool sequence. The specialist's internal models, memory, MCP ca
 and further delegation are opaque unless a separate contract exposes evidence.
 Opacity is an encapsulation boundary, not a reason to trust the result.
 
+### MCP Tasks overlap, carefully
+
+The MCP 2025-11-25 Tasks utility is experimental. Support is negotiated globally and,
+for tool calls, can be declared `required`, `optional`, or `forbidden` at the tool
+boundary. A receiver creates the task identifier, the caller polls state, and the
+result is retrieved separately after a terminal status. These mechanics can carry
+deferred work, but they do not define Northstar's task ownership, authorization,
+retention, approval, or rollback policy (SRC-093).
+
 ## Engineering deep dive
 
 Versioning policy must say whether unknown fields are rejected, ignored, or preserved;
@@ -247,7 +258,10 @@ signal. Before changing task state, authenticate the audience-bound credential,
 authorize the caller against the recorded tenant, principal, task owner, and source
 scope, reject a missing or replayed nonce, and confirm that the current lifecycle state
 permits cancellation. A request for an unknown, foreign, cancelled, or completed task
-must not create or rewrite that task.
+must not create or rewrite that task. Record four separate facts: the request was
+authorized, cancellation intent was accepted, the remote terminal state was observed,
+and external effects were reconciled. Neither A2A nor MCP cancellation proves rollback
+(SRC-092, SRC-093).
 
 Negotiate or explicitly select a mutually supported protocol version before work;
 refuse unsafe downgrade and unsupported features. Carry a local correlation ID across
@@ -260,7 +274,11 @@ Send only the task text, history slices, files, and credentials the specialist n
 Remote messages and artifacts are untrusted results: schema-check, size-limit,
 malware/content-scan where appropriate, label provenance, and require approval before
 they can trigger tools or consequential actions. Text in a result remains data, even
-when it looks like an instruction.
+when it looks like an instruction. Bind each result to the expected local invocation
+and remote task, reject late or mismatched artifacts according to explicit policy, and
+validate evidence before use. Cross-agent prompt injection has propagated through
+agent outputs in tested configurations, so authenticated delivery is not sufficient
+(SRC-101).
 
 MCP, A2A, and AG-UI are evolving protocol examples. Their current roles, fields,
 versions, and lifecycle details are volatile. Use adapters for their distinct
@@ -460,7 +478,9 @@ unauthorized requests and 100 percent incompatible-version detection in fixtures
 Also test a forged Agent Card with a trusted name and attacker destination, unknown
 capability, extra fields, oversized payload, expired identity, source-scope escalation,
 replay, timeout, hostile cancellation, pre-cancellation of an unknown task,
-cancellation after progress, and cancellation racing with completion.
+cancellation after progress, cancellation racing with completion, false progress,
+unsupported cancellation, late completion after local cancellation, duplicate push
+notification, polling overload, and result/task mismatch (SRC-092, SRC-093).
 
 ## Security and safety testing
 
@@ -478,7 +498,9 @@ Measure contract-test pass rate, unauthorized accepted operations, lifecycle
 completeness, incompatible-version detection, cancellation completion, malformed and
 oversized rejection, replay rejection, adapter replacement effort, and audit-event
 coverage. Required results are zero unauthorized operations and no authority increase
-through any protocol field.
+through any protocol field. Also report progress freshness, cancellation-race
+classification, duplicate-update handling, late-result disposition, and any action
+that an untrusted result attempted to trigger.
 
 ## Production checklist
 
@@ -547,6 +569,12 @@ state.
 - SRC-016, Model Context Protocol, *Specification*, volatile.
 - SRC-034, A2A Project, *Agent2Agent Protocol specification*, volatile.
 - SRC-055, AG-UI, *AG-UI documentation*, volatile.
+- SRC-092, A2A Project, *Agent2Agent (A2A) Protocol Specification, Version 1.0.0*,
+  volatile.
+- SRC-093, Model Context Protocol, *Tasks*, 2025-11-25 experimental specification,
+  volatile.
+- SRC-101, *Prompt Infection: LLM-to-LLM Prompt Injection within Multi-Agent Systems*,
+  empirical security research.
 
 All protocol names, roles, versions, fields, lifecycle claims, and compatibility
 claims require primary-source revalidation within 30 days of release.

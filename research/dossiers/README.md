@@ -23,5 +23,7 @@ Supplemental focused dossiers:
 
 - [`microsoft-agent-delegation.md`](microsoft-agent-delegation.md): dated Microsoft
   agent-to-agent architecture, identity, governance, security tests, and rollout plan
+- [`multi-agent-invocation-papers.md`](multi-agent-invocation-papers.md): academic and
+  standards evidence for coordinator-to-specialist delegation, lifecycle, and security
 - [`child-friendly-agent-architecture-animation.md`](child-friendly-agent-architecture-animation.md):
   accessible visual-story and offline animation specification

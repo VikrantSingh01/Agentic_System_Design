@@ -194,10 +194,18 @@ def main() -> int:
         require(not missing_nodes, f"scene {number} references unknown nodes: {sorted(missing_nodes)}")
         require(not missing_edges, f"scene {number} references unknown edges: {sorted(missing_edges)}")
 
-    require({"admission", "badge-check"} <= node_ids, "admission and identity badge nodes must be distinct")
     require(
-        {"front-admission", "admission-badge", "runtime-specialist", "specialist-runtime"} <= edge_ids,
-        "required admission or specialist handoff edges are missing",
+        {"admission", "badge-check", "workload-id", "state", "observability"} <= node_ids,
+        "admission, identity, state, and observability nodes must remain distinct",
+    )
+    require(
+        {
+            "front-admission", "admission-badge", "workload-runtime",
+            "retrieval-outside", "outside-retrieval",
+            "runtime-specialist", "specialist-runtime",
+            "runtime-state", "state-runtime", "runtime-observability",
+        } <= edge_ids,
+        "required identity, source, state, evidence, or specialist edges are missing",
     )
     require("toolbox-specialist" not in edge_ids and "specialist-toolbox" not in edge_ids,
             "specialist delegation must not be modeled as a tool edge")
@@ -218,7 +226,9 @@ def main() -> int:
     for term in (
         "model gateway", "proposal only", "policy_denied", "budget_exhausted",
         "private chain-of-thought", "anything not explicitly allowed is denied",
-        "admission ticket boundary", "identity badge check", "own bounded policy",
+        "admission ticket boundary", "own bounded policy", "workload identity",
+        "durable workflow", "control plane", "data plane", "release gates",
+        "reauthorize", "authoritative state",
     ):
         require(term in lower, f"missing architecture/security term: {term}")
     require(
