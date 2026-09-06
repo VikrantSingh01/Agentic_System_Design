@@ -6,8 +6,9 @@
 
 ## The problem
 
-Mina asks a school helper, “Can our class garden grow mint in the shady corner?”
-The helper writes a confident answer from general patterns it learned long ago. But the
+Mina asks Northstar, the school research helper from Chapter 9, “Can our class
+garden grow mint in the shady corner?” A model produces a confident answer from
+general patterns learned during training. But the
 school's current garden note says that corner floods after rain, and the safety note says
 mint must stay in pots. A fluent answer is not enough. Mina needs an answer based on the
 right notes, available to her, with pointers she can inspect.
@@ -76,37 +77,36 @@ flowchart LR
 
 **Takeaway:** A useful citation is an inspection path, not a decoration.
 
-Text description: claim “Mint must stay in pots” links to citation `C1`. `C1` names
-chunk `garden-policy:v3:c2` and character span 48-71. That chunk belongs to version 3
-of document `garden-policy`, which came from local fixture `policy-note.txt`. A checker
-must be able to follow every link and compare the claim with the exact words.
+Ordered prose walkthrough: (1) claim “Mint must stay in pots” links to citation
+`C1`; (2) `C1` names chunk `garden-policy:v3:c2`; (3) the chunk identifies
+character span 48-71; (4) that span belongs to version 3 of document
+`garden-policy`; and (5) the document came from local fixture
+`policy-note.txt`. A checker follows the same path and compares the claim with
+the exact words.
 
 ### Process flow: the RAG pipeline
 
 ```mermaid
 flowchart TD
-    A["Authorized local documents"] --> B["Ingest: validate and record provenance"]
-    B --> C["Chunk: split while retaining source links"]
-    C --> D["Index: build searchable word records"]
-    Q["Question + authenticated principal"] --> P["Permission filter"]
-    D --> P
-    P --> R["Retrieve and rank"]
-    R --> S{"Enough supporting evidence?"}
-    S -- "No" --> N["Return no-result + search details"]
-    S -- "Yes" --> X["Assemble bounded context"]
-    X --> G["Generate grounded answer"]
-    G --> V["Inspect citations and claims"]
-    V --> O["Answer, citations, and warnings"]
+    A["Approved local sources"] --> B["Validate, split, and index"]
+    Q["Question + user identity"] --> P["Permission filter"]
+    B --> P
+    P --> R["Retrieve allowed pieces"]
+    R --> S{"Enough evidence?"}
+    S -- "No" --> N["Stop: no result"]
+    S -- "Yes" --> X["Build small context"]
+    X --> G["Create cited answer"]
+    G --> V["Check claims and release"]
 ```
 
 **Takeaway:** RAG is a pipeline with testable inputs and outputs at every boundary.
 
-Text description: approved documents enter ingestion, which validates metadata and records
-their origin. Chunking creates source-linked pieces. Indexing makes those pieces searchable.
-At question time, authenticated identity filters candidates before ranking. Retrieval scores
-only allowed chunks. Insufficient evidence produces a no-result response. Otherwise a
-size-limited context goes to the answer step. Citation inspection then checks the returned
-claims and pointers before release.
+Ordered prose walkthrough: (1) approved local sources are validated, split into
+source-linked pieces, and indexed; (2) the question and authenticated user
+identity reach the permission filter; (3) only allowed pieces are retrieved;
+(4) an evidence decision stops with no result when support is insufficient; (5)
+otherwise the runtime builds a small context; (6) the answer step creates cited
+claims; and (7) inspection checks the claims and citations before release.
 
 ### Three different checks
 
@@ -118,12 +118,13 @@ flowchart LR
 
 **Takeaway:** A working link, supporting text, and truth are three separate questions.
 
-Text description: first verify that a citation identifier reaches an existing source,
-version, chunk, and span. Second decide whether those exact words support the linked claim.
-Third compare the claim with an independent answer key or other truth process. Yes or no
-at one step does not decide either later step. A real citation can be irrelevant; a
-supporting source can itself be mistaken; an uncited claim can happen to be true but still
-violate the report contract.
+Ordered prose walkthrough: (1) verify that a citation identifier reaches an
+existing source, version, chunk, and span; (2) decide whether those exact words
+support the linked claim; and (3) compare the claim with an independent answer
+key or other truth process. Yes or no at one step does not decide either later
+step. A real citation can be irrelevant; a supporting source can itself be
+mistaken; an uncited claim can happen to be true but still violate the report
+contract.
 
 ## Vocabulary
 
@@ -143,6 +144,7 @@ violate the report contract.
 | Provenance | A record of where an item came from and which version or transformation produced it |
 | Content hash | A repeatable fingerprint used to detect changed content |
 | Permission | A rule describing who may access a source |
+| Principal | The authenticated user or service identity whose permissions are checked |
 | Freshness | Whether evidence is recent enough for its intended use |
 | Material claim | A statement important enough that changing it could change the answer or a decision |
 | Precision | The share of retrieved items that are relevant |

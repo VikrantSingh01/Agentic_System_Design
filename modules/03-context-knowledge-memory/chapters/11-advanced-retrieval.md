@@ -6,8 +6,8 @@
 
 ## The problem
 
-Northstar can search a collection and place found passages beside a question.
-But a real library is messy. A child asks, “Why are city bees having a hard
+Northstar can now search approved notes and cite the passages used in Mina's
+class reports. But a real library is messy. Mina next asks, “Why are city bees having a hard
 time?” One useful report says “urban pollinator decline” and never says “having
 a hard time.” Another document contains the exact words but is ten years old.
 A third is a private staff note. Which results should Northstar show?
@@ -78,20 +78,20 @@ flowchart LR
 **Takeaway:** Use several clues to find evidence, but let permissions and
 explicit filters control which shelf can contribute.
 
-**Text alternative:** The question goes to a word matcher and an idea matcher.
-The user's identity, chosen dates, and document types become rules. Only
-permitted candidates enter one combined pile. A careful sorter orders that
-pile, and the system returns a small evidence set with citations.
+**Ordered prose walkthrough:** (1) the question goes to a word matcher and an
+idea matcher; (2) the user's identity, chosen dates, and document types become
+rules; (3) only permitted candidates enter one combined pile; (4) a careful
+sorter orders that pile; and (5) the system returns a small evidence set with
+citations.
 
 ### Visual 2: a boundary-first retrieval flow
 
 ```mermaid
 flowchart TD
     A[Receive question and user identity] --> B[Rewrite into bounded searches]
-    B --> C[Apply permission, tenant, type, and date filters]
-    C --> D[Run keyword and vector searches]
-    D --> E[Join results and remove duplicates]
-    E --> F[Rerank permitted candidates]
+    B --> C[Apply permission, organization, type, and date filters]
+    C --> D[Run word and idea searches]
+    D --> F[Join, deduplicate, and rerank]
     F --> G{Enough relevant evidence?}
     G -- no --> H[Say evidence is insufficient]
     G -- yes --> I[Return passages and source IDs]
@@ -101,11 +101,11 @@ flowchart TD
 **Takeaway:** Authorization happens before candidate text is exposed, and “not
 enough evidence” is a valid result.
 
-**Text alternative:** First receive the question and identity. Rewrite only
-within declared limits. Apply permission, tenant, type, and date filters. Run
-word and vector search, merge and deduplicate the permitted results, rerank
-them, and check evidence sufficiency. If evidence is weak, abstain. Otherwise,
-return passages and source IDs, then create a cited answer from those passages.
+**Ordered prose walkthrough:** (1) receive the question and identity; (2)
+rewrite only within declared limits; (3) apply permission, organization, type,
+and date filters; (4) run word and idea search; (5) join, deduplicate, and rerank
+permitted results; (6) check evidence sufficiency and abstain if evidence is
+weak; and (7) otherwise return passages and source IDs for a cited answer.
 
 ## Vocabulary
 
@@ -114,6 +114,7 @@ return passages and source IDs, then create a cited answer from those passages.
 | Candidate | A possibly useful result not yet chosen as final evidence. |
 | Citation | A stable pointer to the source and passage supporting a claim. |
 | Corpus | The collection of documents available to a search system. |
+| Cross-encoder | A model that scores a query and a candidate passage together. |
 | Embedding | A fixed-length list of numbers representing learned patterns in content. |
 | Filter | An exact rule that includes or excludes records, such as type or date. |
 | Freshness | How current a record and its search index are for the task. |
@@ -124,10 +125,12 @@ return passages and source IDs, then create a cited answer from those passages.
 | Precision | The share of retrieved items that are relevant. |
 | Query rewriting | Turning a request into one or more bounded search queries. |
 | Recall | The share of all relevant items that retrieval found. |
+| Reciprocal rank fusion | A method that combines ranked lists using each item's position rather than incompatible raw scores. |
 | Reranking | Applying a more careful scorer to a small candidate set. |
 | Retrieval | Selecting evidence from a collection for a question. |
 | Score | A signal used to order results; it is not a probability of truth. |
 | Vector search | Search for nearby embeddings rather than exact words. |
+| Approximate nearest-neighbor search | A fast vector search that may miss some of the mathematically closest items. |
 
 ## How it works
 
@@ -181,8 +184,9 @@ passage embeddings must be compatible.
 
 Hybrid retrieval runs keyword and vector searches over the same permitted
 scope. Their raw scores usually have different scales, so adding them directly
-is unsafe. A simple alternative is **reciprocal rank fusion**: give each result
-points based on its rank in each list:
+is unsafe. A simple alternative is **reciprocal rank fusion** (combining ranked
+lists from each item's position rather than incompatible raw scores): give each
+result points based on its rank in each list:
 
 ```text
 fusion_score(document) = sum(1 / (constant + rank_in_list))
@@ -302,7 +306,8 @@ useful, and refresh time-sensitive test cases.
 
 ### Filters and approximate indexes
 
-Large vector systems often use approximate nearest-neighbor search, which
+Large vector systems often use **approximate nearest-neighbor search** (a fast
+vector search that may miss some of the mathematically closest items), which
 trades perfect search for speed. Filtering may happen before, during, or after
 vector traversal depending on the engine. Sparse authorized subsets can lower
 recall if the engine explores mostly disallowed neighborhoods. Test realistic

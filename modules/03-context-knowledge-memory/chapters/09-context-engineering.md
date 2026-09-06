@@ -6,10 +6,11 @@
 
 ## The problem
 
-Northstar can call a model and tools, but a model sees only what the runtime puts
-into its current request. Suppose a learner asks, “Can I bring my dog?” The
-conversation says the learner means a school trip. A retrieved permission slip
-says service animals are allowed. An old tool result describes last year's trip.
+Northstar is helping Mina prepare a class report and field-trip plan about city
+pollinators. A model receives only what the runtime puts into its current request.
+Suppose Mina asks, “May a service animal join our field trip?” The conversation
+says she means the pollinator trip. A retrieved permission slip says service
+animals are allowed. An old tool result describes last year's trip.
 If the runtime omits the permission slip, includes the wrong year's result, or
 places an untrusted note where instructions belong, the model may answer
 confidently and incorrectly.
@@ -75,16 +76,16 @@ flowchart TB
     T[Tool results with source labels] --> P
     P --> B[Bounded ordered context]
     B --> M[Model call]
-    M --> A[Answer with supporting source IDs]
+    M --> A[Answer with source labels]
 ```
 
 **Takeaway:** A context is a selected, labeled package for one call, not a heap
 of everything the system knows.
 
-Text equivalent: (1) trusted instructions, needed conversation, retrieved data,
+Ordered prose walkthrough: (1) trusted instructions, needed conversation, retrieved data,
 and tool results enter the packer; (2) the packer filters, labels, orders, and
 limits them; (3) the model receives the resulting context; and (4) the answer
-points back to supporting source IDs.
+points back to supporting source labels.
 
 ### The packing process
 
@@ -104,10 +105,11 @@ flowchart LR
 **Takeaway:** Safe packing filters before ranking, fits a measured budget, and
 ends with evaluation.
 
-Text equivalent: start with the current question; reserve space for rules and
-the answer; enforce permission and trust boundaries; rank remaining items for
-the task; remove duplicates; drop or compact lower-value items until the
-package fits; order it; then measure the answer and the packing trace.
+Ordered prose walkthrough: (1) start with the current question; (2) reserve
+space for rules and the answer; (3) enforce permission and trust boundaries;
+(4) rank remaining items for the task; (5) remove duplicates; (6) drop or
+compact lower-value items until the package fits; (7) order it; and (8) measure
+the answer and the packing trace.
 
 ## Vocabulary
 
@@ -115,6 +117,7 @@ package fits; order it; then measure the answer and the packing trace.
 |---|---|
 | Compaction | Replacing larger context with a smaller structured record while trying to preserve needed facts and constraints. |
 | Context | The model-readable information supplied for one model call. |
+| Context contract | A checkable specification for what may enter one model request. |
 | Context engineering | Designing, assembling, testing, and maintaining context for model calls. |
 | Context window | The model's bounded capacity for input and generated output, measured in tokens according to its interface. |
 | Conversation history | Selected earlier messages included because they matter to the current turn. |
@@ -127,6 +130,8 @@ package fits; order it; then measure the answer and the packing trace.
 | Token | A model-counted unit of text; it may be shorter or longer than a word. |
 | Token budget | The enforced token allowance for context and generated output. |
 | Tool result | Data returned after approved ordinary software runs a tool. |
+| Trace | A time-ordered record of observable system events. |
+| Trajectory | The observable sequence of system decisions and results during one run. |
 | Trust boundary | A place where data with different authority or risk must remain separated and checked. |
 | Untrusted content | Content allowed to provide evidence but not authority, permissions, or new instructions. |
 

@@ -105,7 +105,7 @@ flowchart TB
 **Takeaway:** Not all retained data is memory; each store has a different
 purpose, owner, and lifetime.
 
-Text description: (1) request state carries the present request; (2) execution
+Ordered prose walkthrough: (1) request state carries the present request; (2) execution
 state records enough authoritative progress to resume this job; (3) working
 context is the bounded material sent into a model call; (4) artifacts are
 outputs such as reports; (5) optional memory contains only admitted cross-run
@@ -123,7 +123,7 @@ flowchart LR
     U -- yes --> S{Safe, minimal,<br/>provenanced, useful?}
     S -- no --> X
     S -- yes --> T[Store with scope,<br/>confidence and expiry]
-    T --> R{Later: same tenant/user,<br/>authorized, relevant,<br/>unexpired?}
+    T --> R{Later: same organization/user,<br/>allowed, useful,<br/>unexpired?}
     R -- no --> N[Do not reveal or use]
     R -- yes --> C[Place bounded note<br/>in current context]
 ```
@@ -131,12 +131,13 @@ flowchart LR
 **Takeaway:** Permission to store a note does not automatically grant
 permission to use it later.
 
-Text description: A proposed note must pass purpose, authority or consent,
-sensitivity, minimization, provenance, duplication, retention, and expected
-value checks. Any failed check rejects the write with a reason. An accepted
-record gets tenant and user scope, confidence, and expiry. Every later read
-again checks tenant, user, current authorization, relevance, expiry, and
-conflicts. A failed read returns nothing.
+Ordered prose walkthrough: (1) a proposed note must pass its purpose check; (2)
+it must have authority or consent; (3) safety, minimization, provenance,
+duplication, retention, and expected value are checked together; (4) any failed
+check rejects the write with a reason; (5) an accepted record receives
+organization and user scope, confidence, and expiry; and (6) every later read checks scope,
+current authorization, relevance, expiry, and conflicts again. A failed read
+returns nothing.
 
 ### Diagram 3: deletion is a journey
 
@@ -158,12 +159,12 @@ flowchart LR
 **Takeaway:** “Delete” is a testable process across every copy, not merely one
 database command.
 
-Text description: The application authenticates a deletion request, removes
-the primary record, removes index entries and caches, finds summaries derived
-from it, removes disallowed evaluation copies, and records when protected
-backups will expire. Evidence names each location and its result. A service
-must not promise instant backup erasure if its backup system only supports
-scheduled expiry.
+Ordered prose walkthrough: (1) the application authenticates a deletion
+request; (2) it removes the primary record; (3) deletion propagates to indexes,
+caches, derived summaries, and disallowed evaluation copies; (4) protected
+backups enter their truthful expiry schedule; and (5) deletion evidence names
+each location and result. A service must not promise instant backup erasure if
+its backup system supports only scheduled expiry.
 
 ## Vocabulary
 
@@ -226,7 +227,8 @@ For Northstar's first memory type, a write is eligible only when all are true:
    request.
 6. **Sensitivity:** reject secrets, credentials, health details, and unrelated
    personal data from this store.
-7. **TTL and retention:** attach an expiry and a deletion rule.
+7. **Time to live (TTL)** (how long a record remains active) **and retention:**
+   attach an expiry and a deletion rule.
 8. **Value hypothesis:** name the task metric expected to improve.
 
 Model output, retrieved pages, tools, and other users cannot grant consent.
@@ -437,7 +439,6 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from typing import Callable
-from uuid import uuid4
 
 UTC = timezone.utc
 ALLOWED = {"units", "citation_style", "reading_level"}
@@ -485,6 +486,7 @@ class MemoryStore:
     def __init__(self, now: Callable[[], datetime]):
         self._now = now
         self._items: dict[str, Memory] = {}
+        self._next_id = 1
         self.audit: list[tuple[str, str]] = []  # decision, reason; no values
 
     def write(
@@ -496,8 +498,10 @@ class MemoryStore:
             raise Denied(reason)
 
         old = self.read(caller, proposal.purpose, {proposal.kind})
+        memory_id = f"mem-{self._next_id:04d}"
+        self._next_id += 1
         memory = Memory(
-            memory_id=str(uuid4()),
+            memory_id=memory_id,
             tenant_id=caller.tenant_id,
             principal_id=caller.principal_id,
             kind=proposal.kind,
