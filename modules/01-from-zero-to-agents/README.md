@@ -4,6 +4,11 @@
 
 Explain what makes a system agentic, describe the observe-decide-act loop, build intuition for language models, and show how probabilistic components fit inside deterministic software.
 
+## Before you start
+
+No AI or agent experience is required. Read the chapters in order: each one introduces
+terms and boundaries used by the next.
+
 ## Chapters
 
 1. [**Why Agentic Systems**](chapters/01-why-agentic-systems.md): agents versus automation, assistants, and workflows; autonomy as a spectrum; when not to use an agent.
@@ -18,3 +23,5 @@ only approved sources, returns evidence with its summaries, and cannot publish o
 change records. In this module, define its environment, goal, observations, permitted
 actions, state, stop conditions, and fixed-workflow baseline before writing
 model-dependent code. Module 2 will implement that design offline.
+
+**Continue:** [Book overview](../../README.md) | [Next module: Build the Smallest Useful Agent](../02-smallest-useful-agent/README.md)

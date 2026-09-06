@@ -11,6 +11,11 @@ Northstar remains a research assistant, not an independent publisher. It collect
 invented source IDs from a read-only catalog and produces material for review; model
 output never supplies identity, permission, approval, or extra budget.
 
+## Before you start
+
+Complete Module 01, especially the observe-decide-act loop and deterministic control
+boundaries. Read this module in order because Chapters 5-8 assemble one runtime.
+
 ## Chapters
 
 5. [**Messages, Prompts, and Structured Output**](chapters/05-messages-prompts-structured-output.md): separate instructions from untrusted research text and validate `DraftReportV1`.
@@ -34,3 +39,5 @@ Module 3 then separates **context** (information assembled for one model call),
 **knowledge** (information available from sources), and **memory** (information
 deliberately retained for later). Module 2's bounded messages, provenance, state, and
 traces provide that foundation; they do not make every transcript or result permanent.
+
+**Continue:** [Previous module: From Zero to Agents](../01-from-zero-to-agents/README.md) | [Book overview](../../README.md) | [Next module: Context, Knowledge, and Memory](../03-context-knowledge-memory/README.md)

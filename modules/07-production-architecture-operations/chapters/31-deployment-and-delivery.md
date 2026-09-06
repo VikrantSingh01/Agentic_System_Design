@@ -4,6 +4,13 @@
 > Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
+**On this page**
+
+- [Understand the idea](#the-problem): problem, objectives, first pass, picture, and vocabulary
+- [Build the mechanism](#how-it-works): how it works, engineering detail, and Python
+- [Apply it](#microsoft-implementation): implementation choices, failures, safety, and evaluation
+- [Practice and continue](#review-questions): review, exercises, lab, recap, and sources
+
 ## The problem
 
 A build reaches production, but its checkpoint reader cannot resume runs created by the old

@@ -16,13 +16,19 @@ the capability that the next problem requires:
 5. use uncertain screen, image, or audio observations to save, but never
    autonomously submit, the report in an offline simulation.
 
+## Before you start
+
+Complete Module 02 so messages, model calls, typed tools, budgets, and runtime state are
+familiar. Read Chapters 9-13 in order to keep context, retrieval, memory, and perception
+separate.
+
 ## Chapters
 
-9. [**Context Engineering**](chapters/09-context-engineering.md)
-10. [**RAG Foundations**](chapters/10-rag-foundations.md)
-11. [**Advanced Retrieval**](chapters/11-advanced-retrieval.md)
-12. [**Memory Without Mythology**](chapters/12-memory-without-mythology.md)
-13. [**Multimodal and Computer-Using Agents**](chapters/13-multimodal-computer-using-agents.md)
+9. [**Context Engineering**](chapters/09-context-engineering.md): assemble bounded, labeled information for one model call.
+10. [**RAG Foundations**](chapters/10-rag-foundations.md): retrieve permission-filtered evidence and preserve citations.
+11. [**Advanced Retrieval**](chapters/11-advanced-retrieval.md): improve retrieval quality without weakening authorization or provenance.
+12. [**Memory Without Mythology**](chapters/12-memory-without-mythology.md): retain information only when consent, lifecycle controls, and evaluation justify it.
+13. [**Multimodal and Computer-Using Agents**](chapters/13-multimodal-computer-using-agents.md): turn uncertain observations into bounded, code-checked proposals.
 
 ## Northstar milestone
 
@@ -51,3 +57,5 @@ one-sentence takeaway and numbered prose walkthrough, and uses words and shapes
 rather than color. Permission gates, denials, abstentions, confirmations, and
 safe stops are labeled where they matter. Side inputs and failure branches do
 not count toward the main path.
+
+**Continue:** [Previous module: Build the Smallest Useful Agent](../02-smallest-useful-agent/README.md) | [Book overview](../../README.md) | [Next module: Reasoning, Workflows, and Collaboration](../04-reasoning-workflows-collaboration/README.md)

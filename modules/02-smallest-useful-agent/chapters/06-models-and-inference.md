@@ -4,6 +4,13 @@
 > Owner: Agentic System Design maintainers
 > Last verified: 2026-09-06
 
+**On this page**
+
+- [Understand the idea](#the-problem): problem, objectives, first pass, picture, and vocabulary
+- [Build the mechanism](#how-it-works): how it works, engineering detail, and Python
+- [Apply it](#microsoft-implementation): implementation choices, failures, safety, and evaluation
+- [Practice and continue](#review-questions): review, exercises, lab, recap, and sources
+
 ## The problem
 
 Northstar, our research assistant, must turn a question and a small packet of evidence into a structured research note. A tiny model may be quick and inexpensive but omit evidence. A larger model may follow the format more reliably but take longer and cost more. A model with a huge advertised context may still miss a crucial sentence.
