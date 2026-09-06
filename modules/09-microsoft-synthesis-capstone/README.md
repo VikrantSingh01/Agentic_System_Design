@@ -6,6 +6,6 @@ Map the vendor-neutral production architecture to current Microsoft services and
 
 ## Chapters
 
-36. [**Northstar on the Microsoft Stack**](chapters/36-northstar-on-microsoft-stack.md): Microsoft Foundry portfolio, Azure OpenAI, agent services and frameworks, Azure AI Search, Cosmos DB, Entra ID, Key Vault, safety and governance, OpenTelemetry and Application Insights, messaging, compute, API management, delivery, and infrastructure as code.
+36. [**Northstar on the Microsoft Stack**](chapters/36-northstar-on-microsoft-stack.md): a dated, evidence-bounded mapping to Microsoft Foundry, Foundry Agent Service, Agent Framework, Azure AI Search, Azure Identity, Azure Monitor/Application Insights, Azure Service Bus, and Azure Container Apps. Cosmos DB, Key Vault, API management, delivery tooling, and infrastructure-as-code products remain explicit source gaps rather than implied mappings.
 
 All product names, availability states, SDKs, and service boundaries must be reverified against primary Microsoft sources within 30 days of release.

@@ -22,11 +22,12 @@ measured workloads, accepted tests, and named owners. A candidate is admitted on
 passes those tests. A missing or stale product claim remains unresolved. It never becomes
 permission to relax the design.
 
-This chapter uses only SRC-040, SRC-042, SRC-044, SRC-045, and SRC-046 for Microsoft claims.
+This chapter uses only the dated primary sources in its Sources section for Microsoft claims.
 Every statement about a product, API, SDK, release status, region, quota, limit, price, service
 boundary, data behavior, or supported feature is a `VOLATILE PRODUCT CLAIM`. It must be
 verified against its cited primary source no more than 30 days before release. This chapter
-does not assert a current region, quota, limit, price, or availability state.
+does not infer a current region, quota, limit, price, or availability state; any narrowly stated
+status requires its own cited primary-source wording and the same release-time revalidation.
 
 ## Learning objectives
 
@@ -40,8 +41,10 @@ By the end of this chapter, you will be able to:
 6. Test identity separation, timeouts, rollback, redaction, and adapter substitution offline.
 7. Conduct a production-readiness review that accepts, conditionally accepts, or rejects the
    capstone.
+8. Choose and govern a low-code or code-first specialist-delegation path without confusing
+   agents with tools.
 
-## Accepted requirements first
+### Accepted requirements first
 
 The following register is inherited from the accepted Northstar architecture. Candidate
 targets are release gates, not new measurements claimed by this chapter.
@@ -223,7 +226,8 @@ The deterministic baseline is always one row. Complexity must demonstrate a meas
 
 ### Step 4: record claims, freshness, and gaps
 
-The following dated records are the only approved Microsoft candidates in this chapter.
+The following dated records are the approved responsibility-to-service mapping candidates in this
+chapter. The later delegation matrix uses additional, separately bounded ledger sources.
 `planned_release_on` is an illustrative review date, not a release commitment. Reverify every
 record if that date, the cited material, or the architecture changes.
 
@@ -234,14 +238,22 @@ record if that date, the cited material, or the architecture changes.
 | MS-003 | Configured credential adapter | `VOLATILE PRODUCT CLAIM`: Azure Identity client library for Python is a candidate for currently documented credential-chain and managed-identity integration, subject to explicit configuration and identity tests. | SRC-044 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
 | MS-004 | Architecture and regional review input | `VOLATILE MICROSOFT GUIDANCE CLAIM`: Azure Architecture Center is a candidate source of current cloud design patterns and workload guidance. It is review input, not implementation proof. | SRC-045 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
 | MS-005 | Cross-cutting quality review input | `VOLATILE MICROSOFT GUIDANCE CLAIM`: Azure Well-Architected Framework is a candidate source of current reliability, security, cost, operations, and performance review guidance. It is review input, not implementation proof. | SRC-046 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
+| MS-006 | Managed agent runtime | `VOLATILE PRODUCT CLAIM`: Foundry Agent Service is a candidate hosted agent runtime. Supported capabilities and each selected subfeature remain subject to current documentation and workload tests. | SRC-041 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
+| MS-007 | Retrieval | `VOLATILE PRODUCT CLAIM`: Azure AI Search is a candidate for vector and hybrid retrieval. Authorization filtering, tenant isolation, relevance, freshness, scale, region, and recovery require separate proof. | SRC-043 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
+| MS-008 | Telemetry export | `VOLATILE PRODUCT CLAIM`: Azure Monitor OpenTelemetry with Application Insights export is a candidate telemetry edge. Redaction, correlation, retention, access, sampling, and completeness require tests. | SRC-047 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
+| MS-009 | Container compute | `VOLATILE PRODUCT CLAIM`: Azure Container Apps is a candidate managed container host with event-driven scaling. Runtime, network, identity, region, recovery, quota, and cost fitness require proof. | SRC-048 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
+| MS-010 | Durable messaging | `VOLATILE PRODUCT CLAIM`: Azure Service Bus is a candidate for durable queues and topics. Ordering, duplicate delivery, lock expiry, retry, dead-letter, authorization, tenant partitioning, and recovery remain application acceptance concerns. | SRC-049 | 2026-09-05 | 2026-09-30 | Verify within 30 days before release |
 
-For MS-001 through MS-005, product names, API and SDK behavior, feature boundaries, release
+For MS-001 through MS-010, product names, API and SDK behavior, feature boundaries, release
 status, regions, quotas, limits, prices, data handling, identity behavior, network behavior,
 and availability are volatile and require primary-source verification within 30 days before
 release. The table makes no claim that a candidate is available in Northstar's required
 region, fits its quota or price envelope, or passes an acceptance test.
 
-Any other Microsoft mapping is `VOLATILE UNVERIFIED PRODUCT CLAIM: UNRESOLVED`. It may not be
+Cosmos DB, Key Vault, API management, a delivery product, and an infrastructure-as-code product
+have no approved claim-level source in this chapter's current scope. Those mappings are
+`VOLATILE UNVERIFIED PRODUCT CLAIM: UNRESOLVED`; a product mention in a broader source or an
+authentication-audience example is not service-fit evidence. Any other Microsoft mapping may not be
 selected, described as supported, or used as production evidence in this chapter. The open
 record must preserve the vendor-neutral interface, requirement IDs, owner, evidence needed,
 deadline, fallback, and release consequence.
@@ -289,7 +301,11 @@ flowchart TB
         MA[Model and agent surface adapter]
         FA[Optional framework adapter]
         IA[Credential adapter]
-        X[Unresolved provider adapters]
+        SR[Azure AI Search candidate]
+        SB[Service Bus candidate]
+        AM[Azure Monitor candidate]
+        CA[Container Apps candidate]
+        X[Unresolved state, secrets, API, delivery, and IaC adapters]
     end
     UI --> RT
     RT --> MG
@@ -301,9 +317,11 @@ flowchart TB
     MG --> MA
     RT --> FA
     TG --> IA
-    RG --> X
+    RG --> SR
+    WS --> SB
+    EO --> AM
+    RT --> CA
     WS --> X
-    EO --> X
     GD --> X
 ```
 
@@ -312,8 +330,9 @@ flowchart TB
 **Equivalent text description:** first, experience and governance feed the stable runtime and
 policy contracts. Second, the runtime uses stable model, retrieval, tool, identity, workflow,
 state, evaluation, and observability gateways. Third, model and agent, optional framework, and
-credential candidates sit behind adapters; retrieval, workflow, state, telemetry, and
-deployment remain unresolved where approved evidence is absent. Tenant, principal, region
+credential, retrieval, messaging, telemetry, and container-compute candidates sit behind
+adapters. State database, secrets, API management, delivery, and infrastructure-as-code products
+remain unresolved where approved evidence is absent. Tenant, principal, region
 policy, data classification, request IDs, and redacted evidence cross boundaries as explicit
 fields.
 
@@ -385,7 +404,8 @@ Each environment plan must declare or account for:
 - staged promotion, limited exposure, rollback, restore, reconstruction, and cleanup.
 
 This chapter does not name or emit a provider resource type, deployment language, module, or
-delivery product. Their support is unproven under the approved source scope. The expected
+delivery product. The approved sources establish candidate service responsibilities, not exact
+resource declarations or delivery/IaC support. The expected
 artifact is a logical plan such as:
 
 ```json
@@ -417,7 +437,11 @@ tests:
 | Agent framework | No change unless proven | The custom bounded runtime already expresses accepted semantics. | Admit MS-002 only after measured benefit and substitution tests. |
 | Credential acquisition | Buy behind adapter candidate | A library adapter may reduce credential plumbing while application policy retains authority decisions. | Keep `CredentialProvider` stable and retain a deterministic test adapter. |
 | Architecture and quality review | Hybrid review process | External guidance can improve questions, but workload owners decide from evidence. | Archive dated findings; requirements and tests remain provider-neutral. |
-| Retrieval, workflow, state, telemetry, compute, delivery, and other gaps | Unresolved | Approved claim-level evidence is absent in this chapter's source scope. | Keep interfaces and baseline implementations; block release where no compliant fallback exists. |
+| Retrieval | Hybrid candidate | Azure AI Search has approved vector/hybrid retrieval evidence in MS-007; workload fitness is unproved. | Keep `RetrievalGateway`; retain deterministic corpus and alternate adapter tests. |
+| Durable messaging | Hybrid candidate | Azure Service Bus has approved queue/topic evidence in MS-010; it does not own Northstar's idempotency or workflow semantics. | Keep message and outcome schemas stable; test duplicate delivery and reconciliation. |
+| Telemetry export | Buy behind adapter candidate | Azure Monitor OpenTelemetry has approved export guidance in MS-008; Northstar owns evidence semantics and redaction. | Keep provider-neutral spans/evidence and alternate exporter tests. |
+| Container compute | Hybrid candidate | Azure Container Apps has approved managed hosting and event-driven scaling evidence in MS-009. | Keep OCI/container and runtime contracts portable; rehearse alternate hosting. |
+| Cosmos DB/state, Key Vault/secrets, API management, delivery, and IaC | Unresolved source gaps | No approved claim-level source in the current ledger proves these mappings. | Preserve interfaces and fallbacks; add primary sources and acceptance evidence before naming or selecting a product. |
 
 The final choice can change. A buy option that misses a threshold is rejected. A build option
 with unacceptable operator load is rejected. A hybrid option that leaks provider schemas into
@@ -503,8 +527,14 @@ class DeterministicCredentialProvider:
         return "opaque-synthetic-token"
 
 
-APPROVED_SOURCES = {"SRC-040", "SRC-042", "SRC-044", "SRC-045", "SRC-046"}
-APPROVED_CLAIMS = {"MS-001", "MS-002", "MS-003", "MS-004", "MS-005"}
+APPROVED_SOURCES = {
+    "SRC-040", "SRC-041", "SRC-042", "SRC-043", "SRC-044", "SRC-045",
+    "SRC-046", "SRC-047", "SRC-048", "SRC-049",
+}
+APPROVED_CLAIMS = {
+    "MS-001", "MS-002", "MS-003", "MS-004", "MS-005",
+    "MS-006", "MS-007", "MS-008", "MS-009", "MS-010",
+}
 
 
 def validate_mapping(
@@ -648,10 +678,182 @@ The implementation sequence is deliberately conditional:
    cross-cutting quality questions in `VOLATILE MICROSOFT GUIDANCE CLAIM MS-005, SRC-046`, each
    verified within 30 days before release. Record accepted and rejected recommendations with
    workload evidence.
-5. Leave all other mappings unresolved. Do not invent an SDK import, resource declaration,
-   region, quota, price, status, or service boundary.
+5. Evaluate MS-006 through MS-010 for managed agent runtime, retrieval, telemetry export,
+   container compute, and durable messaging. These are candidate responsibility mappings, not
+   acceptance or exact resource declarations.
+6. Keep Cosmos DB, Key Vault, API management, delivery tooling, and infrastructure-as-code
+   products as logged source gaps. Do not infer service fitness from a token-audience example or
+   broad portfolio page, and do not invent an SDK import, region, quota, price, status, or boundary.
 
 This is a mapping process, not a claim that the candidates have passed.
+
+### Central Copilot to specialists
+
+Here, "central Copilot" means Northstar's user-facing orchestrator, not a claim that every
+Microsoft product named Copilot can natively delegate to every other agent. Think of it as the
+school receptionist: it gives a specialist one bounded assignment and only the necessary part
+of the permission slip.
+
+```mermaid
+flowchart LR
+    U[User] --> C[Central Copilot]
+    C -->|delegate a task| S[Specialist agent]
+    C -->|call a capability| T[Tool or data source]
+    S -->|result and evidence| C
+    C -->|consequential action| H[Human approval]
+```
+
+**Takeaway:** delegate open-ended work to an agent; call a bounded capability as a tool; require
+fresh authorization and human approval before a consequential effect.
+
+**Equivalent text description:** the user asks the central Copilot for an outcome. The Copilot
+either delegates a bounded task to a reasoning specialist or calls a bounded tool or data
+source. A specialist returns a result and evidence. A consequential action cannot proceed until
+a human approves its exact payload.
+
+#### Path A: low-code connected agents
+
+Consider a primary Copilot Studio agent routing a turn to a Copilot Studio specialist when
+business authors own both agents. The cited overview documents separate instructions, knowledge,
+tools, orchestration context, Copilot-Studio-only scope, and forwarding of the user message and
+relevant conversation history (`VOLATILE PRODUCT CLAIM`, SRC-075, updated 2026-08-27). It does
+**not** state GA status or document a switch to disable history forwarding. Therefore release
+status and operator control over forwarded history remain unresolved. Use synthetic minimized
+context in a PoC, inspect what crosses the boundary, and block production if data-minimization
+requirements cannot be proved. Foundry, Fabric, and external-agent bridges remain unresolved;
+a table of contents is navigation evidence, not availability evidence (SRC-076, accessed
+2026-09-06).
+
+#### Path B: code-first Foundry and Agent Framework
+
+Use Microsoft Foundry Agent Service as a candidate managed runtime and Microsoft Agent Framework
+as the application orchestration boundary when developers need explicit contracts, policy,
+state, and per-hop authorization. At the 2026-09-06 freeze, the Agent Service overview documented
+the managed runtime and identified some preview subfeatures but did not establish an overall GA
+claim. Agent Framework documented .NET and Python examples and labeled Go public preview, but its
+overview did not state .NET/Python GA status (`VOLATILE PRODUCT CLAIM`, SRC-073, updated
+2026-08-27; SRC-078, updated 2026-08-25). Foundry documented per-agent Entra identities and a
+token-exchange path for tool access (`VOLATILE PRODUCT CLAIM`, SRC-074, updated 2026-08-25). Put both products behind
+Northstar adapters and revalidate those boundaries and statuses before release.
+
+Use framework-native delegation for tightly coupled subagents. Use A2A for an independent agent
+that receives a task, reasons under its own instructions and state, and returns a result. Use MCP
+for a bounded tool or data operation. Power Platform connectors and Foundry tools remain
+tool/data capabilities, not peer agents merely because an agent invokes them. A2A is a
+Linux Foundation-governed specification, while MCP is an evolving tool/data protocol; neither
+name proves a particular Microsoft integration is supported or GA (`VOLATILE PRODUCT CLAIM`,
+SRC-080 and SRC-079, accessed 2026-09-06).
+
+#### Authority, governance, and operations
+
+- **Delegated authority:** when a middle tier calls downstream on a user's behalf, use Entra OBO
+  delegated scopes rather than application roles. Preserve both user delegation and workload or
+  agent identity, validate token audience at every hop, and never let a specialist's broader
+  identity enlarge the user's rights (SRC-091, updated 2026-06-15).
+- **Agent identity and least privilege:** assign each agent a distinct Entra identity; inventory
+  every shared credential exception; authorize the smallest scopes, tools, sources, tenants, and
+  destinations. Test Conditional Access against token subject and audience rather than assuming
+  one policy covers delegated, application-only, and agent-account cases (`VOLATILE PRODUCT
+  CLAIM`, SRC-074, updated 2026-08-25; SRC-085, updated 2026-07-01). Entra attributes risky OBO
+  activity to the user, useful for attribution but not a preventive control (`VOLATILE PRODUCT
+  CLAIM`, SRC-084, dated 2026-06-17).
+- **Governance:** the Agent 365 overview stated general availability for the Commercial segment
+  as of 2026-05-01 and described a registry/control-plane candidate tying agent inventory to
+  Entra, Purview, and Defender (`VOLATILE PRODUCT CLAIM`, SRC-081 and SRC-082, updated
+  2026-08-19/20). Purview documents auditing and other capability coverage, while
+  licensing and configured-policy coverage vary; it can
+  capture prompts, responses, referenced files, and sensitivity labels (`VOLATILE PRODUCT
+  CLAIM`, SRC-086, updated 2026-06-25). Licensing gates for Agent 365 and Entra remain
+  deployment-specific and must be rechecked (SRC-084; SRC-085).
+- **Tracing:** propagate one correlation ID across the orchestrator, every specialist, tool,
+  approval, and outcome. Record observable task and state transitions, sanitized inputs and
+  results, authorization decisions, timing, token/tool usage, and errors, not private
+  chain-of-thought. Foundry advertises observability and Purview supplies audit evidence, but the
+  exact GA/preview split for prompt, hosted-agent, workflow, and external-A2A tracing was not
+  verified (`VOLATILE PRODUCT CLAIM`, SRC-073, updated 2026-08-27; SRC-086, updated
+  2026-06-25).
+- **Human approval:** bind approval to the exact action payload, actor, tenant, expiry, and
+  idempotency key. Enforce it again in the authorization layer so bypassing a workflow UI cannot
+  bypass the control.
+- **Latency and cost:** compare every delegation design with the single-agent and deterministic
+  baselines. Measure p50/p95/p99 end-to-end and per-hop latency, queue time, tokens, tool calls,
+  retries, and cost per accepted report. No verified source established cross-agent latency or
+  cost attribution, or stable pricing semantics; keep budgets and admission decisions in
+  Northstar.
+- **Unknown semantics:** no primary Microsoft source in the 2026-09-06 review established native
+  replay windows, idempotency keys, or complete retry/timeout semantics for A2A tasks or Copilot
+  Studio connected-agent calls. Exact shared versus individual/OAuth-passthrough A2A defaults
+  and current RBAC role names also remained unverified. Specify deadlines, cancellation, retry
+  classes, backoff, idempotency, reconciliation, and deny-by-default authorization in
+  application-owned contracts; do not infer them from a product label.
+
+Begin with one agent. Promote delegation only when a specialist beats the single-agent baseline
+on frozen quality, safety, latency, reliability, and cost gates. A multi-agent topology that
+merely distributes prompts is additional risk, not an architectural achievement.
+
+#### Phased PoC to production
+
+1. **Scope:** choose one low-risk, read-only delegation; freeze its task/result schema,
+   prohibited actions, deadline, retry classes, budgets, and fallback.
+2. **Baseline:** measure the deterministic and single-agent implementations first.
+3. **Low-code PoC:** build one primary and one Copilot Studio specialist with synthetic,
+   minimized context; measure exactly what history crosses the boundary. Do not claim an
+   undocumented history-disable control.
+4. **Code-first comparison:** implement the same contract through Foundry Agent Service and
+   Agent Framework; empirically compare identity modes and do not assume A2A support.
+5. **Harden identity:** use distinct agent identities, OBO where user authority must cross a
+   hop, least privilege, audience checks, and Conditional Access where verified and licensed.
+6. **Add owned controls:** implement correlation, deadlines, safe retry, idempotency,
+   delegated-content inspection, authorization-layer approval, and reconciliation.
+7. **Govern and attack:** register agents, configure available Purview audit/DLP, and pass the
+   delegation security matrix below with synthetic data and hostile-specialist doubles.
+8. **Stage:** release to a small group, monitor quality, security, latency, cost, and Entra and
+   Purview signals, then rehearse kill, rollback, recovery, and adapter substitution.
+9. **Promote or stop:** enter production only when all frozen gates pass; rerun the suite after
+   every relevant platform, protocol, authentication, or preview-to-GA change.
+
+#### Engineering appendix: dated delegation map
+
+This map was frozen 2026-09-05 and verified 2026-09-06. **Every row is volatile: revalidate it
+against the cited primary source within 30 days of release.**
+
+| Candidate | Status at freeze | Northstar treatment |
+|---|---|---|
+| Foundry Agent Service | Managed runtime documented; overall and selected-subfeature status unresolved (SRC-073, updated 2026-08-27) | Candidate managed runtime; verify each selected subfeature |
+| Foundry agent identity | Identity and token-exchange behavior documented; release status unresolved by the cited page (SRC-074, updated 2026-08-25) | One identity per agent; test exchange, expiry, revocation, audience, and denial |
+| Copilot Studio Connected agents | Mechanics and Copilot-Studio-only scope documented; GA status and a history-disable control not stated (SRC-075, updated 2026-08-27) | PoC with synthetic minimized context; block production until status and data minimization are proved |
+| Copilot Studio A2A/Foundry/Fabric bridges | Exact availability and status unresolved; TOC placement is not evidence (SRC-076, accessed 2026-09-06) | Block release until the chosen bridge is reverified and tested |
+| Microsoft Agent Framework | .NET/Python examples documented; Go public preview; .NET/Python status unstated (SRC-078, updated 2026-08-25) | Code-first adapter candidate |
+| Agent 365 | Commercial-segment GA stated by the product overview (SRC-082, updated 2026-08-20) | Registry and governance candidate; verify segment, licenses, prerequisites, and capability coverage |
+| Entra Agent ID for Copilot Studio | Release-note behavior requires precise revalidation (SRC-083, updated 2026-08-20) | Verify status and tenant behavior; do not reuse identities |
+| Purview for Agent 365 | Capability coverage documented; licensing and configured-policy coverage vary (SRC-086, updated 2026-06-25) | Verify each required audit, DLP, label, retention, and discovery path |
+| Foundry Workflows | Current GA, preview, and retirement status was not established; omission from the current overview does not prove retirement (SRC-073, updated 2026-08-27) | Treat status as unknown and block selection pending fresh primary evidence |
+| Classic Foundry Connected Agents | Current removal or rename status was not established by the reviewed Foundry and Copilot Studio sources (SRC-073; SRC-075, updated 2026-08-27) | Treat status as unknown; do not confuse it with Copilot Studio Connected agents |
+| Semantic Kernel | Still documented; not explicitly deprecated (SRC-077, updated 2024-06-24) | Migration/legacy context only; do not call it retired or superseded without fresh evidence |
+
+#### Engineering appendix: delegation security matrix
+
+| Boundary to attack | Required synthetic test | Release evidence |
+|---|---|---|
+| OBO subject and audience | Present a Resource X token to Resource Y and ask a specialist with broader rights to act | Both calls denied; no downstream effect |
+| Direct versus delegated access | Call the specialist both ways for allowed and forbidden users | Identical effective authorization |
+| Delegated prompt injection | Return hostile instructions and canary data from a specialist | Content stays untrusted; no policy or tool-eligibility change |
+| Data minimization and exfiltration | Forward unnecessary history and target a blocked connector | History omitted; connector denied; canary absent from traces |
+| Tenant isolation | Attempt cross-tenant reads, writes, cache hits, queue consumption, and tool calls | Application and data authorization deny every call; no cross-tenant cache, state, trace, or data disclosure |
+| Network/environment isolation | Attempt cross-environment and disallowed-network calls | Private endpoint, public-network, and IP controls reject the network path; do not count this as tenant-isolation proof |
+| Tool least privilege | Enumerate each agent's tools and revoke a shared-credential exception | Only allowlisted capabilities work; revocation is immediate |
+| Replay and duplicate delivery | Race duplicate delegated tasks and consequential actions | One durable effect per idempotency key; duplicates reconciled |
+| Approval bypass | Invoke the underlying action without the approved payload digest | Authorization layer denies it |
+| Audit and tracing | Correlate one run across at least three agent/tool hops | Complete, ordered, redacted evidence with retention and access checks |
+| Hostile specialist regression | Use a test double for injection, replay, exfiltration, timeout, and malformed results | Stable errors, bounded work, no unauthorized effect |
+
+Prompt Shields and PyRIT are dated candidates for the injection and hostile-specialist tests, not
+substitutes for them (`VOLATILE PRODUCT CLAIM`, SRC-089, updated 2026-06-05; SRC-090, accessed
+2026-09-06). Foundry private networking and Power Platform data policies are dated candidates
+for network/environment isolation and connector controls (`VOLATILE PRODUCT CLAIM`, SRC-087,
+updated 2026-08-26; SRC-088, updated 2026-08-14). They do not prove application/data tenant
+isolation. Revalidate the selected controls and rerun the matrix before
+release.
 
 ## How leading teams approach it
 
@@ -740,7 +942,7 @@ timestamp, slices, and owner. Private chain-of-thought is neither collected nor 
 Observable plans, state transitions, tool requests and results, policy decisions, approvals,
 citations, and outcomes provide the inspectable record.
 
-## Production-readiness checklist
+## Production checklist
 
 - [ ] Frozen requirements retain IDs, thresholds, evidence, and owners.
 - [ ] Build, buy, hybrid, and no-change options use the same measured criteria.
@@ -771,7 +973,7 @@ citations, and outcomes provide the inspectable record.
 - [ ] No prompt, interface, log, trace, approval, evaluation, or review artifact requires or
       stores private chain-of-thought.
 
-## Production-readiness decision
+### Production-readiness decision
 
 The panel includes product, architecture, engineering, evaluation, security, privacy, SRE,
 data, cost, accessibility, governance, source, and release owners. It reviews the deployment
@@ -881,9 +1083,13 @@ network. Cleanup removes only files created in the temporary practice directory.
 - **SRC-040, Microsoft Foundry documentation.** `VOLATILE PRODUCT CLAIM`: current platform
   concepts, projects, models, agents, evaluation, and operations. Verify every used claim
   within 30 days before release.
+- **SRC-041, Foundry Agent Service overview.** `VOLATILE PRODUCT CLAIM`: candidate hosted-agent
+  responsibilities. Verify every selected capability and subfeature within 30 days before release.
 - **SRC-042, Microsoft Agent Framework repository.** `VOLATILE PRODUCT CLAIM`: current
   framework scope, Python APIs, migration, and release status. Verify every used claim within
   30 days before release.
+- **SRC-043, Azure AI Search vector search overview.** `VOLATILE PRODUCT CLAIM`: candidate vector
+  and hybrid retrieval responsibilities; it does not prove Northstar authorization or fitness.
 - **SRC-044, Azure Identity client library for Python.** `VOLATILE PRODUCT CLAIM`: current
   credential-chain and managed-identity integration. Verify every used claim within 30 days
   before release.
@@ -892,6 +1098,73 @@ network. Cleanup removes only files created in the temporary practice directory.
 - **SRC-046, Azure Well-Architected Framework.** `VOLATILE MICROSOFT GUIDANCE CLAIM`: current
   reliability, security, cost, operations, and performance review guidance. Verify every used
   claim within 30 days before release.
+- **SRC-047, Azure Monitor OpenTelemetry.** `VOLATILE PRODUCT CLAIM`: candidate Python telemetry
+  and Application Insights export guidance; evidence semantics, redaction, and completeness stay
+  application-owned.
+- **SRC-048, Azure Container Apps documentation.** `VOLATILE PRODUCT CLAIM`: candidate managed
+  container hosting and event-driven scaling guidance; workload fitness remains unproved.
+- **SRC-049, Azure Service Bus messaging documentation.** `VOLATILE PRODUCT CLAIM`: candidate
+  queues, topics, and durable messaging guidance; Northstar retains idempotency and workflow rules.
+- **SRC-073, Microsoft Learn, [Microsoft Foundry Agent Service
+  overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview).** Dated
+  2026-08-19, updated 2026-08-27, verified 2026-09-06; the page does not establish overall GA.
+- **SRC-074, Microsoft Learn, [Agent identity concepts in Microsoft
+  Foundry](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/agent-identity).**
+  Dated 2026-08-21, updated 2026-08-25, verified 2026-09-06.
+- **SRC-075, Microsoft Learn, [Connected agents
+  overview](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agents-experience/authoring-add-other-agents).**
+  Dated 2026-06-23, updated 2026-08-27, verified 2026-09-06. It documents automatic relevant-history
+  forwarding but states neither GA status nor a disable control.
+- **SRC-076, Microsoft Learn, [Copilot Studio documentation table of
+  contents](https://learn.microsoft.com/en-us/microsoft-copilot-studio/toc.json).** Structural
+  snapshot verified 2026-09-06; use only as navigation evidence.
+- **SRC-077, Microsoft Learn, [Introduction to Semantic
+  Kernel](https://learn.microsoft.com/en-us/semantic-kernel/overview/).** Dated 2023-07-11,
+  updated 2024-06-24, verified 2026-09-06; use only as migration/legacy context.
+- **SRC-078, Microsoft Learn, [Microsoft Agent Framework
+  overview](https://learn.microsoft.com/en-us/agent-framework/overview/).** Dated 2026-07-29,
+  updated 2026-08-25, verified 2026-09-06. It labels Go public preview but does not state
+  .NET/Python GA status.
+- **SRC-079, MCP project, [What is the Model Context
+  Protocol?](https://modelcontextprotocol.io/docs/getting-started/intro).** Snapshot dated
+  2026-07-28, verified 2026-09-06.
+- **SRC-080, A2A project/Linux Foundation, [A2A Protocol
+  documentation](https://a2a-protocol.org/latest/).** Living specification verified
+  2026-09-06.
+- **SRC-081, Microsoft Learn, [Microsoft Agents documentation
+  hub](https://learn.microsoft.com/en-us/agents/).** Dated and updated 2026-08-19, verified
+  2026-09-06.
+- **SRC-082, Microsoft Learn, [Microsoft Agent 365
+  overview](https://learn.microsoft.com/en-us/microsoft-agent-365/overview).** Dated
+  2026-08-19, updated 2026-08-20, verified 2026-09-06.
+- **SRC-083, Microsoft Learn, [What's new in Copilot
+  Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/whats-new).** Dated
+  2026-08-18, updated 2026-08-20, verified 2026-09-06.
+- **SRC-084, Microsoft Learn, [ID Protection for
+  agents](https://learn.microsoft.com/en-us/entra/id-protection/concept-risky-agents).** Dated
+  2026-06-17, verified 2026-09-06.
+- **SRC-085, Microsoft Learn, [Conditional Access for
+  agents](https://learn.microsoft.com/en-us/entra/identity/conditional-access/agent-id).**
+  Dated 2026-06-19, updated 2026-07-01, verified 2026-09-06.
+- **SRC-086, Microsoft Learn, [Use Purview to manage Agent 365 data security and
+  compliance](https://learn.microsoft.com/en-us/purview/ai-agent-365).** Dated 2026-05-01,
+  updated 2026-06-25, verified 2026-09-06.
+- **SRC-087, Microsoft Learn, [Configure network isolation for Microsoft
+  Foundry](https://learn.microsoft.com/en-us/azure/foundry/how-to/configure-private-link).**
+  Dated 2026-08-14, updated 2026-08-26, verified 2026-09-06; this is network/environment
+  isolation evidence, not application/data tenant-isolation evidence.
+- **SRC-088, Microsoft Learn, [Power Platform data
+  policies](https://learn.microsoft.com/en-us/power-platform/admin/wp-data-loss-prevention).**
+  Dated 2026-04-07, updated 2026-08-14, verified 2026-09-06.
+- **SRC-089, Microsoft Learn, [Prompt
+  Shields](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/jailbreak-detection).**
+  Dated 2025-11-21, updated 2026-06-05, verified 2026-09-06.
+- **SRC-090, Microsoft/GitHub,
+  [PyRIT](https://github.com/Azure/PyRIT).** Continuously updated; verified 2026-09-06.
+- **SRC-091, Microsoft Learn, [OAuth 2.0 On-Behalf-Of
+  flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-on-behalf-of-flow).**
+  Dated 2025-01-04, updated 2026-06-15, verified 2026-09-06.
 
-No other source supports a Microsoft claim in this chapter. Source freshness supports review;
-it does not prove that a candidate satisfies Northstar's requirements.
+The delegation additions were frozen 2026-09-05 and last verified 2026-09-06 from these primary
+sources. Revalidate every volatile claim within 30 days of the actual release: source freshness
+supports review; it does not prove that a candidate satisfies Northstar's requirements.
