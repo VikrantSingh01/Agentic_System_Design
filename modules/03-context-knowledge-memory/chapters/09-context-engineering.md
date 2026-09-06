@@ -217,6 +217,20 @@ then divide by token cost. That heuristic is only a starting point. Hard rules
 such as permission, required policy clauses, and maximum item size must not be
 traded away for a higher score.
 
+For example, normalize each quality signal to the range 0 through 1, then rank eligible
+items with:
+
+$$
+	ext{packing score} =
+\frac{0.50(\text{relevance}) + 0.30(\text{source quality}) + 0.20(\text{freshness})}
+{\max(\text{tokens}, 1)} \times 100
+$$
+
+A 50-token passage with scores `0.9`, `1.0`, and `0.8` receives `1.82`. A 200-token
+passage with perfect signals receives `0.50`, so the shorter passage is considered first.
+Weights are task policy, not universal truth. Apply permission, mandatory-content, and size
+rules before scoring; use the score only to order items that already passed those gates.
+
 Conversation deserves selection too. Keep the current request, unresolved
 constraints, confirmed decisions, and references needed to understand words
 such as “that one.” Drop greetings, repeated wording, stale alternatives, and

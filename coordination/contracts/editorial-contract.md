@@ -21,10 +21,25 @@ Every chapter must provide:
 9. Evaluation criteria and production considerations.
 10. Review questions, a design exercise, and a hands-on lab or simulation.
 11. Primary sources with volatile claims clearly identified.
-12. Necessary AI jargon defined immediately in parentheses and collected in the vocabulary table.
+12. Necessary AI jargon defined in plain language immediately in parentheses on first use and
+    collected in the vocabulary table. Do not repeat the parenthetical definition on every use.
+    Prefer a common word when it preserves the exact meaning.
 13. A safe activity, a common misunderstanding, a recap, and a bridge to the next chapter.
 14. A defensive, offline security or safety test using synthetic data, with the expected
     blocked or contained result.
+
+Depth follows progressive disclosure. Present each major idea in this order:
+
+1. one direct plain-language claim;
+2. one concrete example or analogy and its limit;
+3. the precise term with its first-use parenthetical definition;
+4. the mechanism, calculation, or state transition;
+5. implementation and measurable evidence; and
+6. failure, security, operations, and scale tradeoffs.
+
+The first-pass path may omit detail temporarily, but the complete chapter must not remove
+algorithms, uncertainty, constraints, counterexamples, or production consequences merely to
+sound simpler. Shorter sentences and worked examples should carry the depth.
 
 ## Technical contract
 

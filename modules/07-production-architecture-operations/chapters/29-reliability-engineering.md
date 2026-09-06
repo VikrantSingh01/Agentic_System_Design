@@ -90,6 +90,19 @@ after a delay one half-open probe runs; success closes it and failure opens it a
 | Graceful degradation | Smaller useful service with reduced capability clearly declared. |
 | RPO / RTO | Maximum acceptable data-loss window / target restoration time. |
 
+A retry budget is multidimensional. Track each fraction separately:
+
+$$
+r_a=\frac{\text{attempts}}{\text{maximum attempts}},\quad
+r_t=\frac{\text{elapsed time}}{\text{deadline}},\quad
+r_c=\frac{\text{cumulative retry cost}}{\text{cost ceiling}}
+$$
+
+A retry is eligible only while $\max(r_a,r_t,r_c) < 1$. Do not add the fractions together:
+one exhausted dimension must stop retries even when the others have room. The operation must
+also be idempotent, the error must be explicitly retryable, and enough deadline must remain
+for the next attempt and a clean terminal record.
+
 ## How it works
 
 Set an end-to-end deadline, then allocate dependency timeouts inside it. Classify errors as

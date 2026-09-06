@@ -225,9 +225,11 @@ decision component, not as an authenticated principal. It owns no permission.
 
 ### Build misuse cases
 
-A useful misuse case is specific enough to test:
+A useful misuse case is specific enough to test. A precondition can be behavior the design
+intentionally permits, such as reading an authorized source. The control must contain the
+harmful transition that follows; it should not silently remove legitimate access.
 
-| Misuse case | Preconditions | Consequence | Primary break point |
+| Misuse case | Precondition allowed by design | Consequence | Primary break point |
 |---|---|---|---|
 | Indirect injection proposes publication | User may read a poisoned source; model follows its text | Unauthorized disclosure attempt | Tool authorization and egress policy |
 | Confused deputy fetches another user's source | Workload has broad connector access | Permission bypass | Source reauthorization for delegated principal |

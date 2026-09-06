@@ -149,6 +149,10 @@ to the readiness decision.
 
 ### Stable core and volatile edge: beginner view
 
+Read the shapes from left to right: **stable domain contracts** -> **provider-specific
+adapters** -> **approved providers or explicitly unresolved choices**. The adapter translates;
+it does not move provider rules into Northstar's stable core.
+
 ```mermaid
 flowchart LR
     S[Stable core] --> A[Adapters]
@@ -251,6 +255,12 @@ The following dated records are the approved responsibility-to-service mapping c
 chapter. The later delegation matrix uses additional, separately bounded ledger sources.
 `planned_release_on` is an illustrative review date, not a release commitment. Reverify every
 record if that date, the cited material, or the architecture changes.
+
+`verified_on` records when the cited claim was last checked. `planned_release_on` tells the
+release owner when that evidence is expected to be used. Operationally, the release gate
+subtracts the dates and rejects a volatile claim older than 30 days. For example, a claim
+verified on September 5 cannot support an October 10 release until an owner checks the primary
+source again and records the new evidence date.
 
 | Claim ID | Vendor-neutral responsibility | Dated candidate statement | Evidence | verified_on | planned_release_on | Status |
 |---|---|---|---|---|---|---|

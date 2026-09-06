@@ -57,6 +57,9 @@ access controlled.
 
 ### Diagram 1: two independent axes
 
+This chart applies only after safety, authority, and policy invariants pass as hard gates.
+A good outcome never compensates for an unsafe path.
+
 ```mermaid
 quadrantChart
     x-axis Poor trajectory --> Good trajectory

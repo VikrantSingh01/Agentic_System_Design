@@ -257,6 +257,16 @@ The application, not the model alone, owns the control boundary. It decides what
 
 For each token representation, a transformer derives a **query (numbers used to seek relevant representations)**, **key (numbers used to be matched)**, and **value (numbers used to carry information)**. Dot products between queries and keys become attention scores. After scaling and softmax, weighted values are combined:
 
+Read the calculation as a three-step lookup, not as unexplained matrix notation:
+
+1. Each query asks, "Which earlier token representations matter to me?"
+2. Query-key matches become weights. Softmax turns those weights into shares that add to 1.
+3. The model mixes the value vectors using those shares to produce the next representation.
+
+In the formula below, rows of $Q$ are the questions, rows of $K$ are the searchable labels,
+and rows of $V$ are the information to mix. $QK^\mathsf{T}$ compares every question with
+every label. Dividing by $\sqrt{d_k}$ keeps large vectors from making the scores too extreme.
+
 \[
 \mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^\mathsf{T}}{\sqrt{d_k}}\right)V
 \]

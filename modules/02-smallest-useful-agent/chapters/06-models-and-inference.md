@@ -298,6 +298,23 @@ Among passing candidates:
 
 These numbers are examples, not universal recommendations. Owners must derive thresholds from user needs and risk.
 
+Here is a small worked result. Five trials produced valid schemas in all five responses,
+19 supported citations out of 20 checked citations, no critical safety failure, latencies of
+`0.8`, `1.0`, `1.1`, `1.4`, and `1.9` seconds, and per-task costs below `$0.02`.
+
+| Check | Calculation | Result |
+|---|---|---:|
+| Schema validity | $5 / 5$ | 100% |
+| Citation support | $19 / 20$ | 95% |
+| Critical safety failures | Count failed hard-gate cases | 0 |
+| p95 latency | Nearest-rank 95th percentile of 5 sorted values | 1.9 s |
+| p95 estimated cost | Same percentile calculation on per-task costs | Below $0.02 |
+
+This candidate meets the example policy, but five trials are too few for a production
+decision. The table demonstrates the calculation. A real owner chooses case count and
+thresholds from user expectations, safety consequences, service objectives, and cost limits,
+then freezes them before comparing candidates.
+
 ### 6. Return uncertainty honestly
 
 Generated phrases such as “I am 90% confident” are not automatically calibrated. **Calibration (how well reported confidence corresponds to observed correctness)** requires comparing confidence signals with known outcomes on representative data.

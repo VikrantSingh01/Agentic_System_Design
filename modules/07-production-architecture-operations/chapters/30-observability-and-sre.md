@@ -86,7 +86,7 @@ evidence feeds a postmortem, and an improvement receives an owner.
 | Metric | Numeric signal aggregated over events. |
 | Log | Discrete structured record of an event. |
 | Trace / span | Correlated request journey / one timed operation within it. |
-| Cardinality | Number of distinct label values a signal can contain. |
+| Cardinality | Number of distinct label values a signal can contain. A `tenant_tier` label may have 3 values; an unbounded `request_id` label may create millions and overwhelm storage. |
 | SLI / SLO | Measured behavior / target range over a stated window. |
 | Error budget | Allowed service-level gap, never permission to violate safety. |
 | Burn rate | Speed at which an error budget is being consumed. |

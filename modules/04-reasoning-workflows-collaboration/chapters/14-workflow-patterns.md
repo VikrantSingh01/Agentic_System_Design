@@ -175,6 +175,19 @@ Represent every stage result with `status`, `artifact`, `error`, `attempts`, and
 Every child inherits tenant, principal, source scope, deadline, allowed tools, and a
 slice of the parent budget. Child work cannot mint calls or authority.
 
+Use this quick screen before comparing more elaborate patterns:
+
+| Task shape | Start with | Move to something more flexible only when |
+|---|---|---|
+| Fixed, testable sequence | Deterministic workflow | Real cases require different paths |
+| Closed set of known paths | Rule-based router | Rules cannot classify representative cases reliably |
+| Independent repeated items | Bounded fan-out and join | Item dependencies require explicit coordination |
+| Variable but clear decomposition | Orchestrator-worker | A fixed decomposition measurably fails |
+| Open next-step choice | Bounded agent | It beats the best simpler baseline on frozen gates |
+
+The adoption rule is evidence first: keep the simplest pattern that passes quality, safety,
+latency, and cost thresholds. Flexibility is a cost that must earn its place.
+
 Selection depends on five questions:
 
 1. How variable is the useful path?
