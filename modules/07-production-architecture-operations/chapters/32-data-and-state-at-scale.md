@@ -62,15 +62,18 @@ flowchart LR
     K1[tenant-a/run-1] --> P1[Partition 1]
     K2[tenant-b/run-2] --> P2[Partition 2]
     KH[tenant-a/shared] --> PH[Hot partition]
-    PH --> S[Salt by bounded shard]
+    PH --> S[Split the hot key into a few buckets]
     PH --> A[Aggregate or admit less work]
 ```
 
 **Takeaway:** tenant scope protects isolation, but distribution may require an additional
-bounded shard or load-control strategy.
+small set of buckets or a load-control strategy.
 
 **Equivalent text description:** tenant and run keys distribute ordinary work; one shared key
-becomes hot; salting, aggregation, admission control, or dedicated isolation can reduce skew.
+becomes hot; splitting it into a few buckets, aggregation, admission control, or dedicated
+isolation can reduce skew.
+
+**Diagram D4 — Engineering migration view: change stored data without breaking old readers.**
 
 ```mermaid
 sequenceDiagram

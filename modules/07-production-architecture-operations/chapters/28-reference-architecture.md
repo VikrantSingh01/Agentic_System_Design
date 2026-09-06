@@ -30,6 +30,8 @@ box enforces none of those things.
 
 ## Picture the idea
 
+**Diagram D1 — Beginner path: follow one request through the system.**
+
 ```mermaid
 flowchart LR
     U[Researcher] --> A[Front door: admit request]
@@ -44,6 +46,8 @@ flowchart LR
 (3) the runtime coordinates work; (4) specialist gateways provide bounded capabilities; and
 (5) stores preserve authoritative state and artifacts.
 
+**Diagram D2 — Engineering deep dive: control plane and data plane boundaries.**
+
 ```mermaid
 flowchart TB
     subgraph CP[Control plane]
@@ -51,7 +55,7 @@ flowchart TB
         E[Evaluation and release gates] --> P
     end
     subgraph DP[Data plane]
-        API[API and admission] --> W[Durable workflow and runtime]
+        API[Application programming interface, or API, and admission] --> W[Durable workflow and runtime]
         W --> MG[Model gateway]
         W --> RG[Retrieval service]
         W --> TG[Tool gateway]
@@ -65,9 +69,11 @@ flowchart TB
 request content stays in the data plane and reaches telemetry only after redaction.
 
 **Equivalent text description:** (1) governance owns configuration; (2) evaluation controls
-release; (3) the API admits data-plane work; (4) a durable runtime calls model, retrieval, and
-tool gateways; (5) stores hold state; (6) redacted events go to observability; and (7) no
-model or retrieved document can change control-plane policy.
+release; (3) the application programming interface (API) admits data-plane work; (4) a durable
+runtime calls model, retrieval, and tool gateways; (5) stores hold state; (6) redacted events
+go to observability; and (7) no model or retrieved document can change control-plane policy.
+
+**Diagram D3 — Engineering deep dive: typed request and evidence sequence.**
 
 ```mermaid
 sequenceDiagram

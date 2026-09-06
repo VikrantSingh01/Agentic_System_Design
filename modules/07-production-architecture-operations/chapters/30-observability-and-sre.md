@@ -1,4 +1,4 @@
-# Chapter 30: Observability and SRE
+# Chapter 30: Observability and site reliability engineering (SRE)
 
 > Status: drafting  
 > Owner: Module 07 author  
@@ -6,9 +6,9 @@
 
 ## The problem
 
-A fast API returns a report with missing citations. Infrastructure is green, but the user
-outcome failed. Copying prompts and documents into logs would add privacy risk without
-necessarily explaining the failure.
+A fast application programming interface (API) returns a report with missing citations.
+Infrastructure is green, but the user outcome failed. Copying prompts and documents into logs
+would add privacy risk without necessarily explaining the failure.
 
 ## Learning objectives
 
@@ -26,7 +26,7 @@ sampling, and retention are enforced.
 
 ```mermaid
 flowchart LR
-    Q[Request ID] --> A[API checkpoint]
+    Q[Request ID] --> A[App front door: application programming interface, or API]
     A --> W[Queued worker]
     W --> M[Model gateway]
     W --> E[Evaluation]
@@ -37,8 +37,9 @@ flowchart LR
 **Takeaway:** correlation follows the request while protected content stays inside its
 authorized boundary.
 
-**Equivalent text description:** one tenant-safe request ID crosses API, queue, worker,
-model, evaluation, and outcome checkpoints; source bodies are not copied into telemetry.
+**Equivalent text description:** one tenant-safe request ID crosses the application programming
+interface (API), queue, worker, model, evaluation, and outcome checkpoints; source bodies are
+not copied into telemetry.
 
 ```mermaid
 flowchart LR
@@ -57,7 +58,7 @@ bounded, sampled, exported, access controlled, and expired on schedule.
 
 ```mermaid
 flowchart LR
-    S[SLI breach] --> A[Actionable alert]
+    S[Service-level indicator, or SLI, breach] --> A[Actionable alert]
     A --> T[Triage with runbook]
     T --> M[Mitigate]
     M --> V[Verify recovery]
@@ -67,8 +68,9 @@ flowchart LR
 
 **Takeaway:** an alert is useful only when it leads to owned action and verified recovery.
 
-**Equivalent text description:** an SLI breach pages an owner, the runbook guides diagnosis,
-mitigation is verified, evidence feeds a postmortem, and an improvement receives an owner.
+**Equivalent text description:** in site reliability engineering (SRE), a service-level
+indicator (SLI) breach pages an owner, the runbook guides diagnosis, mitigation is verified,
+evidence feeds a postmortem, and an improvement receives an owner.
 
 ## Vocabulary
 

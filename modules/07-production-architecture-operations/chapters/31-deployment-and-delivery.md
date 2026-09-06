@@ -63,7 +63,7 @@ flowchart TD
     K -->|yes| R[Route to accepted version]
     K -->|no| P[Pause or drain durable runs]
     P --> F[Roll forward data or restore compatible code]
-    R --> V[Verify SLIs and resume]
+    R --> V[Verify service measures and resume]
     F --> V
     V --> E[Preserve release evidence]
 ```
