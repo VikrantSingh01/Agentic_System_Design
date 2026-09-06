@@ -6,10 +6,10 @@ Threat-model an agentic system, restrict tool authority, propagate identity safe
 
 ## Chapters
 
-24. **Threat Modeling Agentic Systems**
-25. **Secure Tools and Sandboxes**
-26. **Identity, Privacy, and Content Safety**
-27. **Responsible AI and Governance**
+24. [**Threat Modeling Agentic Systems**](chapters/24-threat-modeling-agentic-systems.md)
+25. [**Secure Tools and Sandboxes**](chapters/25-secure-tools-and-sandboxes.md)
+26. [**Identity, Privacy, and Content Safety**](chapters/26-identity-privacy-content-safety.md)
+27. [**Responsible AI and Governance**](chapters/27-responsible-ai-governance.md)
 
 ## Northstar milestone
 
