@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "setup:book-browser": "puppeteer browsers install chrome-headless-shell@stable",
-    "build:book": "node scripts/build-book.mjs"
+    "build:book": "node scripts/build-book.mjs && node scripts/build-interview-guide.mjs",
+    "build:interview-guide": "node scripts/build-interview-guide.mjs"
   },
   "dependencies": {
     "csv-parse": "^6.2.1",

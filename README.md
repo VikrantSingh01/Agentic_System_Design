@@ -8,7 +8,7 @@
 
 A beginner-to-production guide for designing, building, evaluating, securing, deploying, and operating agentic systems.
 
-**Read the book:** [Web edition](https://vikrantsingh01.github.io/Agentic_System_Design/) | [PDF edition](book/building-agentic-systems.pdf)
+**Read the book:** [Web edition](https://vikrantsingh01.github.io/Agentic_System_Design/) | [PDF edition](book/building-agentic-systems.pdf) | [Interactive interview guide](https://vikrantsingh01.github.io/Agentic_System_Design/agentic-system-design-interviews.html)
 
 The project teaches durable, vendor-neutral engineering principles first. Runnable examples live in each chapter's **Build it in Python** section. Microsoft technologies are introduced through supported Python SDKs and architecture mappings where they add practical value.
 
@@ -19,6 +19,7 @@ You do not need to read every chapter before building something useful.
 | Your goal | Start here | Then read |
 |---|---|---|
 | Learn from the beginning | [Module 1](modules/01-from-zero-to-agents/README.md) | Continue through the modules in order. |
+| Prepare for agentic system design interviews | [Interactive HTML guide](docs/agentic-system-design-interviews.html) | Practice eleven student-friendly designs, then use the [Markdown source](back-matter/appendix-d-agentic-system-design-interviews.md) and linked chapters for deeper study. |
 | Build a small controlled agent | [Module 1](modules/01-from-zero-to-agents/README.md) | [Module 2](modules/02-smallest-useful-agent/README.md), then [Module 5](modules/05-evaluation-improvement/README.md) and [Module 6](modules/06-security-safety-governance/README.md). |
 | Add retrieval or memory | [Module 3](modules/03-context-knowledge-memory/README.md) | Return to Modules 1 and 2 for any unfamiliar foundations. |
 | Prepare a system for production | [Module 7](modules/07-production-architecture-operations/README.md) | [Module 8](modules/08-scale-economics-lifecycle/README.md). Read Modules 5 and 6 before launch. |
@@ -82,7 +83,7 @@ The material is organized as 42 chapters across ten modules:
 Reader and source content:
 
 - `front-matter/`: reader guidance included in the PDF and web editions
-- `back-matter/`: production rollout, evaluation/test, and security review appendices
+- `back-matter/`: production rollout, evaluation/test, security review, and system design interview appendices
 - `modules/`: 42 chapters across ten modules, with exercises and local asset manifests
 - `case-study/northstar/`: architecture and requirements contract for the Northstar case study
 - `visuals/agent-system-journey/`: offline interactive journey through an agent system
@@ -128,7 +129,14 @@ npm run setup:book-browser
 npm run build:book
 ```
 
-The build writes `book/building-agentic-systems.pdf` and `docs/index.html`. It verifies
+The build writes `book/building-agentic-systems.pdf`, `docs/index.html`, and the standalone
+`docs/agentic-system-design-interviews.html`. To rebuild only the interview guide, run:
+
+```powershell
+npm run build:interview-guide
+```
+
+The book build verifies
 the chapter sequence, renders all Mermaid diagrams, rejects diagram errors, and validates
 the PDF page count and metadata. The PDF includes an expandable side-panel table of contents
 with links to the reader guide, every module, and every chapter. Supporting viewers open the

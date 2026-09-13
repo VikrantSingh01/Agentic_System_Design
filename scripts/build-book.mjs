@@ -20,6 +20,7 @@ const appendixPaths = [
   path.join(root, "back-matter", "appendix-a-production-rollout.md"),
   path.join(root, "back-matter", "appendix-b-evaluation-test-plan.md"),
   path.join(root, "back-matter", "appendix-c-security-review.md"),
+  path.join(root, "back-matter", "appendix-d-agentic-system-design-interviews.md"),
 ];
 const buildRoot = path.join(root, "build", "book");
 const outputRoot = path.join(root, "book");
@@ -546,7 +547,11 @@ async function main() {
   const supplementalEntries = [...appendices, glossary, references];
   const backMatterHtml = supplementalEntries.map((entry) => entry.html).join("");
   const sourceDiagramCount = modules.reduce((total, module) => total + module.chapters.reduce(
-    (chapterTotal, chapter) => chapterTotal + (chapter.body.match(/class="mermaid"/g) ?? []).length, 0), 0);
+    (chapterTotal, chapter) => chapterTotal + (chapter.body.match(/class="mermaid"/g) ?? []).length, 0), 0)
+    + appendices.reduce(
+      (total, appendix) => total + (appendix.html.match(/class="mermaid"/g) ?? []).length,
+      0,
+    );
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Building Agentic Systems: From First Principles to Production</title><style>${styles(katexCss)}</style></head>
 <body>
   <header class="web-only web-header"><a href="#contents">Building Agentic Systems</a><span>Vikrant Singh, Microsoft</span></header>
